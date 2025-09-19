@@ -72,7 +72,9 @@ public class ReplayerLoop extends Loop{
 
             GameLoopInputLog currentLog = inputLogs.get(currentLogIndex);
 
-            assert currentLog.inputFrame <= gameLoop.currentFrame;
+            if(currentLog.inputFrame < gameLoop.currentFrame){
+                throw new IllegalStateException("currentLog.inputFrame < gameLoop.currentFrame");
+            }
 
             if(currentLog.inputFrame == gameLoop.currentFrame){
                 gameLoop.process(currentLog.inputs);

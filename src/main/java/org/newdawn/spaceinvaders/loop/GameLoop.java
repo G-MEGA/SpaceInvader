@@ -160,6 +160,12 @@ public class GameLoop extends Loop {
         if (waitingForKeyPress && isKeyInputJustPressed("accept")) {
             GameLoopInputLog lastestLog = inputLogs.get(inputLogs.size()-1);
             inputLogs.clear();
+
+            currentFrame = 0;
+            lastFire = 0;
+
+            lastestLog.inputFrame = currentFrame;
+
             inputLogs.add(lastestLog);
 
             startGame();

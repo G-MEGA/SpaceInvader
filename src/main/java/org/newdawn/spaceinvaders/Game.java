@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputKey;
 import org.newdawn.spaceinvaders.loop.GameLoop;
@@ -244,7 +245,7 @@ public class Game extends Canvas
      * instance of class which will start the display and game
      * loop.
      *
-     * @param argv The arguments that are passed into our game
+     * @param argv The arguments that are passed into our games
      */
 	public static void main(String argv[]) {
         SpriteStore.get().getSprite("sprites/ship.gif", 16.5, 11.5);
@@ -252,8 +253,6 @@ public class Game extends Canvas
         SpriteStore.get().getSprite("sprites/alien.gif", 21.5, 14.5);
         SpriteStore.get().getSprite("sprites/alien2.gif", 21.5, 14.5);
         SpriteStore.get().getSprite("sprites/alien3.gif", 21.5, 14.5);
-
-
 
 		Game g = new Game(100);
 

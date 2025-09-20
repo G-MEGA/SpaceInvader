@@ -1,5 +1,9 @@
 package org.newdawn.spaceinvaders.map_load;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -16,20 +20,21 @@ public class MapDataParser {
         ArrayList<MapLoadCommand> commands = new ArrayList<>();
         String[] plainFile = Arrays.stream(plainData.trim().split("\n"))
                             .map(String::toLowerCase) // 모든 영문자를 소문자로 바꿈
+                            .map(String::trim)
                             .filter(s -> !s.isBlank()) // 빈 줄 제거
                             .toArray(String[]::new);
-
+                            
         for (String plainCommand : plainFile){
                 MapLoadCommand command = null;
 
                 if (plainCommand.startsWith(">")){ // section command로 판단
-                    command = parseSectionCommand(plainData);
+                    command = parseSectionCommand(plainCommand);
                 }
                 else if (plainCommand.startsWith(":")){ // special command로 판단
-                    command = parseSpecialCommand(plainData);
+                    command = parseSpecialCommand(plainCommand);
                 }
                 else{ // command 맨 앞에 특정한 표시자가 없으면 instantiate command로 판단
-                    command = parseInstantiateCommand(plainData);
+                    command = parseInstantiateCommand(plainCommand);
                 }
                 
                 commands.add(command);
@@ -45,8 +50,8 @@ public class MapDataParser {
 
         try {
             long instantiateTime = Long.parseLong(attributes[0]);
-            int instantiateX = Integer.parseInt(attributes[1]);
-            int instantiateY = Integer.parseInt(attributes[2]);
+            long instantiateX = Long.parseLong(attributes[1]);
+            long instantiateY = Long.parseLong(attributes[2]);
             GameObjectType gameObjectType = GameObjectType.fromValue(attributes[3]);
             String gameObjectName = attributes[4];
 
@@ -71,5 +76,17 @@ public class MapDataParser {
         String commandType = plainData.substring(1);
 
         return new SpecialCommand(SpecialCommandType.fromValue(commandType));
+    }
+
+    public static void main(String[] args) {
+        Path filePath = Paths.get("src\\test\\java\\org\\n" + //
+                        "ewdawn\\spaceinvaders\\testMapFile.text"); // 파일 경로
+
+        try {
+            String content = Files.readString(filePath); // 파일 전체를 String으로 읽음
+            new MapDataParser().parseMapData(content);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

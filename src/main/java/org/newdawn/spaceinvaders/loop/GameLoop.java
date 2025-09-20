@@ -21,6 +21,7 @@ import javax.swing.JFileChooser;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Alien;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Bullet;
 
+//!GameLoop 에 destroy이된 게임 오브젝트를 삭제하는데, Loop 는 그러지 않음
 public class GameLoop extends Loop {
     long currentFrame;
     ArrayList<GameLoopInputLog> inputLogs = new ArrayList<>();

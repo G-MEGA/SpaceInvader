@@ -40,21 +40,20 @@ public class LootItemFactory {
         for (String key : _itemWeights.keySet()){
             random -= _itemWeights.get(key);
             
-
             //TODO 생성된 아이템을 Loop의 GameObject 배열에 넣기
             if (random <= 0){
                 switch (key) {
                     case "shield":
-                        new ShieldItem();
+                        new ShieldItem(loop);
                         break;
                     case "battery":
-                        new BatteryItem();
+                        new BatteryItem(loop);
                         break;
                     case "coin":
-                        new CoinItem();
+                        new CoinItem(loop);
                         break;
                     case "frozen":
-                        new FrozenItem();
+                        new FrozenItem(loop);
                         break;
                     default: // 키 값이 none인 경우이다.
                         System.out.println("LootItem 소환 안됨");

@@ -8,17 +8,12 @@
 2500 300 120 Coin 1
 2700 320 140 Coin 5
 3000 350 160 Coin 10
+3500 400 200 Item Speed-Up 1
+3800 420 220 Item Damage-Up 2
 
-
-3500 400 200 Item Speed Up 1
-3800 420 220 Item Damage Up 2
 >store
-
-
 >new-wave
 1000 60 90 Enemy A
-
-
 1300 180 140 Enemy B
 1600 250 200 Coin 5
 1900 280 210 Coin 10

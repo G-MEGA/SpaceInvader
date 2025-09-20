@@ -165,7 +165,6 @@ public class Game extends Canvas
 
             loop.draw(g);
 
-
             // finally, we've completed drawing so clear up the graphics
             // and flip the buffer over
             g.dispose();

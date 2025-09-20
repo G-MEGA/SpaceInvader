@@ -248,17 +248,6 @@ public class Game extends Canvas
      * @param argv The arguments that are passed into our games
      */
 	public static void main(String argv[]) {
-        for(int i = 0; i < 360; i+=10) {
-            System.out.print(i);
-            System.out.print(" ");
-
-            long x = FixedPointUtil.cos(FixedPointUtil.fromLong(i)) * 100;
-            long y = FixedPointUtil.sin(FixedPointUtil.fromLong(i)) * 100;
-
-            System.out.print(FixedPointUtil.toDouble(FixedPointUtil.atan2(y, x)));
-            System.out.println();
-        }
-
         SpriteStore.get().getSprite("sprites/ship.gif", 16.5, 11.5);
         SpriteStore.get().getSprite("sprites/shot.gif", 6, 11.5);
         SpriteStore.get().getSprite("sprites/alien.gif", 21.5, 14.5);

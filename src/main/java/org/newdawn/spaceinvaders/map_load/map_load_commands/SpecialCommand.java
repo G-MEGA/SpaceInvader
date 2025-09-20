@@ -8,6 +8,8 @@ public class SpecialCommand {
     public SpecialCommandType get_specialCommandType() { return _specialCommandType; }
 
     public SpecialCommand(SpecialCommandType specialCommandType){
+        super();
+        
         _specialCommandType = specialCommandType;
     }
 }

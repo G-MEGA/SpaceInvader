@@ -4,7 +4,10 @@ public enum GameObjectType {
     // Enum constants with their associated string values
     Enemy("enemy"),
     Coin("coin"),
-    Item("item");
+    Item("item"),
+    Player("player"),
+    Effect("effect"),
+    Text("text");
 
     // Field to store the string value
     private final String value;

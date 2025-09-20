@@ -1,5 +1,6 @@
 package org.newdawn.spaceinvaders.game_object.ingame;
 
+import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.Mover2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
@@ -16,22 +17,21 @@ public class PlayerShip extends Mover2D implements ICollider2DOwner {
         addChild(spriteRenderer);
 
         Collider2D collider2D = new Collider2D(gameLoop, this);
-        collider2D.bounds.setRect(
-                -spriteRenderer.sprite.getPivotX(),
-                -spriteRenderer.sprite.getPivotY(),
-                spriteRenderer.sprite.getWidth(),
-                spriteRenderer.sprite.getHeight());
+        collider2D.boundsPosX = -spriteRenderer.sprite.getPivotX();
+        collider2D.boundsPosY = -spriteRenderer.sprite.getPivotY();
+        collider2D.boundsWidth = ((long)spriteRenderer.sprite.getWidth()) << 16;
+        collider2D.boundsHeight = ((long)spriteRenderer.sprite.getHeight()) << 16;
         addChild(collider2D);
     }
 
-    protected void process(double deltaTime) {
+    protected void process(long deltaTime) {
         super.process(deltaTime);
 
-        if ((velocityX < 0) && (getX() < 10)) {
-            setX(10);
+        if ((velocityX < 0L) && (getPosX() < (16 << 16) + FixedPointUtil.ZERO_5)) {
+            setPosX((16 << 16) + FixedPointUtil.ZERO_5);
         }
-        if ((velocityX > 0) && (getX() > 750)) {
-            setX(750);
+        if ((velocityX > 0L) && (getPosX() > ((800L << 16)) - (16 << 16) + FixedPointUtil.ZERO_5)) {
+            setPosX(((800L << 16)) - (16 << 16) + FixedPointUtil.ZERO_5);
         }
     }
 

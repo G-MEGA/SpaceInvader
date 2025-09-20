@@ -43,7 +43,7 @@ public class SpriteStore {
 	 * @param ref The reference to the image to use for the sprite
 	 * @return A sprite instance containing an accelerate image of the request reference
 	 */
-	public Sprite getSprite(String ref, double pivotX, double pivotY) {
+	public Sprite getSprite(String ref, long pivotX, long pivotY) {
 		// if we've already got the sprite in the cache
 		// then just return the existing version
 		if (sprites.get(ref) != null) {
@@ -85,7 +85,7 @@ public class SpriteStore {
 		return sprite;
 	}
     public Sprite getSprite(String ref) {
-        return getSprite(ref, 0.0, 0.0);
+        return getSprite(ref, 0L, 0L);
     }
 	
 	/**

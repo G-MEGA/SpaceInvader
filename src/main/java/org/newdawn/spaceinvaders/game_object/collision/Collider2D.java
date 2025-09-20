@@ -9,8 +9,16 @@ import java.awt.Rectangle;
 public class Collider2D extends GameObject2D {
     private ICollider2DOwner owner;
 
-    public Rectangle bounds =  new Rectangle();   // 글로벌 포지션 기준임
-    public Rectangle globalBounds =  new Rectangle();
+    public long boundsPosX = 0;
+    public long boundsPosY = 0;
+    public long boundsWidth = 0;
+    public long boundsHeight = 0;
+
+    // 0 posX
+    // 1 posY
+    // 2 width
+    // 3 height
+    long[] globalBounds = new long[4];
 
     public Collider2D(Loop loop, ICollider2DOwner owner) {
         super(loop);
@@ -26,19 +34,32 @@ public class Collider2D extends GameObject2D {
     public ICollider2DOwner getOwner() {
         return owner;
     }
-    public Rectangle getGlobalBounds() {
-        AffineTransform gt = getGlobalTransform();
+    public long[] getGlobalBounds() {
+        long[] globalTransform = getGlobalTransform();
 
-        globalBounds.setRect(
-                bounds.getX() + gt.getTranslateX(),
-                bounds.getY() + gt.getTranslateY(),
-                bounds.getWidth(), bounds.getHeight());
+        globalBounds[0] = globalTransform[0] + boundsPosX;
+        globalBounds[1] =  globalTransform[1] + boundsPosY;
+        globalBounds[2] = boundsWidth;
+        globalBounds[3] =  boundsHeight;
 
         return globalBounds;
     }
 
     public boolean collidesWith(Collider2D other) {
-        return getGlobalBounds().intersects(other.getGlobalBounds());
+        long[] myBounds = getGlobalBounds();
+        long[] otherBounds = other.getGlobalBounds();
+
+        long myStartX = myBounds[0];
+        long myStartY = myBounds[1];
+        long myEndX = myBounds[0] + myBounds[2];
+        long myEndY = myBounds[1] + myBounds[3];
+
+        long otherStartX = otherBounds[0];
+        long otherStartY = otherBounds[1];
+        long otherEndX = otherBounds[0] + otherBounds[2];
+        long otherEndY = otherBounds[1] + otherBounds[3];
+
+        return myStartX <= otherEndX && myEndX >= otherStartX && myStartY <= otherEndY && myEndY >= otherStartY;
     }
     public void collidedWith(ICollider2DOwner collider){
         owner.collidedWith(collider);

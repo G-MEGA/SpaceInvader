@@ -1,5 +1,7 @@
 package org.newdawn.spaceinvaders.sprite;
 
+import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
+
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 
@@ -15,6 +17,7 @@ import java.awt.geom.AffineTransform;
 public class Sprite {
 	/** The image to be drawn for this sprite */
 	private Image image;
+    private long pivotX, pivotY;
     private AffineTransform transform = new AffineTransform();
 	
 	/**
@@ -22,9 +25,12 @@ public class Sprite {
 	 * 
 	 * @param image The image that is this sprite
 	 */
-	public Sprite(Image image, double pivotX, double pivotY) {
+	public Sprite(Image image, long pivotX, long pivotY) {
         this.image = image;
-        this.transform.setToTranslation(-pivotX, -pivotY);
+        this.pivotX = pivotX;
+        this.pivotY = pivotY;
+        this.transform.setToTranslation(
+                FixedPointUtil.toDouble(-pivotX), FixedPointUtil.toDouble(-pivotY));
 	}
 	
 	/**
@@ -45,11 +51,11 @@ public class Sprite {
 		return image.getHeight(null);
 	}
 
-    public double getPivotX() {
-        return -transform.getTranslateX();
+    public long getPivotX() {
+        return pivotX;
     }
-    public double getPivotY() {
-        return -transform.getTranslateY();
+    public long getPivotY() {
+        return pivotY;
     }
 
 //	/**

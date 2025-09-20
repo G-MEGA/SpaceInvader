@@ -33,8 +33,8 @@ public abstract class GameObject{
     }
 
     //region 상속해서 구현할 것들
-    protected void process(double deltaTime){}
-    protected void postProcess(double deltaTime){}
+    protected void process(long deltaTime){}
+    protected void postProcess(long deltaTime){}
     protected void draw(Graphics2D g){}
     //endregion
 
@@ -47,7 +47,7 @@ public abstract class GameObject{
     }
 
     //region Loop가 호출하는거
-    final public void propagateProcess(double deltaTime){
+    final public void propagateProcess(long deltaTime){
         if(destroyed) return;
 
         process(deltaTime);
@@ -56,7 +56,7 @@ public abstract class GameObject{
             child.propagateProcess(deltaTime);
         }
     }
-    final public void propagatePostProcess(double deltaTime){
+    final public void propagatePostProcess(long deltaTime){
         if(destroyed) return;
 
         postProcess(deltaTime);

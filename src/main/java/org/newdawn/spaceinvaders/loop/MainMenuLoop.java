@@ -1,6 +1,7 @@
 package org.newdawn.spaceinvaders.loop;
 
 import org.newdawn.spaceinvaders.Game;
+import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.sprite.SpriteStore;
@@ -16,7 +17,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 
 public class MainMenuLoop extends Loop {
-    double t = 0.0;
+    long t = 0L;
     SpriteRenderer spriteRenderer;
 
     public MainMenuLoop(Game game) {
@@ -24,14 +25,14 @@ public class MainMenuLoop extends Loop {
 
         spriteRenderer = new SpriteRenderer(this);
         spriteRenderer.sprite = SpriteStore.get().getSprite("sprites/ship.gif");
-        spriteRenderer.setPosition(250, 400);
-        spriteRenderer.setRotation(Math.toRadians(37));
-        spriteRenderer.setScale(20);
+        spriteRenderer.setPos(250L << 16, 400 << 16);
+        spriteRenderer.setRotation(37 << 16);
+        spriteRenderer.setScale(20 << 16);
         gameObjects.add(spriteRenderer);
 
         SpriteRenderer spriteRenderer2 = new SpriteRenderer(this);
         spriteRenderer2.sprite = SpriteStore.get().getSprite("sprites/ship.gif");
-        spriteRenderer2.setPosition(400, 400);
+        spriteRenderer2.setPos(400 << 16, 400 << 16);
         gameObjects.add(spriteRenderer2);
 
     }
@@ -41,7 +42,11 @@ public class MainMenuLoop extends Loop {
         super.process(inputs);
 
         t += game.fixedDeltaTime;
-        spriteRenderer.setRotation(Math.sin(t * Math.PI * 2) * Math.PI * 0.125 + Math.PI*0.25);
+        spriteRenderer.setRotation(
+                FixedPointUtil.fromDouble(
+                        Math.toDegrees(
+                                Math.sin(FixedPointUtil.toDouble(t) * Math.PI * 2) * Math.PI * 0.125 +
+                                        Math.PI*0.25)));
 
         // 게임 진입
         if(isKeyInputJustPressed("accept")){

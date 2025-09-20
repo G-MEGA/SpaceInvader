@@ -1,6 +1,7 @@
 package org.newdawn.spaceinvaders.loop;
 
 import org.newdawn.spaceinvaders.Game;
+import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputLog;
 import org.newdawn.spaceinvaders.game_object.GameObject;
@@ -25,11 +26,11 @@ public class GameLoop extends Loop {
     /** The entity representing the player */
     private PlayerShip ship;
     /** The speed at which the player's ship should move (pixels/sec) */
-    private double moveSpeed = 300;
+    private long moveSpeed = 300L << 16;
     /** The time at which last fired a shot */
-    private double lastFire = 0;
+    private long lastFire = 0L;
     /** The interval between our players shot (ms) */
-    private double firingInterval = 0.1f;
+    private long firingInterval = FixedPointUtil.ZERO_1;
     /** The number of aliens left on the screen */
     private int alienCount;
     private HiveMind alienHiveMind = new HiveMind();
@@ -72,15 +73,15 @@ public class GameLoop extends Loop {
     private void initEntities() {
         // create the player ship and place it roughly in the center of the screen
         ship = new PlayerShip(this);
-        ship.setPosition(370, 550);
+        ship.setPos(400 << 16, 550 << 16);
         gameObjects.add(ship);
 
         // create a block of aliens (5 rows, by 12 aliens, spaced evenly)
         alienCount = 0;
-        for (int row=0;row<5;row++) {
-            for (int x=0;x<12;x++) {
+        for (long row=0L;row<5L;row++) {
+            for (long x=0L;x<12L;x++) {
                 Alien alien = new Alien(this, alienHiveMind);
-                alien.setPosition(100+(x*50), (50)+row*30);
+                alien.setPos((100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                 gameObjects.add(alien);
                 alienHiveMind.addListener(alien);
                 alienCount++;
@@ -91,7 +92,7 @@ public class GameLoop extends Loop {
         System.gc();
     }
 
-    public double getCurrentTime(){
+    public long getCurrentTime(){
         return game.fixedDeltaTime * currentFrame;
     }
 
@@ -125,7 +126,9 @@ public class GameLoop extends Loop {
 
         for(GameObject gameObject : gameObjects){
             if(gameObject instanceof Alien){
-                ((Alien) gameObject).velocityX = ((Alien) gameObject).velocityX * 1.02;
+                ((Alien) gameObject).velocityX = FixedPointUtil.mul(
+                        ((Alien) gameObject).velocityX,
+                        FixedPointUtil.ONE + FixedPointUtil.ZERO_02);
             }
         }
     }
@@ -144,7 +147,7 @@ public class GameLoop extends Loop {
         // if we waited long enough, create the shot entity, and record the time.
         lastFire = getCurrentTime();
         Bullet bullet = new Bullet(this);
-        bullet.setPosition(ship.getX()+10, ship.getY()-30);
+        bullet.setPos(ship.getPosX(), ship.getPosY()-(30 << 16));
         gameObjects.add(bullet);
     }
 

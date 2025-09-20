@@ -1,5 +1,6 @@
 package org.newdawn.spaceinvaders.game_object.ingame;
 
+import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.Mover2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
@@ -11,15 +12,15 @@ import org.newdawn.spaceinvaders.sprite.Sprite;
 import org.newdawn.spaceinvaders.sprite.SpriteStore;
 
 public class Alien extends Mover2D implements ICollider2DOwner, IHiveMindListener {
-    private double moveSpeed = 75;
+    private long moveSpeed = 75L << 16;
 
     private SpriteRenderer spriteRenderer;
 
     private HiveMind hiveMind;
 
     private Sprite[] frames = new Sprite[4];
-    private double lastFrameChange = 0;
-    private double frameDuration = 0.25;
+    private long lastFrameChange = 0L;
+    private long frameDuration = FixedPointUtil.ZERO_25;
     /** The current frame of animation being displayed */
     private int frameNumber;
 
@@ -36,12 +37,10 @@ public class Alien extends Mover2D implements ICollider2DOwner, IHiveMindListene
         addChild(spriteRenderer);
 
         Collider2D collider2D = new Collider2D(gameLoop, this);
-        //TODO 스프라이트 피벗 구현
-        collider2D.bounds.setRect(
-                -spriteRenderer.sprite.getPivotX(),
-                -spriteRenderer.sprite.getPivotY(),
-                spriteRenderer.sprite.getWidth(),
-                spriteRenderer.sprite.getHeight());
+        collider2D.boundsPosX = -spriteRenderer.sprite.getPivotX();
+        collider2D.boundsPosY = -spriteRenderer.sprite.getPivotY();
+        collider2D.boundsWidth = ((long)spriteRenderer.sprite.getWidth()) << 16;
+        collider2D.boundsHeight = ((long)spriteRenderer.sprite.getHeight()) << 16;
         addChild(collider2D);
 
         velocityX = -moveSpeed;
@@ -63,7 +62,7 @@ public class Alien extends Mover2D implements ICollider2DOwner, IHiveMindListene
     }
 
     @Override
-    protected void process(double deltaTime) {
+    protected void process(long deltaTime) {
         super.process(deltaTime);
 
         // since the move tells us how much time has passed
@@ -88,12 +87,12 @@ public class Alien extends Mover2D implements ICollider2DOwner, IHiveMindListene
 
         // if we have reached the left hand side of the screen and
         // are moving left then request a logic update
-        if ((velocityX < 0) && (getX() < 10)) {
+        if ((velocityX < 0) && (getPosX() < (10 << 16))) {
             onCollideWall();
         }
         // and vice vesa, if we have reached the right hand side of
         // the screen and are moving right, request a logic update
-        if ((velocityX > 0) && (getX() > 750)) {
+        if ((velocityX > 0) && (getPosX() > (750 << 16))) {
             onCollideWall();
         }
     }
@@ -109,8 +108,8 @@ public class Alien extends Mover2D implements ICollider2DOwner, IHiveMindListene
 
     private void goForwardAndCheckDeath(){
         velocityX = -velocityX;
-        setY(getY() + 10);
-        if (getY() > 570) {
+        setPosY(getPosY() + (10 << 16));
+        if (getPosY() > (570 << 16)) {
             ((GameLoop)loop).notifyDeath();
         }
     }

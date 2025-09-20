@@ -38,8 +38,8 @@ import org.newdawn.spaceinvaders.sprite.SpriteStore;
  */
 public class Game extends Canvas
 {
-    public final int fixedFPS;
-    public final double fixedDeltaTime;
+    public final long fixedFPS;
+    public final long fixedDeltaTime;
 
     private Loop loop = new MainMenuLoop(this);
 
@@ -62,9 +62,9 @@ public class Game extends Canvas
 	/**
 	 * Construct our game and set it running.
 	 */
-	public Game(int fixedFPS) {
+	public Game(long fixedFPS) {
         this.fixedFPS = fixedFPS;
-        this.fixedDeltaTime = 1.0/fixedFPS;
+        this.fixedDeltaTime = FixedPointUtil.div(FixedPointUtil.ONE, fixedFPS);
 
 		// create a frame to contain our game
 		container = new JFrame("Space Invaders 102");
@@ -173,7 +173,7 @@ public class Game extends Canvas
 			// we've recorded when we started the frame. We add 10 milliseconds
 			// to this and then factor in the current time to give 
 			// us our final value to wait for
-			SystemTimer.sleep(lastLoopTime+(long)(fixedDeltaTime*1000)-SystemTimer.getTime());
+			SystemTimer.sleep(lastLoopTime+(long)(FixedPointUtil.toDouble(fixedDeltaTime)*1000)-SystemTimer.getTime());
 		}
 	}
 	
@@ -248,13 +248,13 @@ public class Game extends Canvas
      * @param argv The arguments that are passed into our games
      */
 	public static void main(String argv[]) {
-        SpriteStore.get().getSprite("sprites/ship.gif", 16.5, 11.5);
-        SpriteStore.get().getSprite("sprites/shot.gif", 6, 11.5);
-        SpriteStore.get().getSprite("sprites/alien.gif", 21.5, 14.5);
-        SpriteStore.get().getSprite("sprites/alien2.gif", 21.5, 14.5);
-        SpriteStore.get().getSprite("sprites/alien3.gif", 21.5, 14.5);
+        SpriteStore.get().getSprite("sprites/ship.gif", (16 << 16) + FixedPointUtil.ZERO_5, (11 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/shot.gif", 6L << 16, (11 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/alien.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/alien2.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/alien3.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
 
-		Game g = new Game(100);
+		Game g = new Game(100L << 16);
 
 		// Start the main game loop, note: this method will not
 		// return until the game has finished running. Hence we are

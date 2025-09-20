@@ -1,89 +1,81 @@
 package org.newdawn.spaceinvaders.game_object;
 
 import org.newdawn.spaceinvaders.Game;
+import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.loop.Loop;
 
 import java.awt.geom.AffineTransform;
 
 public abstract class GameObject2D extends GameObject{
-    AffineTransform transform = new AffineTransform();
-    AffineTransform globalTransform = new AffineTransform();
+    long posX = 0;
+    long posY = 0;
+    long rotation = 0;
+    long scale = 1 << 16;
+
+    // 0 posX
+    // 1 posY
+    // 2 rotation
+    // 3 scale
+    long[] globalTransform = new long[4];
+    
     public GameObject2D(Loop loop) {
         super(loop);
     }
 
+    public long[] getGlobalTransform(){
+        if (getParent() instanceof GameObject2D) {
+            long[] parentGlobalTransform =  ((GameObject2D)getParent()).getGlobalTransform();
 
-    public AffineTransform getGlobalTransform(){
-        globalTransform.setTransform(transform);
+            long globalRotation = parentGlobalTransform[2] + rotation;
+            long globalScale = FixedPointUtil.mul(parentGlobalTransform[3], scale);
 
-        GameObject p = getParent();
-        while (p instanceof GameObject2D){
-            globalTransform.preConcatenate(((GameObject2D) p).transform);
+            long newX = FixedPointUtil.mul(posX, FixedPointUtil.cos(parentGlobalTransform[2])) - FixedPointUtil.mul(posY, FixedPointUtil.sin(parentGlobalTransform[2]));
+            long newY = FixedPointUtil.mul(posX, FixedPointUtil.sin(parentGlobalTransform[2])) + FixedPointUtil.mul(posY, FixedPointUtil.cos(parentGlobalTransform[2]));
+            long globalPosX = parentGlobalTransform[0] + newX;
+            long globalPosY =  parentGlobalTransform[1] + newY;
 
-            p = p.getParent();
+            globalTransform[0] = globalPosX;
+            globalTransform[1] = globalPosY;
+            globalTransform[2] = globalRotation;
+            globalTransform[3] = globalScale;
+            return globalTransform;
         }
-
-        return globalTransform;
+        else{
+            globalTransform[0] = posX;
+            globalTransform[1] = posY;
+            globalTransform[2] = rotation;
+            globalTransform[3] = scale;
+            return globalTransform;
+        }
     }
 
-    public double getX(){
-        return transform.getTranslateX();
+    public long getPosX(){
+        return posX;
     }
-    public double getY(){
-        return transform.getTranslateY();
+    public long getPosY(){
+        return posY;
+    }
+    public long getRotation(){
+        return rotation;
+    }
+    public long getScale(){
+        return scale;
     }
 
-    double[] transformMatrix = new double[6];
-    public void setX(double x){
-        transform.getMatrix(transformMatrix);
-
-        transform.setTransform(
-                transformMatrix[0], transformMatrix[1],
-                transformMatrix[2], transformMatrix[3],
-                x, transformMatrix[5]
-        );
+    public void setPosX(long x){
+        posX = x;
     }
-    public void setY(double y){
-        transform.getMatrix(transformMatrix);
-
-        transform.setTransform(
-                transformMatrix[0], transformMatrix[1],
-                transformMatrix[2], transformMatrix[3],
-                transformMatrix[4], y
-        );
+    public void setPosY(long y){
+        posY = y;
     }
-    public void setPosition(double x, double y){
-        transform.getMatrix(transformMatrix);
-
-        transform.setTransform(
-                transformMatrix[0], transformMatrix[1],
-                transformMatrix[2], transformMatrix[3],
-                x, y
-        );
+    public void setPos(long x, long y){
+        posX = x;
+        posY = y;
     }
-    public void setRotation(double angle){
-        transform.getMatrix(transformMatrix);
-
-        double xAxisLength = Math.sqrt(transformMatrix[0] * transformMatrix[0] + transformMatrix[1] * transformMatrix[1]);
-        double yAxisLength = Math.sqrt(transformMatrix[2] * transformMatrix[2] + transformMatrix[3] * transformMatrix[3]);
-
-        transform.setTransform(
-                Math.cos(angle) * xAxisLength, Math.sin(angle) * xAxisLength,
-                Math.cos(angle + Math.PI*0.5) * yAxisLength, Math.sin(angle + Math.PI*0.5) * yAxisLength,
-                transformMatrix[4], transformMatrix[5]
-        );
+    public void setRotation(long angle){
+        rotation = angle;
     }
-    public void setScale(double scale){
-        transform.getMatrix(transformMatrix);
-
-        double xAxisLength = Math.sqrt(transformMatrix[0] * transformMatrix[0] + transformMatrix[1] * transformMatrix[1]);
-        double yAxisLength = Math.sqrt(transformMatrix[2] * transformMatrix[2] + transformMatrix[3] * transformMatrix[3]);
-
-
-        transform.setTransform(
-                transformMatrix[0]/xAxisLength * scale, transformMatrix[1]/xAxisLength * scale,
-                transformMatrix[2]/yAxisLength * scale, transformMatrix[3]/yAxisLength * scale,
-                transformMatrix[4], transformMatrix[5]
-        );
+    public void setScale(long scale){
+        this.scale = scale;
     }
 }

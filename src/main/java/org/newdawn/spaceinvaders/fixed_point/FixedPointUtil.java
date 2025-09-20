@@ -7,6 +7,20 @@ public class FixedPointUtil {
     public static final long HALF_SCALE = SCALE / 2;
     public static final long ONE = 1L << 16;
 
+    public static final long ZERO_1 = 6553;
+    public static final long ZERO_2 = 13107;
+    public static final long ZERO_3 = 19660;
+    public static final long ZERO_4 = 26214;
+    public static final long ZERO_5 = 32768;
+    public static final long ZERO_6 = 39321;
+    public static final long ZERO_7 = 45875;
+    public static final long ZERO_8 = 52428;
+    public static final long ZERO_9 = 58982;
+
+    public static final long ZERO_25 = 16384;
+
+    public static final long ZERO_02 = 1310;
+
     public static long add(long x, long y) {
         return x + y;
     }

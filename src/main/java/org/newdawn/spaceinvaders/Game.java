@@ -247,14 +247,14 @@ public class Game extends Canvas
      *
      * @param argv The arguments that are passed into our games
      */
-	public static void main(String argv[]) {
+	public static void main(String[] argv) {
         SpriteStore.get().getSprite("sprites/ship.gif", (16 << 16) + FixedPointUtil.ZERO_5, (11 << 16) + FixedPointUtil.ZERO_5);
         SpriteStore.get().getSprite("sprites/shot.gif", 6L << 16, (11 << 16) + FixedPointUtil.ZERO_5);
         SpriteStore.get().getSprite("sprites/alien.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
         SpriteStore.get().getSprite("sprites/alien2.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
         SpriteStore.get().getSprite("sprites/alien3.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
 
-		Game g = new Game(100L << 16);
+		Game g = new Game(60L << 16);
 
 		// Start the main game loop, note: this method will not
 		// return until the game has finished running. Hence we are

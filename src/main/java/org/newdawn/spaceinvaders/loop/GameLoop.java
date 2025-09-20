@@ -5,19 +5,21 @@ import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputLog;
 import org.newdawn.spaceinvaders.game_object.GameObject;
-import org.newdawn.spaceinvaders.game_object.ingame.Alien;
-import org.newdawn.spaceinvaders.game_object.ingame.Bullet;
 import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+
+import javax.swing.JFileChooser;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.Alien;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.Bullet;
 
 public class GameLoop extends Loop {
     long currentFrame;

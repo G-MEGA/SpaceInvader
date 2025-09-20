@@ -1,4 +1,4 @@
-package org.newdawn.spaceinvaders.game_object.ingame;
+package org.newdawn.spaceinvaders.game_object.ingame.enemy;
 
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.Mover2D;
@@ -41,14 +41,14 @@ public class Bullet extends Mover2D implements ICollider2DOwner {
         // don't collide
         if (used || isDestroyed()) return;
 
-        // if we've hit an alien, kill it!
-        if (collider instanceof Alien) {
-            Alien alien = (Alien) collider;
+        // if we've hit an Enemy, kill it!
+        if (collider instanceof Enemy) {
+            Enemy enemy = (Enemy) collider;
 
-            if(alien.isDestroyed()) return;
+            if(enemy.isDestroyed()) return;
 
             destroy();
-            alien.destroy();
+            enemy.onHitByBullet();
 
             used = true;
         }

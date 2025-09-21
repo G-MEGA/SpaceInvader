@@ -95,23 +95,22 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
         }
     }
 
-    @Override
-    public void collidedWith(ICollider2DOwner collider){
-        if (collider instanceof Bullet){
-            collideWihtBullet();
-        }
-        else if (collider instanceof PlayerShip){
-            collideWithPlayerShip();
-        }
-    }
+    public void hurt(){
+        if(isDestroyed()) return;
 
-    private void collideWihtBullet(){
         destroy();
 
         LootItem item = LootItemFactory.getInstance().instantiateRandomItem(loop);
 
         if (item != null){
             item.setPos(getPosX(), getPosY());
+        }
+    }
+
+    @Override
+    public void collidedWith(ICollider2DOwner collider){
+        if (collider instanceof PlayerShip){
+            collideWithPlayerShip();
         }
     }
 

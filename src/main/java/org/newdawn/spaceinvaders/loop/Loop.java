@@ -7,6 +7,7 @@ import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputLog;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputMouseMove;
 import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
+import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -141,8 +142,10 @@ public abstract class Loop {
                 if(him.isDestroyed()) continue;
 
                 if (me.collidesWith(him)) {
-                    me.collidedWith(him.getOwner());
-                    him.collidedWith(me.getOwner());
+                    ICollider2DOwner meOwner = me.getOwner();
+                    ICollider2DOwner himOwner = him.getOwner();
+                    me.collidedWith(himOwner);
+                    him.collidedWith(meOwner);
                 }
             }
         }

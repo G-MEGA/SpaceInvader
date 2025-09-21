@@ -9,8 +9,6 @@ import org.newdawn.spaceinvaders.loop.GameLoop;
 import org.newdawn.spaceinvaders.sprite.SpriteStore;
 
 public class Bullet extends Mover2D implements ICollider2DOwner {
-    /** The vertical speed at which the players shot moves */
-    private long moveSpeed = FixedPointUtil.fromLong(-300);
     /** True if this shot has been "used", i.e. its hit something */
     private boolean used = false;
 
@@ -27,8 +25,6 @@ public class Bullet extends Mover2D implements ICollider2DOwner {
         collider2D.boundsWidth = ((long)spriteRenderer.sprite.getWidth()) << 16;
         collider2D.boundsHeight = ((long)spriteRenderer.sprite.getHeight()) << 16;
         addChild(collider2D);
-
-        velocityY = moveSpeed;
     }
 
     protected void process(long deltaTime) {

@@ -25,12 +25,6 @@ public class GameLoop extends Loop {
 
     /** The entity representing the player */
     private PlayerShip ship;
-    /** The speed at which the player's ship should move (pixels/sec) */
-    private long moveSpeed = 300L << 16;
-    /** The time at which last fired a shot */
-    private long lastFire = 0L;
-    /** The interval between our players shot (ms) */
-    private long firingInterval = FixedPointUtil.ZERO_1;
     /** The number of aliens left on the screen */
     private int alienCount;
     private HiveMind alienHiveMind = new HiveMind();
@@ -95,6 +89,9 @@ public class GameLoop extends Loop {
     public long getCurrentTime(){
         return game.fixedDeltaTime * currentFrame;
     }
+    public boolean isWaitingForKeyPress(){
+        return waitingForKeyPress;
+    }
 
     /**
      * Notification that the player has died.
@@ -133,24 +130,6 @@ public class GameLoop extends Loop {
         }
     }
 
-    /**
-     * Attempt to fire a shot from the player. Its called "try"
-     * since we must first check that the player can fire at this
-     * point, i.e. has he/she waited long enough between shots
-     */
-    public void tryToFire() {
-        // check that we have waiting long enough to fire
-        if (getCurrentTime() - lastFire < firingInterval) {
-            return;
-        }
-
-        // if we waited long enough, create the shot entity, and record the time.
-        lastFire = getCurrentTime();
-        Bullet bullet = new Bullet(this);
-        bullet.setPos(ship.getPosX(), ship.getPosY()-(30 << 16));
-        gameObjects.add(bullet);
-    }
-
     public void process(ArrayList<GameLoopInput> inputs){
         super.process(inputs);
 
@@ -165,7 +144,6 @@ public class GameLoop extends Loop {
             inputLogs.clear();
 
             currentFrame = 0;
-            lastFire = 0;
 
             lastestLog.inputFrame = currentFrame;
 
@@ -239,41 +217,7 @@ public class GameLoop extends Loop {
         if(!waitingForKeyPress){
             alienHiveMind.broadcastIfRequested();
 
-            //propagate 프로세스
-            for(GameObject gameObject : gameObjects){
-                if(!gameObject.isDestroyed()) gameObject.propagateProcess(game.fixedDeltaTime);
-            }
-
-            // 충돌 처리
-            processCollision2D();
-
-            //propagate 포스트 프로세스
-            for(GameObject gameObject : gameObjects){
-                if(!gameObject.isDestroyed()) gameObject.propagatePostProcess(game.fixedDeltaTime);
-            }
-
-            //destroy 된 것 있으면 GameObject 목록에서 제거
-            for(int i=gameObjects.size() - 1 ; i > -1;i--){
-                if(gameObjects.get(i).isDestroyed()){
-                    gameObjects.remove(i);
-                }
-            }
-
-            // resolve the movement of the ship. First assume the ship
-            // isn't moving. If either cursor key is pressed then
-            // update the movement appropraitely
-            ship.velocityX = 0;
-
-            if ((isKeyInputPressed("left")) && (!isKeyInputPressed("right"))) {
-                ship.velocityX = -moveSpeed;
-            } else if ((isKeyInputPressed("right")) && (!isKeyInputPressed("left"))) {
-                ship.velocityX = moveSpeed;
-            }
-
-            // if we're pressing fire, attempt to fire
-            if (isKeyInputPressed("fire")) {
-                tryToFire();
-            }
+            processGameObjects();
         }
 
         //endreigon

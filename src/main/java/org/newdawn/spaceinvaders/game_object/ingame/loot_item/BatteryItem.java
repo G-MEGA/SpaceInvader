@@ -8,4 +8,8 @@ public class BatteryItem extends LootItem {
 
         System.out.println("Battery Item 소환");
     }
+
+    protected void onCollideWithPlayerShip(){
+        System.out.println("유저 속도 빨라짐");
+    }
 }

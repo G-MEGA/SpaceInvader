@@ -8,4 +8,8 @@ public class CoinItem extends LootItem {
 
         System.out.println("Coin Item 소환");
     }
+
+    protected void onCollideWithPlayerShip(){
+        System.out.println("코인 냠냠");
+    }
 }

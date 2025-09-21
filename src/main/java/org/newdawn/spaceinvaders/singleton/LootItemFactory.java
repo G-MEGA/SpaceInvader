@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.newdawn.spaceinvaders.game_object.ingame.loot_item.BatteryItem;
 import org.newdawn.spaceinvaders.game_object.ingame.loot_item.CoinItem;
 import org.newdawn.spaceinvaders.game_object.ingame.loot_item.FrozenItem;
+import org.newdawn.spaceinvaders.game_object.ingame.loot_item.LootItem;
 import org.newdawn.spaceinvaders.game_object.ingame.loot_item.ShieldItem;
 import org.newdawn.spaceinvaders.loop.Loop;
 
@@ -28,8 +29,10 @@ public class LootItemFactory {
      * 랜덤 가중치 알고리즘 기반으로 LootItem을 소환함
      * @param loop
      */
-    public void instantiateRandomItem(Loop loop){
+    public LootItem instantiateRandomItem(Loop loop){
         long totalWeight = 0L;
+        LootItem lootItem = null;
+
         for (String key : _itemWeights.keySet()){
             totalWeight += _itemWeights.get(key);
         }
@@ -44,23 +47,23 @@ public class LootItemFactory {
             if (random <= 0){
                 switch (key) {
                     case "shield":
-                        new ShieldItem(loop);
+                        lootItem = new ShieldItem(loop);
                         break;
                     case "battery":
-                        new BatteryItem(loop);
+                        lootItem = new BatteryItem(loop);
                         break;
                     case "coin":
-                        new CoinItem(loop);
+                        lootItem = new CoinItem(loop);
                         break;
                     case "frozen":
-                        new FrozenItem(loop);
+                        lootItem = new FrozenItem(loop);
                         break;
                     default: // 키 값이 none인 경우이다.
                         System.out.println("LootItem 소환 안됨");
                         break;
                 }
 
-                return;
+                return lootItem;
             }
         }
 

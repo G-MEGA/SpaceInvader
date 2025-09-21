@@ -8,4 +8,8 @@ public class FrozenItem extends LootItem {
 
         System.out.println("Frozen Item 소환");
     }
+
+    protected void onCollideWithPlayerShip(){
+        System.out.println("멈춰!");
+    }
 }

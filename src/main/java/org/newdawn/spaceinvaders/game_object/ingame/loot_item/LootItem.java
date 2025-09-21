@@ -3,12 +3,13 @@ package org.newdawn.spaceinvaders.game_object.ingame.loot_item;
 import org.newdawn.spaceinvaders.game_object.Mover2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
+import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.Loop;
 import org.newdawn.spaceinvaders.sprite.SpriteStore;
 
 public abstract class LootItem extends Mover2D implements ICollider2DOwner {
-    private double moveSpeed = -100;
+    private Long moveSpeed = 100L;
 
     public LootItem(Loop loop) {
         super(loop);
@@ -30,7 +31,12 @@ public abstract class LootItem extends Mover2D implements ICollider2DOwner {
     }
 
     public void collidedWith(ICollider2DOwner collider){
-        
+        if (collider instanceof PlayerShip){
+            onCollideWithPlayerShip();
+        }
+
         destroy();
     }
+
+    protected abstract void onCollideWithPlayerShip();
 }

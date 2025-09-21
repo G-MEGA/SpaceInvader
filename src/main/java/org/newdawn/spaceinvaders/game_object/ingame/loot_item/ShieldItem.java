@@ -8,4 +8,8 @@ public class ShieldItem extends LootItem {
 
         System.out.println("Shield Item 소환");
     }
+
+    protected void onCollideWithPlayerShip(){
+        System.out.println("봉쇄죠?");
+    }
 }

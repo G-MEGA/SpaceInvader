@@ -12,7 +12,6 @@ import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputKey;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputMouseMove;
-import org.newdawn.spaceinvaders.loop.GameLoop;
 import org.newdawn.spaceinvaders.loop.Loop;
 import org.newdawn.spaceinvaders.loop.MainMenuLoop;
 import org.newdawn.spaceinvaders.singleton.PlayerSetting;

@@ -101,7 +101,6 @@ public class PlayerShip extends Mover2D implements ICollider2DOwner {
             }
             else{
                 shieldCount -= 1;
-                System.out.println("쉴드로 적 공격 막음");
             }
         }
     }

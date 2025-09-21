@@ -7,8 +7,6 @@ import org.newdawn.spaceinvaders.loop.Loop;
 public class CoinItem extends LootItem {
     public CoinItem(Loop loop) {
         super(loop, "sprites/coin.png");
-
-        System.out.println("Coin Item 소환");
     }
 
     protected void onCollideWithPlayerShip(){

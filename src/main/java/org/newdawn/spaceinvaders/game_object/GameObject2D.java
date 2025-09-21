@@ -17,6 +17,9 @@ public abstract class GameObject2D extends GameObject{
     // 2 rotation
     // 3 scale
     long[] globalTransform = new long[4];
+
+    AffineTransform globalTransformForDraw = new AffineTransform();
+    AffineTransform tempTransform = new AffineTransform();
     
     public GameObject2D(Loop loop) {
         super(loop);
@@ -47,6 +50,27 @@ public abstract class GameObject2D extends GameObject{
             globalTransform[3] = scale;
             return globalTransform;
         }
+    }
+    protected AffineTransform getGlobalTransformForDraw(){
+        long[] xform = getGlobalTransform();
+
+        double x = FixedPointUtil.toDouble(xform[0]);
+        double y = FixedPointUtil.toDouble(xform[1]);
+        double rotation = Math.toRadians(FixedPointUtil.toDouble(xform[2]));
+        double scale = FixedPointUtil.toDouble(xform[3]);
+
+        globalTransformForDraw.setToIdentity();
+
+        tempTransform.setToScale(scale, scale);
+        globalTransformForDraw.preConcatenate(tempTransform);
+
+        tempTransform.setToRotation(rotation);
+        globalTransformForDraw.preConcatenate(tempTransform);
+
+        tempTransform.setToTranslation(x, y);
+        globalTransformForDraw.preConcatenate(tempTransform);
+
+        return globalTransformForDraw;
     }
 
     public long getPosX(){

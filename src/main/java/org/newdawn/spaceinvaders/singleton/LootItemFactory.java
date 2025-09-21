@@ -16,6 +16,7 @@ public class LootItemFactory {
         return instance;
     }
 
+    //TODO pseudo random으로 선택하게 만들기
     //TODO Object Pulling을 만들기 -> Loop의 GameObject에 넣어놓기
     private final HashMap<String, Long> _itemWeights = new HashMap<>(); //* <아이템 이름, 가중치
     public LootItemFactory() {
@@ -60,7 +61,7 @@ public class LootItemFactory {
                         lootItem = new FrozenItem(loop);
                         break;
                     default: // 키 값이 none인 경우이다.
-                        System.out.println("LootItem 소환 안됨");
+                        // System.out.println("LootItem 소환 안됨");
                         break;
                 }
 

@@ -5,12 +5,13 @@ import org.newdawn.spaceinvaders.loop.Loop;
 
 public class FrozenItem extends LootItem {
     public FrozenItem(Loop loop){
-        super(loop,"sprites/testLootItem.png");
-
-        System.out.println("Frozen Item 소환");
+        super(loop,"sprites/testFrozenItem.png");
     }
 
     protected void onCollideWithPlayerShip(){
-        System.out.println("멈춰!");
+        if (loop instanceof GameLoop){
+            GameLoop gameLoop = (GameLoop)loop;
+            gameLoop.requestToSlowDownEnemies();
+        }
     }
 }

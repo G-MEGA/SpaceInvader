@@ -39,6 +39,9 @@ public abstract class LootItem extends Mover2D implements ICollider2DOwner {
         }
     }
 
+    /**
+     * 플레이어가 LootItem을 먹었을 때, 발동할 효과를 구현함
+     */
     protected abstract void onCollideWithPlayerShip();
     
     @Override
@@ -46,7 +49,6 @@ public abstract class LootItem extends Mover2D implements ICollider2DOwner {
         super.process(deltaTime);
 
         if (getPosY() > 800 << 16){
-            System.out.println(getPosY());
             destroy();
         }
     }

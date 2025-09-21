@@ -25,6 +25,12 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
     /** The current frame of animation being displayed */
     protected int frameNumber;
     
+    protected Boolean isSlowDown = false; // 현재 속도가 줄어든 상태가 지속 되는 시간인지에 대한 변수
+    protected Boolean hasSlowDown = false; // 중복되어 속도가 줄어드는 것을 막기 위한 변수
+    protected long slowDownRatio = FixedPointUtil.ZERO_5;
+    protected long slowDownTime = 3 << 16;
+    protected long slowDownElapsed = 0;
+
     public Enemy(GameLoop gameLoop){
         super(gameLoop);
 
@@ -78,6 +84,15 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
 
             spriteRenderer.sprite = frames.get(frameNumber);
         }
+
+        if (isSlowDown){
+            if (slowDownElapsed >= slowDownTime){
+                onSlowDownEffectEnd();
+            }
+            else{
+                slowDownElapsed += deltaTime;
+            }
+        }
     }
 
     @Override
@@ -115,4 +130,27 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
      * {@code frames}에 삽입해야 한다.</p>
     */
     protected abstract void addSprites();
+    /**
+     * FrozenItem의 지속시간이 끝났을 때, 원래 속도로 복구하는 로직을 구현한다
+     */
+    protected void onSlowDownEffectEnd(){
+        isSlowDown = false;
+        hasSlowDown = false;
+        slowDownElapsed = 0;
+
+        if (velocityX != 0) { velocityX = FixedPointUtil.div(velocityX, slowDownRatio); }
+        if (velocityY != 0) { velocityY = FixedPointUtil.div(velocityY, slowDownRatio); }
+    }
+
+    public void requestSlowDown(){
+        isSlowDown = true;
+        slowDownElapsed = 0;
+
+        if (!hasSlowDown){
+            velocityX = FixedPointUtil.mul(velocityX, slowDownRatio);
+            velocityY = FixedPointUtil.mul(velocityY, slowDownRatio);
+
+            hasSlowDown = true;
+        }
+    }
 }

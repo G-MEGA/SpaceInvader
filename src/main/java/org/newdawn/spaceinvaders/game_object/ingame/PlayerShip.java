@@ -19,9 +19,19 @@ public class PlayerShip extends Mover2D implements ICollider2DOwner {
     /** The interval between our players shot (ms) */
     private long firingInterval = FixedPointUtil.ZERO_1;
     
-    private long shieldCount = 2;
+    private long shieldCount = 0;
     public void addShield(){ addShield(1); }
     public void addShield(long count){ shieldCount += count; }
+    public long getShieldCount() { return shieldCount; }
+
+    private Boolean isSpeedUp = false;
+    private long speedUpRatio = 2 << 16 + FixedPointUtil.ZERO_5;
+    private long speedUpTime = 4 << 16;
+    private long speedUpElapsed = 0;
+    public void requestToSpeedUp(){
+        isSpeedUp = true;
+        speedUpElapsed = 0;
+    }
 
     public PlayerShip(GameLoop gameLoop) {
         super(gameLoop);
@@ -58,6 +68,20 @@ public class PlayerShip extends Mover2D implements ICollider2DOwner {
             } else if ((gameLoop.isKeyInputPressed("down")) && (!gameLoop.isKeyInputPressed("up"))) {
                 velocityY = moveSpeed;
             }
+            
+            //* 만약 SpeedUp된 상태면 PlayerShip의 이동 속도를 증가 시킴
+            if (isSpeedUp){
+                if (speedUpElapsed >= speedUpTime){
+                    isSpeedUp = false;
+                    speedUpElapsed = 0;
+                }
+                else{
+                    speedUpElapsed += deltaTime;
+                    velocityX = FixedPointUtil.mul(velocityX, speedUpRatio);
+                    velocityY = FixedPointUtil.mul(velocityY, speedUpRatio);
+                }
+            }
+
             //endregion
 
             //region 마우스를 향해 회전

@@ -42,26 +42,6 @@ public class Alien extends Enemy implements ICollider2DOwner, IHiveMindListener 
     protected void process(long deltaTime) {
         super.process(deltaTime);
 
-        // // since the move tells us how much time has passed
-        // // by we can use it to drive the animation, however
-        // // its the not the prettiest solution
-        // lastFrameChange += deltaTime;
-
-        // // if we need to change the frame, update the frame number
-        // // and flip over the sprite in use
-        // if (lastFrameChange > frameDuration) {
-        //     // reset our frame change time counter
-        //     lastFrameChange = 0;
-
-        //     // update the frame
-        //     frameNumber++;
-        //     if (frameNumber >= frames.length) {
-        //         frameNumber = 0;
-        //     }
-
-        //     spriteRenderer.sprite = frames[frameNumber];
-        // }
-
         // if we have reached the left hand side of the screen and
         // are moving left then request a logic update
         if ((velocityX < 0) && (getPosX() < (10 << 16))) {
@@ -85,6 +65,7 @@ public class Alien extends Enemy implements ICollider2DOwner, IHiveMindListener 
 
     private void goForwardAndCheckDeath(){
         velocityX = -velocityX;
+        
         setPosY(getPosY() + (10 << 16));
         if (getPosY() > (570 << 16)) {
             ((GameLoop)loop).notifyDeath();

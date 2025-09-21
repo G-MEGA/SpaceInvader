@@ -5,10 +5,13 @@ import org.newdawn.spaceinvaders.loop.Loop;
 
 public class BatteryItem extends LootItem {
     public BatteryItem(Loop loop) {
-        super(loop, "sprites/testLootItem.png");
+        super(loop, "sprites/testBatteryItem.png");
     }
 
     protected void onCollideWithPlayerShip(){
-        System.out.println("유저 속도 빨라짐");
+        if (loop instanceof GameLoop){
+            GameLoop gameLoop = (GameLoop)loop;
+            gameLoop.requestToSpeedUpOnPlayerShip();
+        }
     }
 }

@@ -16,7 +16,7 @@ public abstract class Enemy extends Mover2D {
         LootItem item = LootItemFactory.getInstance().instantiateRandomItem(loop);
 
         if (item != null){
-            item.setPosition(getX(), getY());
+            item.setPos(getPosX(), getPosY());
         }
     }
 }

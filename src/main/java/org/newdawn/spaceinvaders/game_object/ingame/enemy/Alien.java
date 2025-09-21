@@ -11,8 +11,8 @@ import org.newdawn.spaceinvaders.loop.GameLoop;
 import org.newdawn.spaceinvaders.sprite.Sprite;
 import org.newdawn.spaceinvaders.sprite.SpriteStore;
 
-public class Alien extends Mover2D implements ICollider2DOwner, IHiveMindListener {
-    private long moveSpeed = 75L << 16;
+public class Alien extends Enemy implements ICollider2DOwner, IHiveMindListener {
+    private long moveSpeed = 100L << 16;
 
     private SpriteRenderer spriteRenderer;
 

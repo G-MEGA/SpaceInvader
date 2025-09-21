@@ -21,7 +21,6 @@ import javax.swing.JFileChooser;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Alien;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Bullet;
 
-//!GameLoop 에 destroy이된 게임 오브젝트를 삭제하는데, Loop 는 그러지 않음
 public class GameLoop extends Loop {
     long currentFrame;
     ArrayList<GameLoopInputLog> inputLogs = new ArrayList<>();
@@ -38,6 +37,11 @@ public class GameLoop extends Loop {
     private boolean waitingForKeyPress = true;
 
     boolean forReplay = false;
+
+    //* Coin 관련 로직 */
+    private long coinCount = 0;
+    public void addCoin(){ addCoin(1); }
+    public void addCoin(long count){ coinCount += count; }
 
     public GameLoop(Game game){
         super(game);
@@ -237,5 +241,9 @@ public class GameLoop extends Loop {
             g.drawString(message,(800-g.getFontMetrics().stringWidth(message))/2,250);
             g.drawString("Press 'Accept' key",(800-g.getFontMetrics().stringWidth("Press 'Accept' key"))/2,300);
         }
+        
+        String coinText = "Coin : " + Long.toString(coinCount);
+        g.setColor(Color.white);
+        g.drawString(coinText,0,10);
     }
 }

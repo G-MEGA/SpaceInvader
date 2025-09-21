@@ -23,8 +23,8 @@ public abstract class Loop {
     private final HashMap<String, Boolean> isKeyInputJustPressed = new HashMap<String, Boolean>();
     private final HashMap<String, Boolean> isKeyInputJustReleased = new HashMap<String, Boolean>();
 
-    private int mousePosX = 0;
-    private int mousePosY = 0;
+    private int mousePosX = 400;
+    private int mousePosY = 300;
 
     public Loop(Game game) {
         this.game = game;

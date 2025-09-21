@@ -115,7 +115,7 @@ public abstract class Loop {
     //* LootItem 제작하면서, LootItem가 생성 될 때, 해당 LootItem를 Loop로 삽입하기 위해 추가한 메소드
     public void addGameObject(GameObject gameObject){
         if (gameObjects.contains(gameObject))return;
-
+        
         gameObjects.add(gameObject);
     }
     public void removeGameObject(GameObject gameObject){

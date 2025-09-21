@@ -1,4 +1,4 @@
-package org.newdawn.spaceinvaders.game_object.ingame;
+package org.newdawn.spaceinvaders.game_object.ingame.enemy;
 
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.Mover2D;
@@ -20,10 +20,10 @@ public class Bullet extends Mover2D implements ICollider2DOwner {
         addChild(spriteRenderer);
 
         Collider2D collider2D = new Collider2D(gameLoop, this);
-        collider2D.boundsPosX = -spriteRenderer.sprite.getPivotX();
-        collider2D.boundsPosY = -spriteRenderer.sprite.getPivotY();
-        collider2D.boundsWidth = ((long)spriteRenderer.sprite.getWidth()) << 16;
-        collider2D.boundsHeight = ((long)spriteRenderer.sprite.getHeight()) << 16;
+        collider2D.boundsPosX = -23 << 16;
+        collider2D.boundsPosY = -21 << 16;
+        collider2D.boundsWidth = 20 << 16;
+        collider2D.boundsHeight = 20 << 16;
         addChild(collider2D);
     }
 
@@ -41,14 +41,13 @@ public class Bullet extends Mover2D implements ICollider2DOwner {
         // don't collide
         if (used || isDestroyed()) return;
 
-        // if we've hit an alien, kill it!
-        if (collider instanceof Alien) {
-            Alien alien = (Alien) collider;
+        // if we've hit an Enemy, kill it!
+        if (collider instanceof Enemy) {
+            Enemy enemy = (Enemy) collider;
 
-            if(alien.isDestroyed()) return;
+            if(enemy.isDestroyed()) return;
 
             destroy();
-            alien.destroy();
 
             used = true;
         }

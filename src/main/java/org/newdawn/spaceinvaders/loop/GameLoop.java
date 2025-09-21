@@ -5,19 +5,23 @@ import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputLog;
 import org.newdawn.spaceinvaders.game_object.GameObject;
-import org.newdawn.spaceinvaders.game_object.ingame.Alien;
-import org.newdawn.spaceinvaders.game_object.ingame.Bullet;
 import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+
+import javax.swing.JFileChooser;
+
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.Alien;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.Bullet;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 
 public class GameLoop extends Loop {
     long currentFrame;
@@ -28,6 +32,7 @@ public class GameLoop extends Loop {
     /** The number of aliens left on the screen */
     private int alienCount;
     private HiveMind alienHiveMind = new HiveMind();
+    private ArrayList<Enemy> enemies = new ArrayList<>();
 
     /** The message to display which waiting for a key press */
     private String message = "";
@@ -35,6 +40,10 @@ public class GameLoop extends Loop {
     private boolean waitingForKeyPress = true;
 
     boolean forReplay = false;
+
+    private long coinCount = 0;
+    public void addCoin(){ addCoin(1); }
+    public void addCoin(long count){ coinCount += count; }
 
     public GameLoop(Game game){
         super(game);
@@ -77,6 +86,7 @@ public class GameLoop extends Loop {
                 Alien alien = new Alien(this, alienHiveMind);
                 alien.setPos((100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                 gameObjects.add(alien);
+                enemies.add(alien);
                 alienHiveMind.addListener(alien);
                 alienCount++;
             }
@@ -127,6 +137,15 @@ public class GameLoop extends Loop {
                         ((Alien) gameObject).velocityX,
                         FixedPointUtil.ONE + FixedPointUtil.ZERO_02);
             }
+        }
+    }
+
+    //* LootItem을 먹었을때, 나타나는 효과를 호출하는 메소드
+    public void addShieldOnPlayerShip() { ship.addShield(); }
+    public void requestToSpeedUpOnPlayerShip() { ship.requestToSpeedUp(); }
+    public void requestToSlowDownEnemies(){
+        for (Enemy enemy : enemies){
+            enemy.requestSlowDown();
         }
     }
 
@@ -234,5 +253,13 @@ public class GameLoop extends Loop {
             g.drawString(message,(800-g.getFontMetrics().stringWidth(message))/2,250);
             g.drawString("Press 'Accept' key",(800-g.getFontMetrics().stringWidth("Press 'Accept' key"))/2,300);
         }
+        
+        String coinText = "Coin : " + Long.toString(coinCount);
+        g.setColor(Color.white);
+        g.drawString(coinText,0,10);
+
+        String shieldText = "Shield : " + Long.toString(ship.getShieldCount());
+        g.setColor(Color.white);
+        g.drawString(shieldText,0,30);
     }
 }

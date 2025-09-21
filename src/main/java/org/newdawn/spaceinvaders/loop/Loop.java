@@ -4,6 +4,7 @@ import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputKey;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputLog;
+import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputMouseMove;
 import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 
@@ -20,6 +21,9 @@ public abstract class Loop {
     private final HashMap<String, Boolean> isKeyInputPressed = new HashMap<String, Boolean>();
     private final HashMap<String, Boolean> isKeyInputJustPressed = new HashMap<String, Boolean>();
     private final HashMap<String, Boolean> isKeyInputJustReleased = new HashMap<String, Boolean>();
+
+    private int mousePosX = 0;
+    private int mousePosY = 0;
 
     public Loop(Game game) {
         this.game = game;
@@ -56,7 +60,11 @@ public abstract class Loop {
         if(input instanceof GameLoopInputKey){
             inputKey((GameLoopInputKey)input);
         }
+        else if(input instanceof GameLoopInputMouseMove){
+            inputMouseMove((GameLoopInputMouseMove)input);
+        }
     }
+
     private void inputKey(GameLoopInputKey input){
         if(input.pressed){
             if(isKeyInputPressed.get(input.name) == null || !isKeyInputPressed.get(input.name)){
@@ -70,6 +78,11 @@ public abstract class Loop {
         }
 
         isKeyInputPressed.put(input.name, input.pressed);
+    }
+
+    private void inputMouseMove(GameLoopInputMouseMove input) {
+        mousePosX = input.posX;
+        mousePosY = input.posY;
     }
 
     public boolean isKeyInputPressed(String inputName){
@@ -90,6 +103,12 @@ public abstract class Loop {
             return isKeyInputJustReleased.get(inputName);
         }
         return false;
+    }
+    public int getMousePosX() {
+        return mousePosX;
+    }
+    public int getMousePosY() {
+        return mousePosY;
     }
 
     public void addCollider(Collider2D collider){

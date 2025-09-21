@@ -1,10 +1,7 @@
 package org.newdawn.spaceinvaders;
 
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 
@@ -14,6 +11,7 @@ import javax.swing.JPanel;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputKey;
+import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputMouseMove;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 import org.newdawn.spaceinvaders.loop.Loop;
 import org.newdawn.spaceinvaders.loop.MainMenuLoop;
@@ -98,6 +96,10 @@ public class Game extends Canvas
 		// add a key input system (defined below) to our canvas
 		// so we can respond to key pressed
 		addKeyListener(new KeyInputHandler());
+
+        addMouseListener(new MouseInputHandler());
+
+        addMouseMotionListener(new MouseInputHandler());
 		
 		// request the focus so key events come to us
 		requestFocus();
@@ -232,6 +234,67 @@ public class Game extends Canvas
 		public void keyTyped(KeyEvent e) {
 		}
 	}
+
+    private class MouseInputHandler extends MouseAdapter {
+        @Override
+        public void mousePressed(MouseEvent e) {
+            super.mousePressed(e);
+
+            PlayerSetting playerSetting = PlayerSetting.getInstance();
+
+            int buttonCode;
+            if(e.getButton() == MouseEvent.BUTTON1){
+                buttonCode = playerSetting.MOUSE_BUTTON_LEFT;
+            }
+            else if(e.getButton() == MouseEvent.BUTTON3){
+                buttonCode = playerSetting.MOUSE_BUTTON_RIGHT;
+            }
+            else{
+                buttonCode = -9999;
+            }
+
+            String inputName = playerSetting.KeyToInputName(buttonCode);
+            if(inputName == null) return;
+
+            queuedInputs.add(new GameLoopInputKey(inputName, true));
+        }
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            super.mouseReleased(e);
+
+            PlayerSetting playerSetting = PlayerSetting.getInstance();
+
+            int buttonCode;
+            if(e.getButton() == MouseEvent.BUTTON1){
+                buttonCode = playerSetting.MOUSE_BUTTON_LEFT;
+            }
+            else if(e.getButton() == MouseEvent.BUTTON3){
+                buttonCode = playerSetting.MOUSE_BUTTON_RIGHT;
+            }
+            else{
+                buttonCode = -9999;
+            }
+
+            String inputName = playerSetting.KeyToInputName(buttonCode);
+            if(inputName == null) return;
+
+            queuedInputs.add(new GameLoopInputKey(inputName, false));
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            super.mouseMoved(e);
+
+            queuedInputs.add(new GameLoopInputMouseMove(e.getX(), e.getY()));
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            super.mouseDragged(e);
+
+            queuedInputs.add(new GameLoopInputMouseMove(e.getX(), e.getY()));
+        }
+    }
 
 
 

@@ -11,15 +11,16 @@ public class GameLoopInputKey extends GameLoopInput{
     public GameLoopInputKey(String data){
         String[] splited = data.trim().split(" ");
 
-        assert splited[0].equals("KEY");
+        if(!splited[0].equals("K")){
+            throw new IllegalArgumentException();
+        }
         name = splited[1];
         pressed = !splited[2].equals("0");
     }
 
     @Override
     public String toSaveData() {
-        String data = "KEY "+ name + (pressed ?" 1":" 0");
-        return data;
+        return "K "+ name + (pressed ?" 1":" 0");
     }
 
 }

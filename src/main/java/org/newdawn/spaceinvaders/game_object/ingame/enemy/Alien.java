@@ -14,41 +14,18 @@ import org.newdawn.spaceinvaders.sprite.SpriteStore;
 public class Alien extends Enemy implements ICollider2DOwner, IHiveMindListener {
     private long moveSpeed = 100L << 16;
 
-    private SpriteRenderer spriteRenderer;
-
-    private HiveMind hiveMind;
-
-    private Sprite[] frames = new Sprite[4];
-    private long lastFrameChange = 0L;
-    private long frameDuration = FixedPointUtil.ZERO_25;
-    /** The current frame of animation being displayed */
-    private int frameNumber;
-
-    public Alien(GameLoop gameLoop){
-        super(gameLoop);
-
-        frames[0] = SpriteStore.get().getSprite("sprites/alien.gif");
-        frames[1] = SpriteStore.get().getSprite("sprites/alien2.gif");
-        frames[2] = SpriteStore.get().getSprite("sprites/alien.gif");
-        frames[3] = SpriteStore.get().getSprite("sprites/alien3.gif");
-
-        spriteRenderer = new SpriteRenderer(gameLoop);
-        spriteRenderer.sprite = frames[0];
-        addChild(spriteRenderer);
-
-        Collider2D collider2D = new Collider2D(gameLoop, this);
-        collider2D.boundsPosX = -spriteRenderer.sprite.getPivotX();
-        collider2D.boundsPosY = -spriteRenderer.sprite.getPivotY();
-        collider2D.boundsWidth = ((long)spriteRenderer.sprite.getWidth()) << 16;
-        collider2D.boundsHeight = ((long)spriteRenderer.sprite.getHeight()) << 16;
-        addChild(collider2D);
+    public Alien(GameLoop gameLoop, HiveMind hiveMind){
+        super(gameLoop, hiveMind);
 
         velocityX = -moveSpeed;
     }
-    public Alien(GameLoop gameLoop, HiveMind hiveMind){
-        this(gameLoop);
-        this.hiveMind = hiveMind;
-        this.hiveMind.addListener(this);
+
+    @Override
+    protected void addSprites(){
+        frames.add(SpriteStore.get().getSprite("sprites/alien2.gif"));
+        frames.add(SpriteStore.get().getSprite("sprites/alien.gif"));
+        frames.add(SpriteStore.get().getSprite("sprites/alien.gif"));
+        frames.add(SpriteStore.get().getSprite("sprites/alien3.gif"));
     }
 
     @Override
@@ -65,25 +42,25 @@ public class Alien extends Enemy implements ICollider2DOwner, IHiveMindListener 
     protected void process(long deltaTime) {
         super.process(deltaTime);
 
-        // since the move tells us how much time has passed
-        // by we can use it to drive the animation, however
-        // its the not the prettiest solution
-        lastFrameChange += deltaTime;
+        // // since the move tells us how much time has passed
+        // // by we can use it to drive the animation, however
+        // // its the not the prettiest solution
+        // lastFrameChange += deltaTime;
 
-        // if we need to change the frame, update the frame number
-        // and flip over the sprite in use
-        if (lastFrameChange > frameDuration) {
-            // reset our frame change time counter
-            lastFrameChange = 0;
+        // // if we need to change the frame, update the frame number
+        // // and flip over the sprite in use
+        // if (lastFrameChange > frameDuration) {
+        //     // reset our frame change time counter
+        //     lastFrameChange = 0;
 
-            // update the frame
-            frameNumber++;
-            if (frameNumber >= frames.length) {
-                frameNumber = 0;
-            }
+        //     // update the frame
+        //     frameNumber++;
+        //     if (frameNumber >= frames.length) {
+        //         frameNumber = 0;
+        //     }
 
-            spriteRenderer.sprite = frames[frameNumber];
-        }
+        //     spriteRenderer.sprite = frames[frameNumber];
+        // }
 
         // if we have reached the left hand side of the screen and
         // are moving left then request a logic update
@@ -112,10 +89,5 @@ public class Alien extends Enemy implements ICollider2DOwner, IHiveMindListener 
         if (getPosY() > (570 << 16)) {
             ((GameLoop)loop).notifyDeath();
         }
-    }
-
-    @Override
-    public void collidedWith(ICollider2DOwner collider) {
-        // collisions with aliens are handled elsewhere
     }
 }

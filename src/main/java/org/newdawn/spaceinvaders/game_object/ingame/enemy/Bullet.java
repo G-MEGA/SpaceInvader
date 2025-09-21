@@ -48,7 +48,6 @@ public class Bullet extends Mover2D implements ICollider2DOwner {
             if(enemy.isDestroyed()) return;
 
             destroy();
-            enemy.onHitByBullet();
 
             used = true;
         }

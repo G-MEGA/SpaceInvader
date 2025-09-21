@@ -38,7 +38,7 @@ public class GameLoop extends Loop {
 
     boolean forReplay = false;
 
-    //* Coin 관련 로직 */
+    //* LootItem 관련 로직 */
     private long coinCount = 0;
     public void addCoin(){ addCoin(1); }
     public void addCoin(long count){ coinCount += count; }

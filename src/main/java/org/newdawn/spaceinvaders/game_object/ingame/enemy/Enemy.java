@@ -1,16 +1,96 @@
 package org.newdawn.spaceinvaders.game_object.ingame.enemy;
 
-import org.newdawn.spaceinvaders.game_object.Mover2D;
-import org.newdawn.spaceinvaders.game_object.ingame.loot_item.LootItem;
-import org.newdawn.spaceinvaders.loop.Loop;
-import org.newdawn.spaceinvaders.singleton.LootItemFactory;
+import java.util.ArrayList;
 
-public abstract class Enemy extends Mover2D {
-    public Enemy(Loop loop){
-        super(loop);
+import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
+import org.newdawn.spaceinvaders.game_object.Mover2D;
+import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
+import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
+import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
+import org.newdawn.spaceinvaders.game_object.ingame.loot_item.LootItem;
+import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
+import org.newdawn.spaceinvaders.game_object.logic.IHiveMindListener;
+import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
+import org.newdawn.spaceinvaders.loop.GameLoop;
+import org.newdawn.spaceinvaders.singleton.LootItemFactory;
+import org.newdawn.spaceinvaders.sprite.Sprite;
+
+public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMindListener {
+    protected HiveMind hiveMind;
+
+    protected SpriteRenderer spriteRenderer;
+    protected ArrayList<Sprite> frames = new ArrayList<>();
+    protected long lastFrameChange = 0L;
+    protected long frameDuration = FixedPointUtil.ZERO_25;
+    /** The current frame of animation being displayed */
+    protected int frameNumber;
+    
+    public Enemy(GameLoop gameLoop){
+        super(gameLoop);
+
+        spriteRenderer = new SpriteRenderer(gameLoop);
+        addSprites();
+        
+        //* 자식 클래스에서 addSprites()을 구현 할 때, 적어도 1개 이상의 sprite를 frames에 삽입 했음을 전제로 한다.
+        try{
+            spriteRenderer.sprite = frames.get(0);
+            addChild(spriteRenderer);
+        }
+        catch (IndexOutOfBoundsException exception){
+            System.out.println("addSprites() 구현시 하나 이상의 sprite를 삽입하지 않았습니다.");
+        }
+        
+        Collider2D collider2D = new Collider2D(gameLoop, this);
+        collider2D.boundsPosX = -spriteRenderer.sprite.getPivotX();
+        collider2D.boundsPosY = -spriteRenderer.sprite.getPivotY();
+        collider2D.boundsWidth = ((long)spriteRenderer.sprite.getWidth()) << 16;
+        collider2D.boundsHeight = ((long)spriteRenderer.sprite.getHeight()) << 16;
+        addChild(collider2D);
     }
 
-    public void onHitByBullet(){
+    public Enemy(GameLoop gameLoop, HiveMind hiveMind){
+        this(gameLoop);
+
+        this.hiveMind = hiveMind;
+        this.hiveMind.addListener(this);
+    }
+
+    @Override
+    protected void process(long deltaTime) {
+        super.process(deltaTime);
+
+        // since the move tells us how much time has passed
+        // by we can use it to drive the animation, however
+        // its the not the prettiest solution
+        lastFrameChange += deltaTime;
+
+        // if we need to change the frame, update the frame number
+        // and flip over the sprite in use
+        if (lastFrameChange > frameDuration) {
+            // reset our frame change time counter
+            lastFrameChange = 0;
+
+            // update the frame
+            frameNumber++;
+            if (frameNumber >= frames.size()) {
+                frameNumber = 0;
+            }
+
+            spriteRenderer.sprite = frames.get(frameNumber);
+        }
+    }
+
+    @Override
+    public void collidedWith(ICollider2DOwner collider){
+        if (collider instanceof Bullet){
+            collideWihtBullet();
+        }
+        else if (collider instanceof PlayerShip){
+            collideWithPlayerShip();
+        }
+    }
+
+    private void collideWihtBullet(){
         destroy();
 
         LootItem item = LootItemFactory.getInstance().instantiateRandomItem(loop);
@@ -19,4 +99,20 @@ public abstract class Enemy extends Mover2D {
             item.setPos(getPosX(), getPosY());
         }
     }
+
+    private void collideWithPlayerShip(){
+        destroy();
+    }
+    
+    /**
+     * Enemy 객체가 가질 {@code Sprite}를 등록하는 메서드이다.
+     *
+     * <p>등록은 {@code frames.add()}를 통해 수행하며,
+     * 동일 메서드가 2회 이상 호출될 경우 애니메이션으로 실행된다.
+     * 각 프레임의 재생 시간은 {@code frameDuration}에 의해 결정된다.</p>
+     *
+     * <p><b>주의:</b> 구현 시 반드시 하나 이상의 {@code Sprite}를
+     * {@code frames}에 삽입해야 한다.</p>
+    */
+    protected abstract void addSprites();
 }

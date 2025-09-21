@@ -72,8 +72,15 @@ public abstract class GameObject2D extends GameObject{
         posX = x;
         posY = y;
     }
-    public void setRotation(long angle){
-        rotation = angle;
+    public void setRotation(long degrees){
+        while (degrees > 360 << 16) {
+            degrees -= 360 << 16;
+        }
+        while (degrees < 0) {
+            degrees += 360 << 16;
+        }
+
+        rotation = degrees;
     }
     public void setScale(long scale){
         this.scale = scale;

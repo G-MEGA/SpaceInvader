@@ -16,6 +16,7 @@ public abstract class Loop {
     protected final Game game;
 
     protected final ArrayList<GameObject> gameObjects = new ArrayList<>();
+    private final ArrayList<GameObject> gameObjectsInProcessing = new ArrayList<>();
     private final ArrayList<Collider2D> colliders = new ArrayList<>();
 
     private final HashMap<String, Boolean> isKeyInputPressed = new HashMap<String, Boolean>();
@@ -111,6 +112,16 @@ public abstract class Loop {
         return mousePosY;
     }
 
+    //* LootItem 제작하면서, LootItem가 생성 될 때, 해당 LootItem를 Loop로 삽입하기 위해 추가한 메소드
+    public void addGameObject(GameObject gameObject){
+        if (gameObjects.contains(gameObject))return;
+
+        gameObjects.add(gameObject);
+    }
+    public void removeGameObject(GameObject gameObject){
+        gameObjects.remove(gameObject);
+    }
+
     public void addCollider(Collider2D collider){
         if(colliders.contains(collider))return;
 
@@ -133,6 +144,31 @@ public abstract class Loop {
                     me.collidedWith(him.getOwner());
                     him.collidedWith(me.getOwner());
                 }
+            }
+        }
+    }
+
+    protected void processGameObjects(){
+        gameObjectsInProcessing.clear();
+        gameObjectsInProcessing.addAll(gameObjects);
+
+        //propagate 프로세스
+        for(GameObject gameObject : gameObjectsInProcessing){
+            if(!gameObject.isDestroyed()) gameObject.propagateProcess(game.fixedDeltaTime);
+        }
+
+        // 충돌 처리
+        processCollision2D();
+
+        //propagate 포스트 프로세스
+        for(GameObject gameObject : gameObjectsInProcessing){
+            if(!gameObject.isDestroyed()) gameObject.propagatePostProcess(game.fixedDeltaTime);
+        }
+
+        //destroy 된 것 있으면 GameObject 목록에서 제거
+        for(int i=gameObjects.size() - 1 ; i > -1;i--){
+            if(gameObjects.get(i).isDestroyed()){
+                gameObjects.remove(i);
             }
         }
     }

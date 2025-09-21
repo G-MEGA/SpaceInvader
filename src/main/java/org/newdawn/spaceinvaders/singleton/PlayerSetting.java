@@ -24,8 +24,6 @@ public class PlayerSetting {
         newKeySetting.put("up", KeyEvent.VK_W);
         newKeySetting.put("down", KeyEvent.VK_S);
 
-        newKeySetting.put("fire", KeyEvent.VK_SPACE);
-
         newKeySetting.put("escape", KeyEvent.VK_ESCAPE);
         newKeySetting.put("accept", KeyEvent.VK_ENTER);
 

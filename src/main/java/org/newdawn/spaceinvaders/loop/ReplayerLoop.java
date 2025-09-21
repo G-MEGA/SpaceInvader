@@ -51,7 +51,7 @@ public class ReplayerLoop extends Loop{
                 playSpeed = 0;
             }
         }
-        if(isKeyInputJustPressed("fire")) {
+        if(isKeyInputJustPressed("accept")) {
             paused = !paused;
         }
         // Replay 다시 재생
@@ -98,7 +98,7 @@ public class ReplayerLoop extends Loop{
         String message;
         int messageY = 20;
 
-        message = "● Replay - 좌우 방향키로 배속조절, 스페이스바로 일시정지";
+        message = "● Replay - 좌우 방향키로 배속조절, 엔터로 일시정지";
         g.setColor(Color.red);
         g.drawString(message,5,messageY);
         messageY += 15;

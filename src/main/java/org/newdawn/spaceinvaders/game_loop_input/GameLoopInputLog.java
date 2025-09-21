@@ -18,9 +18,16 @@ public class GameLoopInputLog {
 
         inputs = new ArrayList<>();
         for(int i = 1; i < splited.length; i++){
-            if(splited[i].startsWith("KEY")){
+            if(splited[i].startsWith("K")){
                 inputs.add(new GameLoopInputKey(splited[i]));
+                continue;
             }
+            else if(splited[i].startsWith("M")){
+                inputs.add(new GameLoopInputMouseMove(splited[i]));
+                continue;
+            }
+
+            throw new RuntimeException();
         }
     }
 

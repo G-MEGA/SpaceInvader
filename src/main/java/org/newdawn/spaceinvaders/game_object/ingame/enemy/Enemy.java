@@ -157,4 +157,10 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
             hasSlowDown = true;
         }
     }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ((GameLoop)loop).notifyAlienKilled();// GameLoop에 부고소식 전달
+    }
 }

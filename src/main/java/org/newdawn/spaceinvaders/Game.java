@@ -317,6 +317,7 @@ public class Game extends Canvas
         SpriteStore.get().getSprite("sprites/shieldAlien1.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
         SpriteStore.get().getSprite("sprites/shieldAlien2.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
         SpriteStore.get().getSprite("sprites/shieldAlien3.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/artilleryAlien.png", 18 << 16, 18 << 16);
 
 		Game g = new Game(60L << 16);
 

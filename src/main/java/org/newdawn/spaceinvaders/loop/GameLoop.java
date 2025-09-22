@@ -30,9 +30,9 @@ public class GameLoop extends Loop {
 
     /** The entity representing the player */
     private PlayerShip ship;
-    /** The number of aliens left on the screen */
-    private int alienCount;
-    private HiveMind alienHiveMind = new HiveMind();
+    /** The number of enemies left on the screen */
+    private int enemyCount;
+    private HiveMind enemyHiveMind = new HiveMind();
     private ArrayList<Enemy> enemies = new ArrayList<>();
 
     /** The message to display which waiting for a key press */
@@ -81,25 +81,25 @@ public class GameLoop extends Loop {
         gameObjects.add(ship);
 
         // create a block of aliens (5 rows, by 12 aliens, spaced evenly)
-        alienCount = 0;
+        enemyCount = 0;
         for (long row=0L;row<5L;row++) {
             for (long x=0L;x<12L;x++) {
-                Enemy alien;
-                if (row != 4L){
-                    alien = new Alien(this, alienHiveMind);
+                Enemy enemy;
+                if (row <= 2L){
+                    enemy = new Alien(this, enemyHiveMind);
                 }
                 else{
-                    alien = new Guardian(this);
+                    enemy = new Guardian(this, enemyHiveMind);
                 }
-                alien.setPos((100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
-                gameObjects.add(alien);
-                enemies.add(alien);
-                alienHiveMind.addListener(alien);
-                alienCount++;
+                enemy.setPos((100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+                gameObjects.add(enemy);
+                enemies.add(enemy);
+                enemyHiveMind.addListener(enemy);
+                enemyCount++;
             }
         }
 
-        alienHiveMind.cancelBroadcast();
+        enemyHiveMind.cancelBroadcast();
         System.gc();
     }
 
@@ -132,16 +132,16 @@ public class GameLoop extends Loop {
      */
     public void notifyAlienKilled() {
         // reduce the alient count, if there are none left, the player has won!
-        alienCount--;
+        enemyCount--;
 
-        if (alienCount == 0) {
+        if (enemyCount == 0) {
             notifyWin();
         }
 
         for(GameObject gameObject : gameObjects){
-            if(gameObject instanceof Alien){
-                ((Alien) gameObject).velocityX = FixedPointUtil.mul(
-                        ((Alien) gameObject).velocityX,
+            if(gameObject instanceof Enemy){
+                ((Enemy) gameObject).velocityX = FixedPointUtil.mul(
+                        ((Enemy) gameObject).velocityX,
                         FixedPointUtil.ONE + FixedPointUtil.ZERO_02);
             }
         }
@@ -241,7 +241,7 @@ public class GameLoop extends Loop {
         }
 
         if(!waitingForKeyPress){
-            alienHiveMind.broadcastIfRequested();
+            enemyHiveMind.broadcastIfRequested();
 
             processGameObjects();
         }

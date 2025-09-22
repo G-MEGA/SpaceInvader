@@ -1,21 +1,16 @@
 package org.newdawn.spaceinvaders.game_object.ingame.enemy;
 
-import org.newdawn.spaceinvaders.game_object.logic.IHiveMindListener;
+import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
-public class Artillery extends Enemy{
-    public Artillery(GameLoop gameLoop) {
-        super(gameLoop, 1);
+public class Artillery extends SweeperEnemy{
+
+    public Artillery(GameLoop gameLoop, HiveMind hiveMind, long initialHealth) {
+        super(gameLoop, hiveMind, initialHealth);
     }
 
     @Override
     protected void addSprites() {
-        frames.add("sprites/artilleryAlien.png");
     }
-
-    @Override
-    public void onBroadcast() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'onBroadcast'");
-    }
+    
 }

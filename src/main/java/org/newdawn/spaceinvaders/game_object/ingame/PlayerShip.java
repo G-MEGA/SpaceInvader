@@ -1,6 +1,7 @@
 package org.newdawn.spaceinvaders.game_object.ingame;
 
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
+import org.newdawn.spaceinvaders.game_object.GameCharacter;
 import org.newdawn.spaceinvaders.game_object.Mover2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
@@ -11,7 +12,7 @@ import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 import org.newdawn.spaceinvaders.sprite.SpriteStore;
 
-public class PlayerShip extends Mover2D implements ICollider2DOwner {
+public class PlayerShip extends GameCharacter{
     /** The speed at which the player's ship should move (pixels/sec) */
     private long moveSpeed = 300L << 16;
     /** The time at which last fired a shot */
@@ -19,10 +20,10 @@ public class PlayerShip extends Mover2D implements ICollider2DOwner {
     /** The interval between our players shot (ms) */
     private long firingInterval = FixedPointUtil.ZERO_1;
     
-    private long shieldCount = 0;
-    public void addShield(){ addShield(1); }
-    public void addShield(long count){ shieldCount += count; }
-    public long getShieldCount() { return shieldCount; }
+    // private long shieldCount = 0;
+    // public void addShield(){ addShield(1); }
+    // public void addShield(long count){ shieldCount += count; }
+    // public long getShieldCount() { return shieldCount; }
 
     private Boolean isSpeedUp = false;
     private long speedUpRatio = 2 << 16 + FixedPointUtil.ZERO_5;
@@ -34,7 +35,7 @@ public class PlayerShip extends Mover2D implements ICollider2DOwner {
     }
 
     public PlayerShip(GameLoop gameLoop) {
-        super(gameLoop);
+        super(gameLoop, 3);
 
         SpriteRenderer spriteRenderer = new SpriteRenderer(gameLoop);
         spriteRenderer.setSpriteRef("sprites/ship.gif");
@@ -120,11 +121,11 @@ public class PlayerShip extends Mover2D implements ICollider2DOwner {
     @Override
     public void collidedWith(ICollider2DOwner collider) {
         if (collider instanceof Enemy) {
-            if (shieldCount == 0){
+            if (_health == 0){
                 ((GameLoop)loop).notifyDeath();
             }
             else{
-                shieldCount -= 1;
+                _health -= 1;
             }
         }
     }

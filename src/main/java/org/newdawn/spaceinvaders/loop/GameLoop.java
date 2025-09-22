@@ -22,6 +22,7 @@ import javax.swing.JFileChooser;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Alien;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Bullet;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.Guardian;
 
 public class GameLoop extends Loop {
     long currentFrame;
@@ -83,7 +84,13 @@ public class GameLoop extends Loop {
         alienCount = 0;
         for (long row=0L;row<5L;row++) {
             for (long x=0L;x<12L;x++) {
-                Alien alien = new Alien(this, alienHiveMind);
+                Enemy alien;
+                if (row != 4L){
+                    alien = new Alien(this, alienHiveMind);
+                }
+                else{
+                    alien = new Guardian(this);
+                }
                 alien.setPos((100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                 gameObjects.add(alien);
                 enemies.add(alien);
@@ -141,7 +148,7 @@ public class GameLoop extends Loop {
     }
 
     //* LootItem을 먹었을때, 나타나는 효과를 호출하는 메소드
-    public void addShieldOnPlayerShip() { ship.addShield(); }
+    public void addShieldOnPlayerShip() { ship.increaseHealth(); }
     public void requestToSpeedUpOnPlayerShip() { ship.requestToSpeedUp(); }
     public void requestToSlowDownEnemies(){
         for (Enemy enemy : enemies){
@@ -258,7 +265,7 @@ public class GameLoop extends Loop {
         g.setColor(Color.white);
         g.drawString(coinText,0,10);
 
-        String shieldText = "Shield : " + Long.toString(ship.getShieldCount());
+        String shieldText = "Health : " + Long.toString(ship.getHealth());
         g.setColor(Color.white);
         g.drawString(shieldText,0,30);
     }

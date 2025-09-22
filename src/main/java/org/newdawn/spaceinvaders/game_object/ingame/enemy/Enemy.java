@@ -3,6 +3,7 @@ package org.newdawn.spaceinvaders.game_object.ingame.enemy;
 import java.util.ArrayList;
 
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
+import org.newdawn.spaceinvaders.game_object.GameCharacter;
 import org.newdawn.spaceinvaders.game_object.Mover2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
@@ -15,9 +16,7 @@ import org.newdawn.spaceinvaders.loop.GameLoop;
 import org.newdawn.spaceinvaders.singleton.LootItemFactory;
 import org.newdawn.spaceinvaders.sprite.Sprite;
 
-public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMindListener {
-    protected long health;
-
+public abstract class Enemy extends GameCharacter implements IHiveMindListener {
     protected HiveMind hiveMind;
 
     protected SpriteRenderer spriteRenderer;
@@ -34,9 +33,7 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
     protected long slowDownElapsed = 0;
 
     public Enemy(GameLoop gameLoop, long initialHealth){
-        super(gameLoop);
-        
-        health = initialHealth;
+        super(gameLoop, initialHealth);
 
         spriteRenderer = new SpriteRenderer(gameLoop);
         addSprites();
@@ -99,9 +96,10 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
         }
     }
 
-    public void hurt(){
+    public void onHitByBullet(){
         if(isDestroyed()) return;
-        if (--health <= 0){
+
+        if (--_health <= 0){
             destroy();
     
             LootItem item = LootItemFactory.getInstance().instantiateRandomItem(loop);
@@ -120,7 +118,7 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
     }
 
     protected void collideWithPlayerShip(){
-        if (--health <= 0){
+        if (--_health <= 0){
             destroy();
         }
     }

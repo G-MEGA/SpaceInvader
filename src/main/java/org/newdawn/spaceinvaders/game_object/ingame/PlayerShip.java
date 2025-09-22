@@ -2,15 +2,13 @@ package org.newdawn.spaceinvaders.game_object.ingame;
 
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.GameCharacter;
-import org.newdawn.spaceinvaders.game_object.Mover2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
-import org.newdawn.spaceinvaders.game_object.ingame.enemy.Alien;
-import org.newdawn.spaceinvaders.game_object.ingame.enemy.Bullet;
+import org.newdawn.spaceinvaders.game_object.ingame.bullet.EnemyBullet;
+import org.newdawn.spaceinvaders.game_object.ingame.bullet.PlayerBullet;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
-import org.newdawn.spaceinvaders.sprite.SpriteStore;
 
 public class PlayerShip extends GameCharacter{
     /** The speed at which the player's ship should move (pixels/sec) */
@@ -121,12 +119,20 @@ public class PlayerShip extends GameCharacter{
     @Override
     public void collidedWith(ICollider2DOwner collider) {
         if (collider instanceof Enemy) {
-            if (_health == 0){
-                ((GameLoop)loop).notifyDeath();
-            }
-            else{
-                _health -= 1;
-            }
+            onHurt();
+        }
+        else if (collider instanceof EnemyBullet){
+            onHurt();
+            
+            EnemyBullet enemyBullet = (EnemyBullet)collider;
+            enemyBullet.onHitByPlayerShip();
+            // enemyBullet.destroy();
+        }
+    }
+
+    private void onHurt(){
+        if (--_health == 0){
+            ((GameLoop)loop).notifyDeath();
         }
     }
 
@@ -145,20 +151,14 @@ public class PlayerShip extends GameCharacter{
         // if we waited long enough, create the shot entity, and record the time.
         lastFire = gameLoop.getCurrentTime();
 
-        Bullet bullet = new Bullet(gameLoop);
-
-        bullet.setRotation(getRotation());
-
-        long r = bullet.getRotation() + (90 << 16);
-
-        bullet.setPos(
-                getPosX() + FixedPointUtil.mul(FixedPointUtil.cos(r), FixedPointUtil.fromLong(-30)),
-                getPosY() + FixedPointUtil.mul(FixedPointUtil.sin(r), FixedPointUtil.fromLong(-30))
-        );
-
-        long bulletSpeed = FixedPointUtil.fromLong(-300);
-        bullet.velocityX = FixedPointUtil.mul(FixedPointUtil.cos(r), bulletSpeed);
-        bullet.velocityY = FixedPointUtil.mul(FixedPointUtil.sin(r), bulletSpeed);
+        PlayerBullet bullet = new PlayerBullet(
+            gameLoop, 
+            getRotation(), 
+            getPosX(), 
+            getPosY(), 
+            -30,
+            FixedPointUtil.fromLong(-300)
+            );
 
         gameLoop.addGameObject(bullet);
     }

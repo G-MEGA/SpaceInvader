@@ -20,10 +20,9 @@ import java.util.ArrayList;
 import javax.swing.JFileChooser;
 
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Alien;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.Artillery;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Raider;
-import org.newdawn.spaceinvaders.game_object.ingame.enemy.Bullet;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
-import org.newdawn.spaceinvaders.game_object.ingame.enemy.Guardian;
 
 public class GameLoop extends Loop {
     long currentFrame;
@@ -90,7 +89,7 @@ public class GameLoop extends Loop {
                     enemy = new Alien(this, enemyHiveMind);
                 }
                 else{
-                    enemy = new Raider(this, enemyHiveMind, ship);
+                    enemy = new Artillery(this, enemyHiveMind, ship);
                 }
                 enemy.setPos((100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                 gameObjects.add(enemy);

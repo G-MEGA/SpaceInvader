@@ -16,6 +16,8 @@ import org.newdawn.spaceinvaders.singleton.LootItemFactory;
 import org.newdawn.spaceinvaders.sprite.Sprite;
 
 public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMindListener {
+    protected long health;
+
     protected HiveMind hiveMind;
 
     protected SpriteRenderer spriteRenderer;
@@ -31,8 +33,10 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
     protected long slowDownTime = 3 << 16;
     protected long slowDownElapsed = 0;
 
-    public Enemy(GameLoop gameLoop){
+    public Enemy(GameLoop gameLoop, long initialHealth){
         super(gameLoop);
+        
+        health = initialHealth;
 
         spriteRenderer = new SpriteRenderer(gameLoop);
         addSprites();
@@ -54,8 +58,8 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
         addChild(collider2D);
     }
 
-    public Enemy(GameLoop gameLoop, HiveMind hiveMind){
-        this(gameLoop);
+    public Enemy(GameLoop gameLoop, HiveMind hiveMind, long initialHealth){
+        this(gameLoop, initialHealth);
 
         this.hiveMind = hiveMind;
         this.hiveMind.addListener(this);
@@ -97,13 +101,14 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
 
     public void hurt(){
         if(isDestroyed()) return;
-
-        destroy();
-
-        LootItem item = LootItemFactory.getInstance().instantiateRandomItem(loop);
-
-        if (item != null){
-            item.setPos(getPosX(), getPosY());
+        if (--health <= 0){
+            destroy();
+    
+            LootItem item = LootItemFactory.getInstance().instantiateRandomItem(loop);
+    
+            if (item != null){
+                item.setPos(getPosX(), getPosY());
+            }
         }
     }
 
@@ -114,8 +119,10 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
         }
     }
 
-    private void collideWithPlayerShip(){
-        destroy();
+    protected void collideWithPlayerShip(){
+        if (--health <= 0){
+            destroy();
+        }
     }
     
     /**

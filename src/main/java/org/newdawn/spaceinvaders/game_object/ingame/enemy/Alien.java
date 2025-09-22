@@ -1,21 +1,16 @@
 package org.newdawn.spaceinvaders.game_object.ingame.enemy;
 
-import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
-import org.newdawn.spaceinvaders.game_object.Mover2D;
-import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
 import org.newdawn.spaceinvaders.game_object.logic.IHiveMindListener;
-import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
-import org.newdawn.spaceinvaders.sprite.Sprite;
 import org.newdawn.spaceinvaders.sprite.SpriteStore;
 
 public class Alien extends Enemy implements ICollider2DOwner, IHiveMindListener {
     private long moveSpeed = 100L << 16;
 
     public Alien(GameLoop gameLoop, HiveMind hiveMind){
-        super(gameLoop, hiveMind);
+        super(gameLoop, hiveMind, 1);
 
         velocityX = -moveSpeed;
     }

@@ -22,10 +22,10 @@ public class Alien extends Enemy implements ICollider2DOwner, IHiveMindListener 
 
     @Override
     protected void addSprites(){
-        frames.add(SpriteStore.get().getSprite("sprites/alien2.gif"));
-        frames.add(SpriteStore.get().getSprite("sprites/alien.gif"));
-        frames.add(SpriteStore.get().getSprite("sprites/alien.gif"));
-        frames.add(SpriteStore.get().getSprite("sprites/alien3.gif"));
+        frames.add("sprites/alien2.gif");
+        frames.add("sprites/alien.gif");
+        frames.add("sprites/alien.gif");
+        frames.add("sprites/alien3.gif");
     }
 
     @Override

@@ -37,14 +37,14 @@ public class PlayerShip extends Mover2D implements ICollider2DOwner {
         super(gameLoop);
 
         SpriteRenderer spriteRenderer = new SpriteRenderer(gameLoop);
-        spriteRenderer.sprite = SpriteStore.get().getSprite("sprites/ship.gif");
+        spriteRenderer.setSpriteRef("sprites/ship.gif");
         addChild(spriteRenderer);
 
         Collider2D collider2D = new Collider2D(gameLoop, this);
-        collider2D.boundsPosX = -spriteRenderer.sprite.getPivotX();
-        collider2D.boundsPosY = -spriteRenderer.sprite.getPivotY();
-        collider2D.boundsWidth = ((long)spriteRenderer.sprite.getWidth()) << 16;
-        collider2D.boundsHeight = ((long)spriteRenderer.sprite.getHeight()) << 16;
+        collider2D.boundsPosX = -spriteRenderer.getSpritePivotX();
+        collider2D.boundsPosY = -spriteRenderer.getSpritePivotY();
+        collider2D.boundsWidth = ((long)spriteRenderer.getSpriteWidth()) << 16;
+        collider2D.boundsHeight = ((long)spriteRenderer.getSpriteHeight()) << 16;
         addChild(collider2D);
     }
 

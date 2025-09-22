@@ -27,14 +27,14 @@ public class MainMenuLoop extends Loop {
         super(game);
 
         spriteRenderer = new SpriteRenderer(this);
-        spriteRenderer.sprite = SpriteStore.get().getSprite("sprites/ship.gif");
+        spriteRenderer.setSpriteRef("sprites/ship.gif");
         spriteRenderer.setPos(250L << 16, 400 << 16);
         spriteRenderer.setRotation(37 << 16);
         spriteRenderer.setScale(20 << 16);
         addGameObject(spriteRenderer);
 
         SpriteRenderer spriteRenderer2 = new SpriteRenderer(this);
-        spriteRenderer2.sprite = SpriteStore.get().getSprite("sprites/ship.gif");
+        spriteRenderer2.setSpriteRef("sprites/ship.gif");
         spriteRenderer2.setPos(400 << 16, 400 << 16);
         addGameObject(spriteRenderer2);
 
@@ -119,7 +119,7 @@ public class MainMenuLoop extends Loop {
     public void process(ArrayList<GameLoopInput> inputs) {
         super.process(inputs);
 
-        t += game.fixedDeltaTime;
+        t += getGame().fixedDeltaTime;
 
         spriteRenderer.setRotation(
                 FixedPointUtil.fromDouble(

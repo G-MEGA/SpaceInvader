@@ -3,9 +3,10 @@ package org.newdawn.spaceinvaders.game_object;
 import org.newdawn.spaceinvaders.loop.Loop;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public abstract class GameObject{
+public abstract class GameObject implements Serializable {
     protected final Loop loop;
 
     boolean destroyed = false;

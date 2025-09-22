@@ -16,7 +16,7 @@ public class Bullet extends Mover2D implements ICollider2DOwner {
         super(gameLoop);
 
         SpriteRenderer spriteRenderer = new SpriteRenderer(gameLoop);
-        spriteRenderer.sprite = SpriteStore.get().getSprite("sprites/shot.gif");
+        spriteRenderer.setSpriteRef("sprites/shot.gif");
         addChild(spriteRenderer);
 
         Collider2D collider2D = new Collider2D(gameLoop, this);

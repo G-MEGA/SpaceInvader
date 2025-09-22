@@ -19,7 +19,7 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
     protected HiveMind hiveMind;
 
     protected SpriteRenderer spriteRenderer;
-    protected ArrayList<Sprite> frames = new ArrayList<>();
+    protected ArrayList<String> frames = new ArrayList<>();
     protected long lastFrameChange = 0L;
     protected long frameDuration = FixedPointUtil.ZERO_25;
     /** The current frame of animation being displayed */
@@ -39,7 +39,7 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
         
         //* 자식 클래스에서 addSprites()을 구현 할 때, 적어도 1개 이상의 sprite를 frames에 삽입 했음을 전제로 한다.
         try{
-            spriteRenderer.sprite = frames.get(0);
+            spriteRenderer.setSpriteRef(frames.get(0));
             addChild(spriteRenderer);
         }
         catch (IndexOutOfBoundsException exception){
@@ -47,10 +47,10 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
         }
         
         Collider2D collider2D = new Collider2D(gameLoop, this);
-        collider2D.boundsPosX = -spriteRenderer.sprite.getPivotX();
-        collider2D.boundsPosY = -spriteRenderer.sprite.getPivotY();
-        collider2D.boundsWidth = ((long)spriteRenderer.sprite.getWidth()) << 16;
-        collider2D.boundsHeight = ((long)spriteRenderer.sprite.getHeight()) << 16;
+        collider2D.boundsPosX = -spriteRenderer.getSpritePivotX();
+        collider2D.boundsPosY = -spriteRenderer.getSpritePivotY();
+        collider2D.boundsWidth = ((long)spriteRenderer.getSpriteWidth()) << 16;
+        collider2D.boundsHeight = ((long)spriteRenderer.getSpriteHeight()) << 16;
         addChild(collider2D);
     }
 
@@ -82,7 +82,7 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
                 frameNumber = 0;
             }
 
-            spriteRenderer.sprite = frames.get(frameNumber);
+            spriteRenderer.setSpriteRef(frames.get(frameNumber));
         }
 
         if (isSlowDown){

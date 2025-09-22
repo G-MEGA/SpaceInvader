@@ -1,8 +1,9 @@
 package org.newdawn.spaceinvaders.game_object.logic;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class HiveMind {
+public class HiveMind implements Serializable {
     boolean broadcastRequested = false;
     ArrayList<IHiveMindListener> listeners = new  ArrayList<>();
 

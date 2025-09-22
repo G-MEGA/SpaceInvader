@@ -97,7 +97,7 @@ public class GameLoop extends Loop {
     }
 
     public long getCurrentTime(){
-        return game.fixedDeltaTime * currentFrame;
+        return getGame().fixedDeltaTime * currentFrame;
     }
     public boolean isWaitingForKeyPress(){
         return waitingForKeyPress;
@@ -172,7 +172,7 @@ public class GameLoop extends Loop {
             waitingForKeyPress = false;
         }
         if(isKeyInputJustPressed("escape")) {
-            game.changeLoop(new MainMenuLoop(game));
+            getGame().changeLoop(new MainMenuLoop(getGame()));
         }
 
         if(!forReplay && isKeyInputJustPressed("record")) {
@@ -197,7 +197,7 @@ public class GameLoop extends Loop {
             JFileChooser chooser = new JFileChooser();
 
             // 파일 저장 다이얼로그를 현재 프레임(this) 중앙에 띄움
-            int result = chooser.showSaveDialog(game);
+            int result = chooser.showSaveDialog(getGame());
 
             // 사용자가 '저장' 버튼을 눌렀는지 확인
             if (result == JFileChooser.APPROVE_OPTION) {
@@ -230,7 +230,7 @@ public class GameLoop extends Loop {
 
             // 쓸데없는 예외가 생길 가능성을 봉쇄하기 위하여
             // 리플레이 저장 즉시 메인메뉴로 사출
-            game.changeLoop(new MainMenuLoop(game));
+            getGame().changeLoop(new MainMenuLoop(getGame()));
         }
 
         if(!waitingForKeyPress){

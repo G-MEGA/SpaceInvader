@@ -17,14 +17,14 @@ public abstract class LootItem extends Mover2D implements ICollider2DOwner {
         super(loop);
 
         SpriteRenderer spriteRenderer = new SpriteRenderer(loop);
-        spriteRenderer.sprite = SpriteStore.get().getSprite(ref);
+        spriteRenderer.setSpriteRef(ref);
         addChild(spriteRenderer);
 
         Collider2D collider2D = new Collider2D(loop, this);
-        collider2D.boundsPosX = -spriteRenderer.sprite.getPivotX();
-        collider2D.boundsPosY = -spriteRenderer.sprite.getPivotY();
-        collider2D.boundsWidth = ((long)spriteRenderer.sprite.getWidth()) << 16;
-        collider2D.boundsHeight = ((long)spriteRenderer.sprite.getHeight()) << 16;
+        collider2D.boundsPosX = -spriteRenderer.getSpritePivotX();
+        collider2D.boundsPosY = -spriteRenderer.getSpritePivotY();
+        collider2D.boundsWidth = ((long)spriteRenderer.getSpriteWidth()) << 16;
+        collider2D.boundsHeight = ((long)spriteRenderer.getSpriteHeight()) << 16;
         addChild(collider2D);
             
         velocityY = moveSpeed;

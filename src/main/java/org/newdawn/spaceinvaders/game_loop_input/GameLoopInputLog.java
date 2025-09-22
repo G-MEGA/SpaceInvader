@@ -1,8 +1,9 @@
 package org.newdawn.spaceinvaders.game_loop_input;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class GameLoopInputLog {
+public class GameLoopInputLog implements Serializable {
     public long inputFrame;
     public ArrayList<GameLoopInput> inputs;
 

@@ -5,6 +5,7 @@ import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputLog;
 
 import java.awt.*;
+import java.io.*;
 import java.util.ArrayList;
 
 public class ReplayerLoop extends Loop{
@@ -17,6 +18,11 @@ public class ReplayerLoop extends Loop{
     GameLoop gameLoop;
     int playSpeed = 1;
     boolean paused = false;
+
+    long rollbackFrame = -1;
+    int rollbackLogIndex = -1;
+
+    byte[] rollbackSnapshot;
 
     public ReplayerLoop(Game game, String replaySaveData) {
         super(game);
@@ -39,7 +45,7 @@ public class ReplayerLoop extends Loop{
         super.process(inputs);
 
         if(isKeyInputJustPressed("escape")) {
-            game.changeLoop(new MainMenuLoop(game));
+            getGame().changeLoop(new MainMenuLoop(getGame()));
         }
 
         if(isKeyInputJustPressed("right")) {
@@ -56,8 +62,65 @@ public class ReplayerLoop extends Loop{
         }
         // Replay 다시 재생
         if(isKeyInputJustPressed("record")) {
-            game.changeLoop(new ReplayerLoop(game, replaySaveData));
+            getGame().changeLoop(new ReplayerLoop(getGame(), replaySaveData));
             return;
+        }
+
+        //TODO Rollback Test
+        if (isKeyInputPressed("mouse_button_left")) {
+            long startTime = System.nanoTime();
+
+            rollbackFrame = currentFrame;
+            rollbackLogIndex = currentLogIndex;
+            // MainObject만 직렬화합니다.
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = null;
+            try {
+                oos = new ObjectOutputStream(baos);
+                oos.writeObject(gameLoop);
+                oos.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            rollbackSnapshot = baos.toByteArray();
+
+            long endTime = System.nanoTime();
+            // 4. 소요 시간 계산 및 출력
+            long durationNs = endTime - startTime; // 나노초 단위
+            double durationMs = durationNs / 1_000_000.0; // 밀리초 단위로 변환
+            System.out.println("직렬화된 데이터 크기: " + rollbackSnapshot.length + " bytes");
+            System.out.println("직렬화에 걸린 시간: " + durationNs + " ns");
+            System.out.println("직렬화에 걸린 시간: " + String.format("%.6f", durationMs) + " ms");
+        }
+        else if(isKeyInputJustPressed("mouse_button_right") && rollbackFrame >= 0 && rollbackSnapshot != null) {
+            long startTime = System.nanoTime();
+
+            currentFrame = rollbackFrame;
+            currentLogIndex = rollbackLogIndex;
+            // 역직렬화
+            ByteArrayInputStream bais = new ByteArrayInputStream(rollbackSnapshot);
+            ObjectInputStream ois = null;
+            try {
+                ois = new ObjectInputStream(bais);
+                try {
+                    GameLoop restored = (GameLoop) ois.readObject();
+                    gameLoop = restored;
+                    gameLoop.setGame(getGame());
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                ois.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            long endTime = System.nanoTime();
+            // 소요 시간 계산 및 출력
+            long durationNs = endTime - startTime; // 나노초 단위
+            double durationMs = durationNs / 1_000_000.0; // 밀리초 단위로 변환
+            System.out.println("REVERSE 직렬화에 걸린 시간: " + durationNs + " ns");
+            System.out.println("REVERSE 직렬화에 걸린 시간: " + String.format("%.6f", durationMs) + " ms");
         }
 
 

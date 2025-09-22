@@ -10,11 +10,12 @@ import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public abstract class Loop {
-    protected final Game game;
+public abstract class Loop implements Serializable {
+    private transient Game game;
 
     protected final ArrayList<GameObject> gameObjects = new ArrayList<>();
     private final ArrayList<GameObject> gameObjectsInProcessing = new ArrayList<>();
@@ -111,6 +112,13 @@ public abstract class Loop {
     }
     public int getMousePosY() {
         return mousePosY;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+    public void setGame(Game game) {
+        this.game = game;
     }
 
     //* LootItem 제작하면서, LootItem가 생성 될 때, 해당 LootItem를 Loop로 삽입하기 위해 추가한 메소드

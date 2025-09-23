@@ -7,6 +7,7 @@ import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 import org.newdawn.spaceinvaders.game_object.ingame.bullet.EnemyBullet;
 import org.newdawn.spaceinvaders.game_object.ingame.bullet.PlayerBullet;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.ActiveSkill;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
@@ -17,11 +18,9 @@ public class PlayerShip extends GameCharacter{
     private long lastFire = 0L;
     /** The interval between our players shot (ms) */
     private long firingInterval = FixedPointUtil.ZERO_1;
-    
-    // private long shieldCount = 0;
-    // public void addShield(){ addShield(1); }
-    // public void addShield(long count){ shieldCount += count; }
-    // public long getShieldCount() { return shieldCount; }
+
+    private ActiveSkill activeSkill = null;
+    public void setActiveSkill(ActiveSkill activeSkill) { this.activeSkill = activeSkill;}   
 
     private Boolean isSpeedUp = false;
     private long speedUpRatio = 2 << 16 + FixedPointUtil.ZERO_5;

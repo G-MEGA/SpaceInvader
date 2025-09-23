@@ -320,6 +320,8 @@ public class Game extends Canvas
         SpriteStore.get().getSprite("sprites/raiderAlien1.png", 32 << 16, 32 << 16);
         SpriteStore.get().getSprite("sprites/raiderAlien2.png", 32 << 16, 32 << 16);
         SpriteStore.get().getSprite("sprites/raiderAlien3.png", 32 << 16, 32 << 16);
+		SpriteStore.get().getSprite("sprites/testPassiveSkill.png", 32 << 16, 32 << 16);
+		SpriteStore.get().getSprite("sprites/testActiveSkill.png", 32 << 16, 32 << 16);
 
 		Game g = new Game(60L << 16);
 

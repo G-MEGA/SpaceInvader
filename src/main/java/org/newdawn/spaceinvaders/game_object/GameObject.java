@@ -79,13 +79,11 @@ public abstract class GameObject implements Serializable {
         return parent;
     }
     public void addChild(GameObject child){
-        assert children.contains(child) || child.parent != null;
         if(children.contains(child) || child.parent != null) return;
         children.add(child);
         child.parent = this;
     }
     public void removeChild(GameObject child){
-        assert !children.contains(child) || child.parent != this;
         if(!children.contains(child) || child.parent != this) return;
         child.parent = null;
         children.remove(child);

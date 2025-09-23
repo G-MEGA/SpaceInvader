@@ -3,7 +3,6 @@ package org.newdawn.spaceinvaders.loop;
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputKey;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputLog;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputMouseMove;
 import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
@@ -123,6 +122,9 @@ public abstract class Loop implements Serializable {
 
     //* LootItem 제작하면서, LootItem가 생성 될 때, 해당 LootItem를 Loop로 삽입하기 위해 추가한 메소드
     public void addGameObject(GameObject gameObject){
+        if(gameObject.getParent() != null){
+            throw new IllegalArgumentException("부모가 있는 게임오브젝트는 Loop에 직접 연결할 수 없음");
+        }
         if (gameObjects.contains(gameObject))return;
         
         gameObjects.add(gameObject);

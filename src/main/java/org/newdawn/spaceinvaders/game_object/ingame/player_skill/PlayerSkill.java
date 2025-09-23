@@ -1,4 +1,4 @@
-package org.newdawn.spaceinvaders.game_object.player_skill;
+package org.newdawn.spaceinvaders.game_object.ingame.player_skill;
 
 import org.newdawn.spaceinvaders.game_object.ingame.store.IStoreItem;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
@@ -10,8 +10,9 @@ public abstract class PlayerSkill implements IStoreItem {
     private String skillSpriteRef;
     private GameLoop gameLoop;
 
-    public PlayerSkill(String skillName, GameLoop gameLoop) {
+    public PlayerSkill(String skillName, String skillSpriteRef, GameLoop gameLoop) {
         this.skillName = skillName;
+        this.skillSpriteRef = skillSpriteRef;
         this.gameLoop = gameLoop;
     }
 

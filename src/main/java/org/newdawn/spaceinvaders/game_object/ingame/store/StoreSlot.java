@@ -17,9 +17,6 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner {
         spriteRenderer.setSpriteRef(item.getSpriteRef());
         
         addChild(spriteRenderer);
-
-
-
     }
 
     @Override

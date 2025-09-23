@@ -154,13 +154,8 @@ public abstract class Loop implements Serializable {
                 if (me.collidesWith(him)) {
                     ICollider2DOwner meOwner = me.getOwner();
                     ICollider2DOwner himOwner = him.getOwner();
-                    me.collidedWith(himOwner);
-                    
-                    //* me.collidedWith()을 실행하면서, him의 ICollider2DOwner가 파괴 될 수 있다
-                    //* 그 부분을 고려하여 아래 조건식을 추가한 것이다.
-                    if (him.getOwner() != null){
-                        him.collidedWith(meOwner);
-                    }
+                    meOwner.collidedWith(himOwner);
+                    himOwner.collidedWith(meOwner);
                 }
             }
         }

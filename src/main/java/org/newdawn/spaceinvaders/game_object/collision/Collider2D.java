@@ -61,7 +61,4 @@ public class Collider2D extends GameObject2D {
 
         return myStartX <= otherEndX && myEndX >= otherStartX && myStartY <= otherEndY && myEndY >= otherStartY;
     }
-    public void collidedWith(ICollider2DOwner collider){
-        owner.collidedWith(collider);
-    }
 }

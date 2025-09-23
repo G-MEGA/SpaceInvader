@@ -103,7 +103,7 @@ public class Game extends Canvas
 		// request the focus so key events come to us
 		requestFocus();
 
-		// create the buffering strategy which will allow AWT
+		// create the buffering strategy which will allow AWTㄴ
 		// to manage our accelerated graphics
 		createBufferStrategy(2);
 		strategy = getBufferStrategy();

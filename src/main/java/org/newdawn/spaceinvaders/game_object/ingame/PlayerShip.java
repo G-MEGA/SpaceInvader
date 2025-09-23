@@ -1,5 +1,8 @@
 package org.newdawn.spaceinvaders.game_object.ingame;
 
+import java.util.HashMap;
+
+import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.GameCharacter;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
@@ -7,6 +10,7 @@ import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 import org.newdawn.spaceinvaders.game_object.ingame.bullet.EnemyBullet;
 import org.newdawn.spaceinvaders.game_object.ingame.bullet.PlayerBullet;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.ActiveSkill;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
@@ -21,6 +25,21 @@ public class PlayerShip extends GameCharacter{
 
     private ActiveSkill activeSkill = null;
     public void setActiveSkill(ActiveSkill activeSkill) { this.activeSkill = activeSkill;}   
+    public String getActiveSkillName() { 
+        if (activeSkill != null) { return activeSkill.getName(); }
+        return null;
+    }
+
+    private HashMap<PlayerPassiveSkillType, Long> passiveSkills = new HashMap<>(); // < PlayerPassiveSkillType, level >
+    public Long getPassiveSkillLevel(PlayerPassiveSkillType type) { return passiveSkills.get(type); }
+    public boolean isSkillMaxLevel(PlayerPassiveSkillType type) { return passiveSkills.get(type) == type.getMaxLevel(); }
+    public void upgradePassiveSkill(PlayerPassiveSkillType type) { upgradePassiveSkill(type, 1);}
+    public void upgradePassiveSkill(PlayerPassiveSkillType type, long amount){
+        if (!isSkillMaxLevel(type)){
+            long newLevel = Math.clamp(passiveSkills.get(type) + amount, 0, type.getMaxLevel());
+            passiveSkills.put(type, newLevel);
+        }
+    } 
 
     private Boolean isSpeedUp = false;
     private long speedUpRatio = 2 << 16 + FixedPointUtil.ZERO_5;
@@ -33,6 +52,10 @@ public class PlayerShip extends GameCharacter{
 
     public PlayerShip(GameLoop gameLoop) {
         super(gameLoop, 3);
+        
+        for (PlayerPassiveSkillType type : PlayerPassiveSkillType.values()) {
+            passiveSkills.put(type, 0L);
+        }
 
         SpriteRenderer spriteRenderer = new SpriteRenderer(gameLoop);
         spriteRenderer.setSpriteRef("sprites/ship.gif");
@@ -96,6 +119,9 @@ public class PlayerShip extends GameCharacter{
             if (gameLoop.isKeyInputPressed("mouse_button_left")) {
                 tryToFire();
             }
+            if (gameLoop.isKeyInputJustPressed("mouse_button_right")) {
+                tryToDoActiveSkill();
+            }
         }
 
         //region 화면 밖으로 나가지 못하게 제약
@@ -113,6 +139,12 @@ public class PlayerShip extends GameCharacter{
             setPosY(((600L << 16)) - (16 << 16) + FixedPointUtil.ZERO_5);
         }
         //endregion
+    }
+
+    private void tryToDoActiveSkill() {
+        if (activeSkill != null){
+            activeSkill.activate();
+        }
     }
 
     @Override

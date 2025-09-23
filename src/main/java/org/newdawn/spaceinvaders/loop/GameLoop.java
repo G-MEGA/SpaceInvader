@@ -1,6 +1,7 @@
 package org.newdawn.spaceinvaders.loop;
 
 import org.newdawn.spaceinvaders.Game;
+import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputLog;
@@ -21,8 +22,9 @@ import javax.swing.JFileChooser;
 
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Alien;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Artillery;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BasicActiveSkill;
-import org.newdawn.spaceinvaders.game_object.ingame.player_skill.passive_skill.PassiveSkill;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.LaserSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.store.StoreSlot;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 
@@ -130,13 +132,39 @@ public class GameLoop extends Loop {
             }
         }
 
-        BasicActiveSkill basicActiveSkill = new BasicActiveSkill(this);
-        StoreSlot storeSlot = new StoreSlot(this, 2, basicActiveSkill, 400 << 16, 300 << 16);
+        //* 상점 아이템 생성 슬롯
+        BasicActiveSkill basicActiveSkill = new BasicActiveSkill(ship, this);
+        StoreSlot storeSlot = new StoreSlot(this, 0, basicActiveSkill, 600 << 16, 300 << 16);
         gameObjects.add(storeSlot);
 
-        PassiveSkill passiveSkill = new PassiveSkill("Fuck","sprites/testPassiveSkill.png", this, "응애");
-        storeSlot = new StoreSlot(this,1, passiveSkill, 500 << 16, 300 << 16);
+        LaserSkill laserSkill = new LaserSkill(ship, this);
+        storeSlot = new StoreSlot(this, 0, laserSkill, 700 << 16, 300 << 16);
         gameObjects.add(storeSlot);
+
+        // (타입, x, y) 정보를 담은 배열
+        Object[][] skillData = {
+            { PlayerPassiveSkillType.AttackSpeed, 100 << 16, 300 << 16 },
+            { PlayerPassiveSkillType.AttackSpeed, 200 << 16, 300 << 16 },
+            { PlayerPassiveSkillType.AttackSpeed, 300 << 16, 300 << 16 },
+            { PlayerPassiveSkillType.AttackSpeed, 400 << 16, 300 << 16 },
+            { PlayerPassiveSkillType.AdditionalEngine, 100 << 16, 400 << 16 },
+            { PlayerPassiveSkillType.AdditionalEngine, 200 << 16, 400 << 16 }
+        };
+
+        // 반복문으로 생성
+        for (Object[] data : skillData) {
+            PlayerPassiveSkillType type = (PlayerPassiveSkillType) data[0];
+            int x = (int) data[1];
+            int y = (int) data[2];
+
+            PassiveSkill passiveSkill = new PassiveSkill(type, ship, this);
+            storeSlot = new StoreSlot(this, 0, passiveSkill, x, y);
+            gameObjects.add(storeSlot);
+        }
+
+        // PassiveSkill passiveSkill = new PassiveSkill("Fuck", "sprites/testPassiveSkill.png", ship, this, "응애");
+        // storeSlot = new StoreSlot(this,1, passiveSkill, 500 << 16, 300 << 16);
+        // gameObjects.add(storeSlot);
 
         enemyHiveMind.cancelBroadcast();
         System.gc();
@@ -307,5 +335,18 @@ public class GameLoop extends Loop {
         String shieldText = "Health : " + Long.toString(ship.getHealth());
         g.setColor(Color.white);
         g.drawString(shieldText,0,30);
+
+        String activeSkillText = "Active Skill : " + ship.getActiveSkillName();
+        g.setColor(Color.white);
+        g.drawString(activeSkillText,0,50);
+
+        String passiveSkillsText = "(Passive Skills)";
+        g.setColor(Color.white);
+        g.drawString(passiveSkillsText,0,70);
+        int i = 1;
+        for (PlayerPassiveSkillType type : PlayerPassiveSkillType.values()) {
+            passiveSkillsText = type.getName() + " : " + ship.getPassiveSkillLevel(type) + "\n";
+            g.drawString(passiveSkillsText,0,70 + 20 * i++);
+        }
     }
 }

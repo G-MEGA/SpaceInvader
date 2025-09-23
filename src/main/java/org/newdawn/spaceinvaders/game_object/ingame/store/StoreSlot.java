@@ -56,8 +56,9 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner {
     public void collidedWith(ICollider2DOwner collider) {
         if (collider instanceof PlayerShip){
             if(gameLoop.decreaseCoin(price)){
-                item.acquire(gameLoop);
-                destroy();
+                if(item.onAcquire(gameLoop)){
+                    destroy();
+                }
             }
             else{
                 //TODO GUI 표시로 바꾸기

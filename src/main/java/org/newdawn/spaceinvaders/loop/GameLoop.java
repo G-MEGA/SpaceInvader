@@ -20,7 +20,8 @@ import java.util.ArrayList;
 import javax.swing.JFileChooser;
 
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Alien;
-import org.newdawn.spaceinvaders.game_object.ingame.enemy.Bullet;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.Artillery;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.Raider;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 
 public class GameLoop extends Loop {
@@ -29,9 +30,9 @@ public class GameLoop extends Loop {
 
     /** The entity representing the player */
     private PlayerShip ship;
-    /** The number of aliens left on the screen */
-    private int alienCount;
-    private HiveMind alienHiveMind = new HiveMind();
+    /** The number of enemies left on the screen */
+    private int enemyCount;
+    private HiveMind enemyHiveMind = new HiveMind();
     private ArrayList<Enemy> enemies = new ArrayList<>();
 
     /** The message to display which waiting for a key press */
@@ -80,19 +81,25 @@ public class GameLoop extends Loop {
         gameObjects.add(ship);
 
         // create a block of aliens (5 rows, by 12 aliens, spaced evenly)
-        alienCount = 0;
+        enemyCount = 0;
         for (long row=0L;row<5L;row++) {
             for (long x=0L;x<12L;x++) {
-                Alien alien = new Alien(this, alienHiveMind);
-                alien.setPos((100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
-                gameObjects.add(alien);
-                enemies.add(alien);
-                alienHiveMind.addListener(alien);
-                alienCount++;
+                Enemy enemy;
+                if (row <= 3L){
+                    enemy = new Alien(this, enemyHiveMind);
+                }
+                else{
+                    enemy = new Artillery(this, enemyHiveMind, ship);
+                }
+                enemy.setPos((100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+                gameObjects.add(enemy);
+                enemies.add(enemy);
+                enemyHiveMind.addListener(enemy);
+                enemyCount++;
             }
         }
 
-        alienHiveMind.cancelBroadcast();
+        enemyHiveMind.cancelBroadcast();
         System.gc();
     }
 
@@ -125,23 +132,23 @@ public class GameLoop extends Loop {
      */
     public void notifyAlienKilled() {
         // reduce the alient count, if there are none left, the player has won!
-        alienCount--;
+        enemyCount--;
 
-        if (alienCount == 0) {
+        if (enemyCount == 0) {
             notifyWin();
         }
 
         for(GameObject gameObject : gameObjects){
-            if(gameObject instanceof Alien){
-                ((Alien) gameObject).velocityX = FixedPointUtil.mul(
-                        ((Alien) gameObject).velocityX,
+            if(gameObject instanceof Enemy){
+                ((Enemy) gameObject).velocityX = FixedPointUtil.mul(
+                        ((Enemy) gameObject).velocityX,
                         FixedPointUtil.ONE + FixedPointUtil.ZERO_02);
             }
         }
     }
 
     //* LootItem을 먹었을때, 나타나는 효과를 호출하는 메소드
-    public void addShieldOnPlayerShip() { ship.addShield(); }
+    public void addShieldOnPlayerShip() { ship.increaseHealth(); }
     public void requestToSpeedUpOnPlayerShip() { ship.requestToSpeedUp(); }
     public void requestToSlowDownEnemies(){
         for (Enemy enemy : enemies){
@@ -234,7 +241,7 @@ public class GameLoop extends Loop {
         }
 
         if(!waitingForKeyPress){
-            alienHiveMind.broadcastIfRequested();
+            enemyHiveMind.broadcastIfRequested();
 
             processGameObjects();
         }
@@ -258,7 +265,7 @@ public class GameLoop extends Loop {
         g.setColor(Color.white);
         g.drawString(coinText,0,10);
 
-        String shieldText = "Shield : " + Long.toString(ship.getShieldCount());
+        String shieldText = "Health : " + Long.toString(ship.getHealth());
         g.setColor(Color.white);
         g.drawString(shieldText,0,30);
     }

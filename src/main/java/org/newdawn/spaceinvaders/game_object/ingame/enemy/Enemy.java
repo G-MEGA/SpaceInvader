@@ -3,6 +3,7 @@ package org.newdawn.spaceinvaders.game_object.ingame.enemy;
 import java.util.ArrayList;
 
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
+import org.newdawn.spaceinvaders.game_object.GameCharacter;
 import org.newdawn.spaceinvaders.game_object.Mover2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
@@ -15,7 +16,7 @@ import org.newdawn.spaceinvaders.loop.GameLoop;
 import org.newdawn.spaceinvaders.singleton.LootItemFactory;
 import org.newdawn.spaceinvaders.sprite.Sprite;
 
-public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMindListener {
+public abstract class Enemy extends GameCharacter implements IHiveMindListener {
     protected HiveMind hiveMind;
 
     protected SpriteRenderer spriteRenderer;
@@ -31,8 +32,8 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
     protected long slowDownTime = 3 << 16;
     protected long slowDownElapsed = 0;
 
-    public Enemy(GameLoop gameLoop){
-        super(gameLoop);
+    public Enemy(GameLoop gameLoop, long initialHealth){
+        super(gameLoop, initialHealth);
 
         spriteRenderer = new SpriteRenderer(gameLoop);
         addSprites();
@@ -54,8 +55,8 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
         addChild(collider2D);
     }
 
-    public Enemy(GameLoop gameLoop, HiveMind hiveMind){
-        this(gameLoop);
+    public Enemy(GameLoop gameLoop, HiveMind hiveMind, long initialHealth){
+        this(gameLoop, initialHealth);
 
         this.hiveMind = hiveMind;
         this.hiveMind.addListener(this);
@@ -95,15 +96,17 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
         }
     }
 
-    public void hurt(){
+    public void onHitByBullet(){
         if(isDestroyed()) return;
 
-        destroy();
-
-        LootItem item = LootItemFactory.getInstance().instantiateRandomItem(loop);
-
-        if (item != null){
-            item.setPos(getPosX(), getPosY());
+        if (--_health <= 0){
+            destroy();
+    
+            LootItem item = LootItemFactory.getInstance().instantiateRandomItem(loop);
+    
+            if (item != null){
+                item.setPos(getPosX(), getPosY());
+            }
         }
     }
 
@@ -114,8 +117,10 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
         }
     }
 
-    private void collideWithPlayerShip(){
-        destroy();
+    protected void collideWithPlayerShip(){
+        if (--_health <= 0){
+            destroy();
+        }
     }
     
     /**
@@ -151,5 +156,11 @@ public abstract class Enemy extends Mover2D implements ICollider2DOwner, IHiveMi
 
             hasSlowDown = true;
         }
+    }
+    
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ((GameLoop)loop).notifyAlienKilled();// GameLoop에 부고소식 전달
     }
 }

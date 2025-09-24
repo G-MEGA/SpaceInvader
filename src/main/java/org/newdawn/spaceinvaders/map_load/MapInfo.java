@@ -17,4 +17,14 @@ public class MapInfo {
     public String toString() {
         return "MapInfo " + title + " " + path + " " + hash;
     }
+
+    public String getHash() {
+        return hash;
+    }
+    public Path getPath() {
+        return path;
+    }
+    public String getTitle() {
+        return title;
+    }
 }

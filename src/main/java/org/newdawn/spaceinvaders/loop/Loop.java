@@ -16,7 +16,7 @@ import java.util.HashMap;
 public abstract class Loop implements Serializable {
     private transient Game game;
 
-    protected final ArrayList<GameObject> gameObjects = new ArrayList<>();
+    private final ArrayList<GameObject> gameObjects = new ArrayList<>();
     private final ArrayList<GameObject> gameObjectsInProcessing = new ArrayList<>();
     private final ArrayList<Collider2D> colliders = new ArrayList<>();
 
@@ -121,7 +121,7 @@ public abstract class Loop implements Serializable {
     }
 
     //* LootItem 제작하면서, LootItem가 생성 될 때, 해당 LootItem를 Loop로 삽입하기 위해 추가한 메소드
-    public void addGameObject(GameObject gameObject){
+    public final void addGameObject(GameObject gameObject){
         if(gameObject.getParent() != null){
             throw new IllegalArgumentException("부모가 있는 게임오브젝트는 Loop에 직접 연결할 수 없음");
         }
@@ -129,20 +129,26 @@ public abstract class Loop implements Serializable {
         
         gameObjects.add(gameObject);
     }
-    public void removeGameObject(GameObject gameObject){
+    public final void removeGameObject(GameObject gameObject){
         gameObjects.remove(gameObject);
     }
+    public final void clearGameObjects() {
+        gameObjects.clear();
+    }
+    public final ArrayList<GameObject> getGameObjects(){
+        return gameObjects;
+    }
 
-    public void addCollider(Collider2D collider){
+    public final void addCollider(Collider2D collider){
         if(colliders.contains(collider))return;
 
         colliders.add(collider);
     }
-    public void removeCollider(Collider2D collider){
+    public final void removeCollider(Collider2D collider){
         colliders.remove(collider);
     }
 
-    public void processCollision2D(){
+    public final void processCollision2D(){
         for (int p=0;p<colliders.size();p++) {
             for (int s=p+1;s<colliders.size();s++) {
                 Collider2D me = colliders.get(p);
@@ -161,7 +167,7 @@ public abstract class Loop implements Serializable {
         }
     }
 
-    protected void processGameObjects(){
+    protected final void processGameObjects(){
         gameObjectsInProcessing.clear();
         gameObjectsInProcessing.addAll(gameObjects);
 

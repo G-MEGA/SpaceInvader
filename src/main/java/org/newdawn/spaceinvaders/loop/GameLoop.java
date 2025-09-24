@@ -63,10 +63,10 @@ public class GameLoop extends Loop {
      */
     private void startGame() {
         // clear out any existing entities and intialise a new set
-        for (GameObject gameObject : gameObjects) {
+        for (GameObject gameObject : getGameObjects()) {
             gameObject.destroy();
         }
-        gameObjects.clear();
+        clearGameObjects();
         initEntities();
     }
 
@@ -78,7 +78,7 @@ public class GameLoop extends Loop {
         // create the player ship and place it roughly in the center of the screen
         ship = new PlayerShip(this);
         ship.setPos(400 << 16, 550 << 16);
-        gameObjects.add(ship);
+        addGameObject(ship);
 
         // create a block of aliens (5 rows, by 12 aliens, spaced evenly)
         enemyCount = 0;
@@ -92,7 +92,7 @@ public class GameLoop extends Loop {
                     enemy = new Artillery(this, enemyHiveMind, ship);
                 }
                 enemy.setPos((100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
-                gameObjects.add(enemy);
+                addGameObject(enemy);
                 enemies.add(enemy);
                 enemyHiveMind.addListener(enemy);
                 enemyCount++;
@@ -138,13 +138,34 @@ public class GameLoop extends Loop {
             notifyWin();
         }
 
-        for(GameObject gameObject : gameObjects){
+        for(GameObject gameObject : getGameObjects()){
             if(gameObject instanceof Enemy){
                 ((Enemy) gameObject).velocityX = FixedPointUtil.mul(
                         ((Enemy) gameObject).velocityX,
                         FixedPointUtil.ONE + FixedPointUtil.ZERO_02);
             }
         }
+    }
+
+    public String getReplayData(){
+//            forReplay 변수가 있으니 리플레이 녹화 버튼 입력이 리플레이 데이터에 들어가도 괜찮음
+//            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외
+//            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외
+
+        StringBuilder sb = new StringBuilder();
+        for(GameLoopInputLog gameLoopInputLog : inputLogs){
+            String gameLoopInputLogData = gameLoopInputLog.toSaveData();
+
+//            forReplay 변수가 있으니 리플레이 녹화 버튼 입력이 리플레이 데이터에 들어가도 괜찮음
+//                if(gameLoopInputLogData.contains("record"))
+//                    continue;
+
+            sb.append(gameLoopInputLogData).append("\n");
+        }
+
+        String data = sb.toString();
+
+        return data;
     }
 
     //* LootItem을 먹었을때, 나타나는 효과를 호출하는 메소드
@@ -182,23 +203,9 @@ public class GameLoop extends Loop {
             getGame().changeLoop(new MainMenuLoop(getGame()));
         }
 
+        //TODO 리플레이 저장 (임시)
         if(!forReplay && isKeyInputJustPressed("record")) {
-//            forReplay 변수가 있으니 리플레이 녹화 버튼 입력이 리플레이 데이터에 들어가도 괜찮음
-//            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외
-//            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외
-
-            StringBuilder sb = new StringBuilder();
-            for(GameLoopInputLog gameLoopInputLog : inputLogs){
-                String gameLoopInputLogData = gameLoopInputLog.toSaveData();
-
-//            forReplay 변수가 있으니 리플레이 녹화 버튼 입력이 리플레이 데이터에 들어가도 괜찮음
-//                if(gameLoopInputLogData.contains("record"))
-//                    continue;
-
-                sb.append(gameLoopInputLogData).append("\n");
-            }
-
-            String data = sb.toString();
+            String data = getReplayData();
 
             // JFileChooser 객체 생성
             JFileChooser chooser = new JFileChooser();

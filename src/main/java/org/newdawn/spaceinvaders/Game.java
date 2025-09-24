@@ -181,6 +181,10 @@ public class Game extends Canvas
 			SystemTimer.sleep(lastLoopTime+(long)(FixedPointUtil.toDouble(fixedDeltaTime)*1000)-SystemTimer.getTime());
 		}
 	}
+
+    public MapList getMapList() {
+        return mapList;
+    }
 	
 	/**
 	 * A class to handle keyboard input from the user. The class

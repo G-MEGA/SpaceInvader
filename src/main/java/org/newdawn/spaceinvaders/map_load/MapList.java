@@ -11,16 +11,24 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MapList {
-    List<MapInfo> list = new ArrayList<>();
+    ArrayList<MapInfo> list = new ArrayList<>();
+    public ArrayList<MapInfo> getList() {
+        return list;
+    }
 
     public MapList(){
+        refresh();
+    }
+
+    public void refresh(){
+        list.clear();
+
         // 맵 목록 읽어오기
-        List<Path> pathList = new ArrayList<>();
+        ArrayList<Path> pathList = new ArrayList<>();
         try {
             pathList.addAll(listFiles("maps"));
         } catch (Exception e) {
@@ -47,7 +55,7 @@ public class MapList {
                 }
 
                 list.add(new MapInfo(hash, path, title));
-                System.out.println(list.get(list.size()-1).toString());
+//                System.out.println(list.get(list.size()-1).toString());
             } catch (IOException e) {
                 System.err.println("파일을 읽는 중 오류가 발생했습니다: " + e.getMessage());
                 e.printStackTrace();
@@ -60,7 +68,7 @@ public class MapList {
      * @param path resources 폴더를 기준으로 한 내부 디렉터리 경로 (예: "maps")
      * @return 파일 이름 목록
      */
-    public List<Path> listFiles(String path) throws IOException, URISyntaxException {
+    public ArrayList<Path> listFiles(String path) throws IOException, URISyntaxException {
         // 1. ClassLoader를 통해 리소스의 URL을 가져옵니다.
         URL url = this.getClass().getClassLoader().getResource(path);
         if (url == null) {
@@ -84,9 +92,7 @@ public class MapList {
         // 3. 얻어진 Path 객체를 사용하여 파일 목록을 스트림으로 처리합니다.
         //    이 부분은 두 환경 모두 동일하게 동작합니다.
         try (Stream<Path> stream = Files.list(myPath)) {
-            return stream
-                    .filter(Files::isRegularFile)
-                    .collect(Collectors.toList());
+            return stream.filter(Files::isRegularFile).collect(Collectors.toCollection(ArrayList::new));
         }
     }
 

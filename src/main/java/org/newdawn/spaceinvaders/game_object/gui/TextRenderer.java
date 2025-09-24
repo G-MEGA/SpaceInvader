@@ -8,6 +8,12 @@ import java.awt.geom.AffineTransform;
 
 public class TextRenderer extends GameObject2D {
     String text;
+    public void setText(String text)
+    {
+        this.text = text;
+
+        lines = this.text.split("\n");
+    }
     int fontSize;
     Color color;
     int fontStyle;// 0 기본 1 굵게 2 이탤릭
@@ -16,10 +22,12 @@ public class TextRenderer extends GameObject2D {
 
     Font font;
 
+    String[] lines;
+
     public TextRenderer(Loop loop, String text, int fontSize, Color color, int fontStyle) {
         super(loop);
 
-        this.text = text;
+        setText(text);
         this.fontSize = fontSize;
         this.color = color;
         this.fontStyle = fontStyle;
@@ -38,19 +46,23 @@ public class TextRenderer extends GameObject2D {
         AffineTransform t = getGlobalTransformForDraw();
 
         g.setFont(font);
-        int width = g.getFontMetrics().stringWidth(text);
         int height = g.getFontMetrics().getHeight();
+        int startY = (int)t.getTranslateY() + height;
 
         g.setColor(color);
 
-        if(alignment == 0){
-            g.drawString(text,(int)t.getTranslateX(), (int)t.getTranslateY() + height);
-        }
-        else if(alignment == 1){
-            g.drawString(text,(int)t.getTranslateX() - width/2, (int)t.getTranslateY() + height);
-        }
-        else if(alignment == 2){
-            g.drawString(text,(int)t.getTranslateX() - width, (int)t.getTranslateY() + height);
+        for(int i = 0; i < lines.length; i++){
+            String line = lines[i];
+
+            int x = (int)t.getTranslateX();
+            int width = g.getFontMetrics().stringWidth(line);
+            if(alignment == 1){
+                x = (int)t.getTranslateX() - width/2;
+            }
+            else if(alignment == 2){
+                x = (int)t.getTranslateX() - width;
+            }
+            g.drawString(line,x, startY + i * height);
         }
     }
 }

@@ -11,7 +11,6 @@ import org.newdawn.spaceinvaders.game_object.ingame.bullet.EnemyBullet;
 import org.newdawn.spaceinvaders.game_object.ingame.bullet.PlayerBullet;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 
-import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.ActiveSkill;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
@@ -29,16 +28,24 @@ public class PlayerShip extends GameCharacter{
     private final long defaultFiringIntreval = FixedPointUtil.ZERO_5;
     private long firingInterval = defaultFiringIntreval;
 
-    private int waveInitialShield = 0;
-    private int currentShield = waveInitialShield; 
-    public int getCurrentShield() { return currentShield; }
-
+    private long activeSkillActivateElapsed = Long.MAX_VALUE;
+    private boolean isActiveSkillCoolDown = false;
     private ActiveSkill activeSkill = null;
     public void setActiveSkill(ActiveSkill activeSkill) { this.activeSkill = activeSkill;}   
     public String getActiveSkillName() { 
         if (activeSkill != null) { return activeSkill.getName(); }
         return null;
     }
+    public boolean isActiveSkillCoolDown() { return isActiveSkillCoolDown; }
+    public Long getRemainCoolTime() { 
+        if (activeSkill == null || !isActiveSkillCoolDown) { return null; }
+        return activeSkill.getCoolTime() - activeSkillActivateElapsed;
+    }
+
+    private int waveInitialShield = 0;
+    private int currentShield = waveInitialShield; 
+    public int getCurrentShield() { return currentShield; }
+
 
     private HashMap<PlayerPassiveSkillType, Integer> passiveSkills = new HashMap<>(); // < PlayerPassiveSkillType, level >
     public int getPassiveSkillLevel(PlayerPassiveSkillType type) { return passiveSkills.get(type); }
@@ -143,6 +150,11 @@ public class PlayerShip extends GameCharacter{
     private long speedUpRatio = 2 << 16 + FixedPointUtil.ZERO_5;
     private long speedUpTime = 4 << 16;
     private long speedUpElapsed = 0;
+
+    private long reflexibleElapsed = 0;
+    private final long reflexibleTime = 2L << 16;
+    private boolean isReflexible = false;;
+
     public void requestToSpeedUp(){
         isSpeedUp = true;
         speedUpElapsed = 0;
@@ -218,7 +230,7 @@ public class PlayerShip extends GameCharacter{
                 tryToFire();
             }
             if (gameLoop.isKeyInputJustPressed("mouse_button_right")) {
-                tryToDoActiveSkill();
+                tryToDoActiveSkill(deltaTime);
             }
         }
 
@@ -237,21 +249,46 @@ public class PlayerShip extends GameCharacter{
             setPosY(((600L << 16)) - (16 << 16) + FixedPointUtil.ZERO_5);
         }
         //endregion
+
+        //TODO coolTime 로직 고치기
+        if (isActiveSkillCoolDown){
+            if (activeSkillActivateElapsed <= activeSkill.getCoolTime()){
+                isActiveSkillCoolDown = false;
+                activeSkillActivateElapsed = 0;
+            }
+            else{
+                activeSkillActivateElapsed += deltaTime;
+            }
+        }
+
+        if (isReflexible){
+            if (reflexibleElapsed >= reflexibleTime){
+                isReflexible = false;
+                reflexibleElapsed = 0;
+            }
+            else{
+                reflexibleElapsed += deltaTime;
+            }
+        }
     }
 
-    private void tryToDoActiveSkill() {
+    private void tryToDoActiveSkill(long deltaTime) {
         if (activeSkill != null){
-            activeSkill.activate();
+            if (!isActiveSkillCoolDown){
+                activeSkill.activate();
+                activeSkillActivateElapsed = -deltaTime; //* textUI 띄울 때 activeSkill.getCoolTime() 부터 보이도록 하는 용도로 -deltaTime을 할당
+                isActiveSkillCoolDown = true;
+            }
         }
     }
 
     @Override
     public void collidedWith(ICollider2DOwner collider) {
         if (collider instanceof Enemy) {
-            onHurt();
+            onHurt(collider);
         }
         else if (collider instanceof EnemyBullet){
-            onHurt();
+            onHurt(collider);
             
             EnemyBullet enemyBullet = (EnemyBullet)collider;
             enemyBullet.onHitByPlayerShip();
@@ -259,7 +296,25 @@ public class PlayerShip extends GameCharacter{
         }
     }
 
-    private void onHurt(){
+    private void onHurt(ICollider2DOwner collider){
+        if (isReflexible && collider instanceof EnemyBullet){
+            GameLoop gameLoop = (GameLoop)loop;
+            EnemyBullet enemyBullet = (EnemyBullet)collider;
+
+            PlayerBullet bullet = new PlayerBullet(
+            bulletDamage,
+            gameLoop, 
+            enemyBullet.getRotation(), 
+            getPosX(), 
+            getPosY(), 
+            -30,
+            -enemyBullet.getSpawnSpeed()
+            );
+
+            gameLoop.addGameObject(bullet);
+
+            return;
+        }
         if (currentShield > 0){
             currentShield -= 1;
             return;
@@ -271,6 +326,11 @@ public class PlayerShip extends GameCharacter{
 
     public void onWaveStart(){
         currentShield = waveInitialShield;
+    }
+
+    public void notifyReflectionionEvent(){
+        isReflexible = true;
+        reflexibleElapsed = 0;
     }
 
     /**

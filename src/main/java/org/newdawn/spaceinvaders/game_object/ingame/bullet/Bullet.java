@@ -11,6 +11,8 @@ import org.newdawn.spaceinvaders.loop.GameLoop;
 public abstract class Bullet extends Mover2D implements ICollider2DOwner {
      /** True if this shot has been "used", i.e. its hit something */
     protected boolean used = false;
+    protected long spawnSpeed = 0;;
+    public long getSpawnSpeed() { return spawnSpeed; }
 
     public Bullet(GameLoop gameLoop, long spawnAngle, long spawnCentralX, long spawnCentralY, long spawnOffset, long spawnSpeed) {
         super(gameLoop);
@@ -37,6 +39,8 @@ public abstract class Bullet extends Mover2D implements ICollider2DOwner {
 
         velocityX = FixedPointUtil.mul(FixedPointUtil.cos(spawnAngle), spawnSpeed);
         velocityY = FixedPointUtil.mul(FixedPointUtil.sin(spawnAngle), spawnSpeed);
+
+        this.spawnSpeed = spawnSpeed;
     }
 
     protected void process(long deltaTime) {

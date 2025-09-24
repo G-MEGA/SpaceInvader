@@ -1,6 +1,7 @@
 package org.newdawn.spaceinvaders.loop;
 
 import org.newdawn.spaceinvaders.Game;
+import org.newdawn.spaceinvaders.enums.IndicatorTextType;
 import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
@@ -68,6 +69,20 @@ public class GameLoop extends Loop {
         }
     }
 
+    private TextRenderer indicatorText;
+    private boolean isIndicatorShown = false;
+    private final long indicatorShowTime = 2 << 16;
+    private long indicatorShownElapsed = 0;
+    public void showIndicatorText(String text) { showIndicatorText(text, IndicatorTextType.Default);}
+    public void showIndicatorText(String text, IndicatorTextType type){ showIndicatorText(text, type.getColor(), type.getFontStyle()); }
+    public void showIndicatorText(String text, Color color, int fontStyle){
+        indicatorText.setText(text);
+        indicatorText.setColor(color);
+        indicatorText.setFontStyle(fontStyle);
+
+        isIndicatorShown = true;
+    }
+
     private long coinCount = 0;
     public long getCoinCount() { return coinCount; }
     public void increaseCoin(){ increaseCoin(1); }
@@ -109,6 +124,7 @@ public class GameLoop extends Loop {
     }
 
     private void initText() {
+        //* 좌측 상단 Text 관련 초기화
         passiveSkillsTexts = new HashMap<>();
         
         coinCountText = new TextRenderer(this, "Coin : " + Long.toString(coinCount), 15);
@@ -130,6 +146,12 @@ public class GameLoop extends Loop {
         for (TextRenderer text : passiveSkillsTexts.values()) {
             text.setPos(0, (90 + index++ * 10) << 16);
         }
+
+        //* Indicator Text 관련 초기화
+        indicatorText = new TextRenderer(this, "", 20);
+        indicatorText.alignment = 1;
+        indicatorText.setPos(400 << 16, 50 << 16);
+        gameObjects.add(indicatorText);
     }
 
     private void updateText() {
@@ -368,7 +390,17 @@ public class GameLoop extends Loop {
             processGameObjects();
         }
 
+        //* TextUI 관련 로직
         updateText();
+        if (isIndicatorShown){
+            if (indicatorShownElapsed > indicatorShowTime){
+                isIndicatorShown = false;
+                indicatorShownElapsed = 0;
+                indicatorText.setText("");
+            }
+            else { indicatorShownElapsed += getGame().fixedDeltaTime; } //? 흠 deltaTime 아니긴 한데 괜찮겠지?
+        }
+
         //endreigon
 
         currentFrame++;
@@ -384,26 +416,5 @@ public class GameLoop extends Loop {
             g.drawString("Press 'Accept' key",(800-g.getFontMetrics().stringWidth("Press 'Accept' key"))/2,300);
         }
         
-        // String coinText = "Coin : " + Long.toString(coinCount);
-        // g.setColor(Color.white);
-        // g.drawString(coinText,0,10);
-
-        // String shieldText = "Health : " + Long.toString(ship.getHealth());
-        // g.setColor(Color.white);
-        // g.drawString(shieldText,0,30);
-
-        // String activeSkillText = "Active Skill : " + ship.getActiveSkillName();
-        // g.setColor(Color.white);
-        // g.drawString(activeSkillText,0,50);
-
-        // String passiveSkillsText = "(Passive Skills)";
-        // g.setColor(Color.white);
-        // g.drawString(passiveSkillsText,0,70);
-        // int i = 1;
-        // for (PlayerPassiveSkillType type : PlayerPassiveSkillType.values()) {
-        //     passiveSkillsText = type.getName() + " : " + ship.getPassiveSkillLevel(type) + "\n";
-        //     g.drawString(passiveSkillsText,0,70 + 20 * i++);
-        // }
     }
-
 }

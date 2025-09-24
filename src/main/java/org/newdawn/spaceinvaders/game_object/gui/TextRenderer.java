@@ -10,6 +10,7 @@ public class TextRenderer extends GameObject2D {
     String text;
     int fontSize;
     Color color;
+    
     int fontStyle;// 0 기본 1 굵게 2 이탤릭
     
     public int alignment = 0;// 0 오른쪽 1 중앙 2 왼쪽 표시
@@ -21,7 +22,8 @@ public class TextRenderer extends GameObject2D {
         this.fontStyle = fontStyle;
         font = new Font("Dialog.plain", fontStyle, fontSize);
     }
-
+    public void setColor(Color color) { this.color = color; }
+    
     public TextRenderer(Loop loop, String text, int fontSize, Color color, int fontStyle) {
         super(loop);
 

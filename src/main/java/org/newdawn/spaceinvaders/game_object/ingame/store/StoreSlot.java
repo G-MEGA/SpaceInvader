@@ -3,6 +3,7 @@ package org.newdawn.spaceinvaders.game_object.ingame.store;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
+import org.newdawn.spaceinvaders.enums.IndicatorTextType;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
@@ -69,8 +70,7 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner {
                 }
             }
             else{
-                //TODO GUI 표시로 바꾸기
-                System.out.println("코인 갯수 부족 합니다!");
+                gameLoop.showIndicatorText("코인 갯수가 부족 합니다!", IndicatorTextType.Warning);
             }
         }
     }

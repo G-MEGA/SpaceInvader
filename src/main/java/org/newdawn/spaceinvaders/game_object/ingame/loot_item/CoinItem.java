@@ -12,7 +12,7 @@ public class CoinItem extends LootItem {
     protected void onCollideWithPlayerShip(){
         if (loop instanceof GameLoop){
             GameLoop gameLoop = (GameLoop)loop;
-            gameLoop.addCoin();
+            gameLoop.increaseCoin();
         }
     }
 }

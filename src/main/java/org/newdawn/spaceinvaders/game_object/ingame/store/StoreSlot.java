@@ -7,6 +7,7 @@ import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
+import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
 import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
@@ -17,6 +18,8 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner {
     private long price;
     private GameLoop gameLoop;
     private SpriteRenderer spriteRenderer;
+    private TextRenderer itemNameText;
+    private TextRenderer priceText;
 
     public StoreSlot(GameLoop loop, long price, IStoreItem item, long spawnX, long spawnY) {
         super(loop);
@@ -26,7 +29,20 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner {
 
         spriteRenderer = new SpriteRenderer(loop);
         spriteRenderer.setSpriteRef(item.getSpriteRef());
+
+        long spriteHalfHeight = FixedPointUtil.div(spriteRenderer.getSpriteHeight() << 16, 2 << 16);
+        itemNameText = new TextRenderer(loop, item.getName(), 10);
+        itemNameText.alignment = 1;
+        itemNameText.setPos(getPosX(), getPosY() + spriteHalfHeight);
+        itemNameText.setFontStyle(1);
+        
+        priceText = new TextRenderer(loop, Long.toString(price), 10, Color.yellow);
+        itemNameText.alignment = 1;
+        priceText.setPos(getPosX(), getPosY() + spriteHalfHeight + (13 << 16));
+
         addChild(spriteRenderer);
+        addChild(itemNameText);
+        addChild(priceText);
 
         Collider2D collider2D = new Collider2D(loop, this);
         collider2D.boundsPosX = -spriteRenderer.getSpritePivotX();
@@ -42,14 +58,6 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner {
     @Override
     protected void draw(Graphics2D g) {
         super.draw(g);
-
-        //TODO 좀 더 보기 좋게 만들기
-        long startX = getPosX() >> 16;
-        long startY = (getPosY() >> 16) + 50;
-        g.setColor(Color.white);
-        g.drawString(item.getName(), startX - 32, startY);
-        g.setColor(Color.yellow);
-        g.drawString(Long.toString(price), startX, startY + 15);
     }
 
     @Override

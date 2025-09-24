@@ -16,7 +16,11 @@ public class TextRenderer extends GameObject2D {
     
     Font font;
     
-    public void setText(String text) { this.text = text; }
+    public void setText(String text) { this.text = text; }    
+    public void setFontStyle(int fontStyle) { 
+        this.fontStyle = fontStyle;
+        font = new Font("Dialog.plain", fontStyle, fontSize);
+    }
 
     public TextRenderer(Loop loop, String text, int fontSize, Color color, int fontStyle) {
         super(loop);

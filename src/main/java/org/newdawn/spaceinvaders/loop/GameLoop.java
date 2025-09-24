@@ -17,9 +17,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JFileChooser;
 
+import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Alien;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Artillery;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
@@ -45,6 +47,26 @@ public class GameLoop extends Loop {
     private boolean waitingForKeyPress = true;
 
     boolean forReplay = false;
+
+    //* 게임 화면에 존재하는 Text UI들
+    private TextRenderer coinCountText;
+    private TextRenderer playerHealthText;
+    private TextRenderer activeSkill;
+    private TextRenderer passiveSkillHeaderText;
+    private HashMap<PlayerPassiveSkillType, TextRenderer> passiveSkillsTexts;
+    private void updatePassiveSkillText(){
+        for (PlayerPassiveSkillType type : PlayerPassiveSkillType.values()) {
+            TextRenderer text = passiveSkillsTexts.get(type);
+            if (text == null){
+                text = new TextRenderer(this, "", 10);
+                passiveSkillsTexts.put(type, text);
+
+                addGameObject(text);
+            }
+
+            text.setText(type.getName() + " : " + ship.getPassiveSkillLevel(type));
+        }
+    }
 
     private long coinCount = 0;
     public long getCoinCount() { return coinCount; }
@@ -78,13 +100,45 @@ public class GameLoop extends Loop {
         return false;    
     }
 
-
     public GameLoop(Game game){
         super(game);
         // initialise the entities in our game so there's something
         // to see at startup
         initEntities();
+        initText();
     }
+
+    private void initText() {
+        passiveSkillsTexts = new HashMap<>();
+        
+        coinCountText = new TextRenderer(this, "Coin : " + Long.toString(coinCount), 15);
+        playerHealthText = new TextRenderer(this, "Health : " + Long.toString(ship.getHealth()), 15);
+        activeSkill = new TextRenderer(this, "Active Skill : " + ship.getActiveSkillName(), 15);
+        passiveSkillHeaderText = new TextRenderer(this, "(Passive Skills)", 15);
+
+        gameObjects.add(coinCountText);
+        gameObjects.add(playerHealthText);
+        gameObjects.add(activeSkill);
+        gameObjects.add(passiveSkillHeaderText);
+        updatePassiveSkillText();
+
+        coinCountText.setPos(0 , 10 << 16);
+        playerHealthText.setPos(0, 30 << 16);
+        activeSkill.setPos(0, 50 << 16);
+        passiveSkillHeaderText.setPos(0, 70 << 16);
+        int index = 0;
+        for (TextRenderer text : passiveSkillsTexts.values()) {
+            text.setPos(0, (90 + index++ * 10) << 16);
+        }
+    }
+
+    private void updateText() {
+        coinCountText.setText("Coin : " + Long.toString(coinCount));
+        playerHealthText.setText("Health : " + Long.toString(ship.getHealth()));
+        activeSkill.setText("Active Skill : " + ship.getActiveSkillName());
+        updatePassiveSkillText();
+    }
+
     public GameLoop(Game game, boolean forReplay){
         this(game);
 
@@ -101,6 +155,7 @@ public class GameLoop extends Loop {
         }
         gameObjects.clear();
         initEntities();
+        initText();
     }
 
     /**
@@ -313,6 +368,7 @@ public class GameLoop extends Loop {
             processGameObjects();
         }
 
+        updateText();
         //endreigon
 
         currentFrame++;
@@ -328,25 +384,26 @@ public class GameLoop extends Loop {
             g.drawString("Press 'Accept' key",(800-g.getFontMetrics().stringWidth("Press 'Accept' key"))/2,300);
         }
         
-        String coinText = "Coin : " + Long.toString(coinCount);
-        g.setColor(Color.white);
-        g.drawString(coinText,0,10);
+        // String coinText = "Coin : " + Long.toString(coinCount);
+        // g.setColor(Color.white);
+        // g.drawString(coinText,0,10);
 
-        String shieldText = "Health : " + Long.toString(ship.getHealth());
-        g.setColor(Color.white);
-        g.drawString(shieldText,0,30);
+        // String shieldText = "Health : " + Long.toString(ship.getHealth());
+        // g.setColor(Color.white);
+        // g.drawString(shieldText,0,30);
 
-        String activeSkillText = "Active Skill : " + ship.getActiveSkillName();
-        g.setColor(Color.white);
-        g.drawString(activeSkillText,0,50);
+        // String activeSkillText = "Active Skill : " + ship.getActiveSkillName();
+        // g.setColor(Color.white);
+        // g.drawString(activeSkillText,0,50);
 
-        String passiveSkillsText = "(Passive Skills)";
-        g.setColor(Color.white);
-        g.drawString(passiveSkillsText,0,70);
-        int i = 1;
-        for (PlayerPassiveSkillType type : PlayerPassiveSkillType.values()) {
-            passiveSkillsText = type.getName() + " : " + ship.getPassiveSkillLevel(type) + "\n";
-            g.drawString(passiveSkillsText,0,70 + 20 * i++);
-        }
+        // String passiveSkillsText = "(Passive Skills)";
+        // g.setColor(Color.white);
+        // g.drawString(passiveSkillsText,0,70);
+        // int i = 1;
+        // for (PlayerPassiveSkillType type : PlayerPassiveSkillType.values()) {
+        //     passiveSkillsText = type.getName() + " : " + ship.getPassiveSkillLevel(type) + "\n";
+        //     g.drawString(passiveSkillsText,0,70 + 20 * i++);
+        // }
     }
+
 }

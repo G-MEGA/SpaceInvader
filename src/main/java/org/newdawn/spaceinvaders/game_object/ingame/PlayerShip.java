@@ -10,6 +10,7 @@ import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 import org.newdawn.spaceinvaders.game_object.ingame.bullet.EnemyBullet;
 import org.newdawn.spaceinvaders.game_object.ingame.bullet.PlayerBullet;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
+
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.ActiveSkill;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
@@ -36,7 +37,8 @@ public class PlayerShip extends GameCharacter{
     public void upgradePassiveSkill(PlayerPassiveSkillType type) { upgradePassiveSkill(type, 1);}
     public void upgradePassiveSkill(PlayerPassiveSkillType type, long amount){
         if (!isSkillMaxLevel(type)){
-            long newLevel = Math.clamp(passiveSkills.get(type) + amount, 0, type.getMaxLevel());
+            //* 증가된 레벨 값을 0와 type의 최대 레벨 사이로 clamp한다
+            long newLevel = Math.max(0L, Math.min(type.getMaxLevel(), passiveSkills.get(type) + amount));
             passiveSkills.put(type, newLevel);
         }
     } 

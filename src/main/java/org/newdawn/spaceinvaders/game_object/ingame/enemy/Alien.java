@@ -5,7 +5,7 @@ import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class Alien extends SweeperEnemy{
     public Alien(GameLoop gameLoop, HiveMind hiveMind){
-        super(gameLoop, hiveMind, 1);
+        super(gameLoop, hiveMind, 5);
     }
 
     @Override

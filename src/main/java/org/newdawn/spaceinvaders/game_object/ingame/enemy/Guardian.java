@@ -23,7 +23,7 @@ public class Guardian extends SweeperEnemy{
     }
 
     @Override
-    public void onHitByBullet() {
+    public void onHitByBullet(int damage) {
         if(isDestroyed()) return;
 
         if (hasShield){
@@ -37,7 +37,9 @@ public class Guardian extends SweeperEnemy{
             return;
         }
 
-        if (--_health <= 0){
+        decreaseHealth(damage);
+        
+        if (_health <= 0){
             destroy();
     
             LootItem item = LootItemFactory.getInstance().instantiateRandomItem(loop);

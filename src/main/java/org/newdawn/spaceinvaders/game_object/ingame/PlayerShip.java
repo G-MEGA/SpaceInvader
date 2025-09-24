@@ -17,12 +17,21 @@ import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class PlayerShip extends GameCharacter{
+    private int bulletDamage = 1;
+
     /** The speed at which the player's ship should move (pixels/sec) */
-    private long moveSpeed = 300L << 16;
+    private final long defaultMoveSpeed = 300L << 16;
+    private long moveSpeed = defaultMoveSpeed;
+
     /** The time at which last fired a shot */
     private long lastFire = 0L;
-    /** The interval between our players shot (ms) */
-    private long firingInterval = FixedPointUtil.ZERO_1;
+    /** The interval between our players shot (s) */
+    private final long defaultFiringIntreval = FixedPointUtil.ZERO_5;
+    private long firingInterval = defaultFiringIntreval;
+
+    private int waveInitialShield = 0;
+    private int currentShield = waveInitialShield; 
+    public int getCurrentShield() { return currentShield; }
 
     private ActiveSkill activeSkill = null;
     public void setActiveSkill(ActiveSkill activeSkill) { this.activeSkill = activeSkill;}   
@@ -31,18 +40,105 @@ public class PlayerShip extends GameCharacter{
         return null;
     }
 
-    private HashMap<PlayerPassiveSkillType, Long> passiveSkills = new HashMap<>(); // < PlayerPassiveSkillType, level >
-    public Long getPassiveSkillLevel(PlayerPassiveSkillType type) { return passiveSkills.get(type); }
+    private HashMap<PlayerPassiveSkillType, Integer> passiveSkills = new HashMap<>(); // < PlayerPassiveSkillType, level >
+    public int getPassiveSkillLevel(PlayerPassiveSkillType type) { return passiveSkills.get(type); }
     public boolean isSkillMaxLevel(PlayerPassiveSkillType type) { return passiveSkills.get(type) == type.getMaxLevel(); }
     public void upgradePassiveSkill(PlayerPassiveSkillType type) { upgradePassiveSkill(type, 1);}
-    public void upgradePassiveSkill(PlayerPassiveSkillType type, long amount){
+    public void upgradePassiveSkill(PlayerPassiveSkillType type, int amount){
         if (!isSkillMaxLevel(type)){
             //* 증가된 레벨 값을 0와 type의 최대 레벨 사이로 clamp한다
-            long newLevel = Math.max(0L, Math.min(type.getMaxLevel(), passiveSkills.get(type) + amount));
+            int newLevel = Math.max(0, Math.min(type.getMaxLevel(), passiveSkills.get(type) + amount));
             passiveSkills.put(type, newLevel);
+
+            applyPassiveSkill();
         }
     } 
-
+    private void applyPassiveSkill() {
+        for (PlayerPassiveSkillType type : passiveSkills.keySet()) {
+            if (type == PlayerPassiveSkillType.FireSpeed){
+                applyFireSpeedPassiveSkill();
+            }
+            if (type == PlayerPassiveSkillType.DamageUp){
+                applayDamageUpPassiveSkill();
+            }
+            if (type == PlayerPassiveSkillType.AdditionalEngine){
+                applyAdditionalPassiveSkill();
+            }
+            if (type == PlayerPassiveSkillType.RepairKit){
+                applyRepairKitPassiveSkill();
+            }
+        }
+    }
+    private void applyFireSpeedPassiveSkill() {
+        long fireSpeedMultiplier;
+        switch (passiveSkills.get(PlayerPassiveSkillType.FireSpeed)) {
+                case 1:
+                    fireSpeedMultiplier = (1 << 16) + FixedPointUtil.ZERO_3;
+                    break;
+                case 2:
+                    fireSpeedMultiplier = (1 << 16) + FixedPointUtil.ZERO_8;
+                    break;
+                case 3:
+                    fireSpeedMultiplier = (2 << 16) + FixedPointUtil.ZERO_5;
+                    break;
+                default:
+                    fireSpeedMultiplier = 1 << 16;
+                    break;
+            }
+            firingInterval = FixedPointUtil.div(defaultFiringIntreval, fireSpeedMultiplier);
+        }
+    private void applayDamageUpPassiveSkill() {
+        int newBulletDamage = 1;
+        switch (passiveSkills.get(PlayerPassiveSkillType.DamageUp)) {
+            case 1:
+                newBulletDamage = 2; 
+                break;
+            case 2:
+                newBulletDamage = 3; 
+                break;
+            case 3:
+                newBulletDamage = 4; 
+                break;
+            case 4:
+                newBulletDamage = 5; 
+                break;
+            case 5:
+                newBulletDamage = 6; 
+                break;
+        }
+        bulletDamage = newBulletDamage;
+    }
+    private void applyAdditionalPassiveSkill() {
+        long moveSpeedMultiplier = 1 << 16;
+        switch (passiveSkills.get(PlayerPassiveSkillType.AdditionalEngine)) {
+            case 1:
+                moveSpeedMultiplier = (1 << 16) + FixedPointUtil.ZERO_15;
+                break;
+            case 2:
+                moveSpeedMultiplier = (1 << 16) + FixedPointUtil.ZERO_3;
+                break;
+            case 3:
+                moveSpeedMultiplier = (1 << 16) + FixedPointUtil.ZERO_5;
+                break;
+        }
+        moveSpeed = FixedPointUtil.mul(defaultMoveSpeed, moveSpeedMultiplier);
+    }
+    private void applyRepairKitPassiveSkill() {
+        int initialShield = 1;
+        switch (passiveSkills.get(PlayerPassiveSkillType.RepairKit)) {
+            case 1:
+                initialShield = 1;
+                break;
+            case 2:
+                initialShield = 1;
+                break;
+            case 3:
+                initialShield = 2;
+                break;
+        }
+        waveInitialShield = initialShield;
+    }
+    
     private Boolean isSpeedUp = false;
     private long speedUpRatio = 2 << 16 + FixedPointUtil.ZERO_5;
     private long speedUpTime = 4 << 16;
@@ -56,7 +152,7 @@ public class PlayerShip extends GameCharacter{
         super(gameLoop, 3);
         
         for (PlayerPassiveSkillType type : PlayerPassiveSkillType.values()) {
-            passiveSkills.put(type, 0L);
+            passiveSkills.put(type, 0);
         }
 
         SpriteRenderer spriteRenderer = new SpriteRenderer(gameLoop);
@@ -164,9 +260,17 @@ public class PlayerShip extends GameCharacter{
     }
 
     private void onHurt(){
+        if (currentShield > 0){
+            currentShield -= 1;
+            return;
+        }
         if (--_health == 0){
             ((GameLoop)loop).notifyDeath();
         }
+    }
+
+    public void onWaveStart(){
+        currentShield = waveInitialShield;
     }
 
     /**
@@ -185,6 +289,7 @@ public class PlayerShip extends GameCharacter{
         lastFire = gameLoop.getCurrentTime();
 
         PlayerBullet bullet = new PlayerBullet(
+            bulletDamage,
             gameLoop, 
             getRotation(), 
             getPosX(), 

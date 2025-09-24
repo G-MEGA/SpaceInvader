@@ -156,7 +156,8 @@ public class GameLoop extends Loop {
 
     private void updateText() {
         coinCountText.setText("Coin : " + Long.toString(coinCount));
-        playerHealthText.setText("Health : " + Long.toString(ship.getHealth()));
+        playerHealthText.setText("Health : " + Long.toString(ship.getHealth()) + 
+        (ship.getCurrentShield() == 0 ? "" : " ( " + Integer.toString(ship.getCurrentShield())  + " ) "));
         activeSkill.setText("Active Skill : " + ship.getActiveSkillName());
         updatePassiveSkillText();
     }
@@ -178,6 +179,7 @@ public class GameLoop extends Loop {
         gameObjects.clear();
         initEntities();
         initText();
+        ship.onWaveStart();
     }
 
     /**
@@ -199,7 +201,7 @@ public class GameLoop extends Loop {
                     enemy = new Alien(this, enemyHiveMind);
                 }
                 else{
-                    enemy = new Artillery(this, enemyHiveMind, ship);
+                    enemy = new Alien(this, enemyHiveMind);
                 }
                 enemy.setPos((100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                 gameObjects.add(enemy);
@@ -220,12 +222,10 @@ public class GameLoop extends Loop {
 
         // (타입, x, y) 정보를 담은 배열
         Object[][] skillData = {
-            { PlayerPassiveSkillType.AttackSpeed, 100 << 16, 300 << 16 },
-            { PlayerPassiveSkillType.AttackSpeed, 200 << 16, 300 << 16 },
-            { PlayerPassiveSkillType.AttackSpeed, 300 << 16, 300 << 16 },
-            { PlayerPassiveSkillType.AttackSpeed, 400 << 16, 300 << 16 },
-            { PlayerPassiveSkillType.AdditionalEngine, 100 << 16, 400 << 16 },
-            { PlayerPassiveSkillType.AdditionalEngine, 200 << 16, 400 << 16 }
+            { PlayerPassiveSkillType.DamageUp, 100 << 16, 500 << 16 },
+            { PlayerPassiveSkillType.DamageUp, 200 << 16, 500 << 16 },
+            { PlayerPassiveSkillType.DamageUp, 300 << 16, 500 << 16 },
+            { PlayerPassiveSkillType.DamageUp, 400 << 16, 500 << 16 },
         };
 
         // 반복문으로 생성

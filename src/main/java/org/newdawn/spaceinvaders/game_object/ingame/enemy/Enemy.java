@@ -96,10 +96,12 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
         }
     }
 
-    public void onHitByBullet(){
+    public void onHitByBullet(int damage){
         if(isDestroyed()) return;
+        
+        decreaseHealth(damage);
 
-        if (--_health <= 0){
+        if (isDead()){
             destroy();
     
             LootItem item = LootItemFactory.getInstance().instantiateRandomItem(loop);

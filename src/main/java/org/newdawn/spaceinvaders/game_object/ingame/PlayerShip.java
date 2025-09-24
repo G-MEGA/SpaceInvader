@@ -29,16 +29,16 @@ public class PlayerShip extends GameCharacter{
     private long firingInterval = defaultFiringIntreval;
 
     private long activeSkillActivateElapsed = Long.MAX_VALUE;
-    private boolean isActiveSkillCoolDown = false;
+    private boolean isActiveSkillActable = true;
     private ActiveSkill activeSkill = null;
     public void setActiveSkill(ActiveSkill activeSkill) { this.activeSkill = activeSkill;}   
     public String getActiveSkillName() { 
         if (activeSkill != null) { return activeSkill.getName(); }
         return null;
     }
-    public boolean isActiveSkillCoolDown() { return isActiveSkillCoolDown; }
-    public Long getRemainCoolTime() { 
-        if (activeSkill == null || !isActiveSkillCoolDown) { return null; }
+    public boolean isActiveSkillActable() { return isActiveSkillActable; }
+    public Long getRemainCoolTime() {
+        if (activeSkill == null || isActiveSkillActable) { return null; }
         return activeSkill.getCoolTime() - activeSkillActivateElapsed;
     }
 
@@ -250,10 +250,9 @@ public class PlayerShip extends GameCharacter{
         }
         //endregion
 
-        //TODO coolTime 로직 고치기
-        if (isActiveSkillCoolDown){
-            if (activeSkillActivateElapsed <= activeSkill.getCoolTime()){
-                isActiveSkillCoolDown = false;
+        if (!isActiveSkillActable){
+            if (activeSkillActivateElapsed >= activeSkill.getCoolTime()){
+                isActiveSkillActable = true;
                 activeSkillActivateElapsed = 0;
             }
             else{
@@ -274,10 +273,10 @@ public class PlayerShip extends GameCharacter{
 
     private void tryToDoActiveSkill(long deltaTime) {
         if (activeSkill != null){
-            if (!isActiveSkillCoolDown){
+            if (isActiveSkillActable){
                 activeSkill.activate();
                 activeSkillActivateElapsed = -deltaTime; //* textUI 띄울 때 activeSkill.getCoolTime() 부터 보이도록 하는 용도로 -deltaTime을 할당
-                isActiveSkillCoolDown = true;
+                isActiveSkillActable = false;
             }
         }
     }
@@ -360,4 +359,5 @@ public class PlayerShip extends GameCharacter{
 
         gameLoop.addGameObject(bullet);
     }
+
 }

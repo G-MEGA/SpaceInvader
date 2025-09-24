@@ -166,7 +166,7 @@ public class GameLoop extends Loop {
 
         //TODO 쿨타임 텍스트 출력 안되는 버그 고치기
         String activeSkillTextContent = "Active Skill : " + ship.getActiveSkillName();
-        activeSkillTextContent += ship.getRemainCoolTime() == null ? "" : "( " + Long.toString(ship.getRemainCoolTime() >> 16) + " )";
+        activeSkillTextContent += ship.isActiveSkillActable() ? "" : "( " + Long.toString(ship.getRemainCoolTime() >> 16) + " )";
         activeSkillText.setText(activeSkillTextContent);
         updatePassiveSkillText();
     }

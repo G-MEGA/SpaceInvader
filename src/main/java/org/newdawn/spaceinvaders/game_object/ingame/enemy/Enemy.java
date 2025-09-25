@@ -102,7 +102,7 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
         
         if (isDead()){
             destroy();
-            LootItem item = LootItemFactory.getInstance().instantiateRandomItem(loop);
+            LootItem item = LootItemFactory.getInstance().instantiateRandomItem((GameLoop)loop);
             
             if (item != null){
                 item.setPos(getPosX(), getPosY());

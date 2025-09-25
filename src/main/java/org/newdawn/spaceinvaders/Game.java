@@ -84,6 +84,7 @@ public class Game extends Canvas
         SpriteStore.get().getSprite("sprites/testBarrier.png", 25 << 16, 8 << 16);
         SpriteStore.get().getSprite("sprites/testLaser.png", 8 << 16, 512 << 16);
 		SpriteStore.get().getSprite("sprites/testWarning.png", 10 << 16, 10 << 16);
+		SpriteStore.get().getSprite("sprites/scoringItem.png", 12 << 16, 12 << 16);
 
         loop = new MainMenuLoop(this);  // 게임 시작 후 가장 처음 진입할 Loop
 

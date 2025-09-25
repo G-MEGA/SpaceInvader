@@ -21,6 +21,7 @@ public class FixedPointUtil {
     public static final long ZERO_25 = 16384;
 
     public static final long ZERO_02 = 1310;
+    public static final long ZERO_01 = 655;
 
     public static long add(long x, long y) {
         return x + y;

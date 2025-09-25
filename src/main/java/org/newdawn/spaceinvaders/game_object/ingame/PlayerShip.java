@@ -50,6 +50,8 @@ public class PlayerShip extends GameCharacter{
     private int currentShield = waveInitialShield; 
     public int getCurrentShield() { return currentShield; }
 
+    private EnemyDetectionZone enemyDetectionZone;
+
     private HashMap<PlayerPassiveSkillType, Integer> passiveSkills = new HashMap<>(); // < PlayerPassiveSkillType, level >
     public int getPassiveSkillLevel(PlayerPassiveSkillType type) { return passiveSkills.get(type); }
     public boolean isSkillMaxLevel(PlayerPassiveSkillType type) { return passiveSkills.get(type) == type.getMaxLevel(); }
@@ -158,6 +160,8 @@ public class PlayerShip extends GameCharacter{
     private final long reflexibleTime = 2L << 16;
     private boolean isReflexible = false;;
 
+    SpriteRenderer spriteRenderer;
+    public SpriteRenderer getSpriteRenderer() { return spriteRenderer; }
     public void requestToSpeedUp(){
         isSpeedUp = true;
         speedUpElapsed = 0;
@@ -170,7 +174,7 @@ public class PlayerShip extends GameCharacter{
             passiveSkills.put(type, 0);
         }
 
-        SpriteRenderer spriteRenderer = new SpriteRenderer(gameLoop);
+        spriteRenderer = new SpriteRenderer(gameLoop);
         spriteRenderer.setSpriteRef("sprites/ship.gif");
         addChild(spriteRenderer);
 
@@ -180,6 +184,9 @@ public class PlayerShip extends GameCharacter{
         collider2D.boundsWidth = ((long)spriteRenderer.getSpriteWidth()) << 16;
         collider2D.boundsHeight = ((long)spriteRenderer.getSpriteHeight()) << 16;
         addChild(collider2D);
+
+        enemyDetectionZone = new EnemyDetectionZone(gameLoop, this);
+        addChild(enemyDetectionZone);
     }
 
     protected void process(long deltaTime) {

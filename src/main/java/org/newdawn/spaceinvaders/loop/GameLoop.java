@@ -9,6 +9,7 @@ import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputLog;
 import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
+import org.w3c.dom.Text;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -23,23 +24,26 @@ import java.util.HashMap;
 import javax.swing.JFileChooser;
 
 import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
-import org.newdawn.spaceinvaders.game_object.ingame.enemy.Alien;
-import org.newdawn.spaceinvaders.game_object.ingame.enemy.Artillery;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BasicActiveSkill;
-import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BombSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.LaserSkill;
-import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.ReflectSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.store.StoreSlot;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.EnemyFactory;
-import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BarrierSkill;
 
 public class GameLoop extends Loop {
     long currentFrame;
     ArrayList<GameLoopInputLog> inputLogs = new ArrayList<>();
 
     private EnemyFactory enemyFactory;
+
+    private int score = 0;
+    public int getScore() { return score; }
+    public void increaseScore() { increaseScore(100); }
+    public void increaseScore(int amount) { score += amount; }
+    private final long scoringTimeInterval = FixedPointUtil.ZERO_01;
+    private final int scoringScore = 1;
+    private long scoredTimeElapsed = 0;
 
     /** The entity representing the player */
     private PlayerShip ship;
@@ -51,11 +55,12 @@ public class GameLoop extends Loop {
     /** The message to display which waiting for a key press */
     private String message = "";
     /** True if we're holding up game play until a key has been pressed */
-    private boolean waitingForKeyPress = true;
+    private boolean waitingForKeyPress = false;
 
     boolean forReplay = false;
 
     //* 게임 화면에 존재하는 Text UI들
+    private TextRenderer scoreText;
     private TextRenderer coinCountText;
     private TextRenderer playerHealthText;
     private TextRenderer activeSkillText;
@@ -125,36 +130,37 @@ public class GameLoop extends Loop {
 
     public GameLoop(Game game){
         super(game);
-        // initialise the entities in our game so there's something
-        // to see at startup
-        initEntities();
-        initText();
+
+        startGame();
     }
 
     private void initText() {
         //* 좌측 상단 Text 관련 초기화
         passiveSkillsTexts = new HashMap<>();
         
+        scoreText = new TextRenderer(this, "Score : 0", 15);
+        scoreText.setFontStyle(1);
         coinCountText = new TextRenderer(this, "Coin : " + Long.toString(coinCount), 15);
         playerHealthText = new TextRenderer(this, "Health : " + Long.toString(ship.getHealth()), 15);
-        
         activeSkillText = new TextRenderer(this, "Active Skill : " + ship.getActiveSkillName(), 15);
         passiveSkillHeaderText = new TextRenderer(this, "(Passive Skills)", 15);
 
+        addGameObject(scoreText);
         addGameObject(coinCountText);
         addGameObject(playerHealthText);
         addGameObject(activeSkillText);
         addGameObject(passiveSkillHeaderText);
 
         updatePassiveSkillText();
-
-        coinCountText.setPos(0 , 10 << 16);
-        playerHealthText.setPos(0, 30 << 16);
-        activeSkillText.setPos(0, 50 << 16);
-        passiveSkillHeaderText.setPos(0, 70 << 16);
+        
+        scoreText.setPos(0, 0);
+        coinCountText.setPos(0 , 15 << 16);
+        playerHealthText.setPos(0, 35 << 16);
+        activeSkillText.setPos(0, 55 << 16);
+        passiveSkillHeaderText.setPos(0, 75 << 16);
         int index = 0;
         for (TextRenderer text : passiveSkillsTexts.values()) {
-            text.setPos(0, (90 + index++ * 10) << 16);
+            text.setPos(0, (95 + index++ * 10) << 16);
         }
 
         //* Indicator Text 관련 초기화
@@ -165,6 +171,7 @@ public class GameLoop extends Loop {
     }
 
     private void updateText() {
+        scoreText.setText("Score : " + score);
         coinCountText.setText("Coin : " + Long.toString(coinCount));
         playerHealthText.setText("Health : " + Long.toString(ship.getHealth()) + 
         (ship.getCurrentShield() == 0 ? "" : " ( " + Integer.toString(ship.getCurrentShield())  + " ) "));
@@ -189,6 +196,7 @@ public class GameLoop extends Loop {
         for (GameObject gameObject : getGameObjects()) {
             gameObject.destroy();
         }
+        score = 0;
         clearGameObjects();
         initEntities();
         initText();
@@ -200,12 +208,12 @@ public class GameLoop extends Loop {
      * entitiy will be added to the overall list of entities in the game.
      */
     private void initEntities() {
-        enemyFactory = new EnemyFactory(this, ship);
-
         // create the player ship and place it roughly in the center of the screen
         ship = new PlayerShip(this);
         ship.setPos(400 << 16, 550 << 16);
         addGameObject(ship);
+
+        enemyFactory = new EnemyFactory(this, ship);
 
         // create a block of aliens (5 rows, by 12 aliens, spaced evenly)
         enemyCount = 0;
@@ -295,6 +303,7 @@ public class GameLoop extends Loop {
     public void notifyAlienKilled() {
         // reduce the alient count, if there are none left, the player has won!
         enemyCount--;
+        increaseScore();
 
         if (enemyCount == 0) {
             notifyWin();
@@ -427,6 +436,15 @@ public class GameLoop extends Loop {
         }
 
         //endreigon
+        if (!waitingForKeyPress){
+            if (scoredTimeElapsed >= scoringTimeInterval){
+                increaseScore(scoringScore);
+                scoredTimeElapsed = 0;
+            }
+            else{
+                scoredTimeElapsed += getGame().fixedDeltaTime;
+            }
+        }
 
         currentFrame++;
     }

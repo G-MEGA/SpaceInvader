@@ -309,19 +309,24 @@ public class Game extends Canvas
      * @param argv The arguments that are passed into our games
      */
 	public static void main(String[] argv) {
+		//* Loading GameCharacter Sprites
         SpriteStore.get().getSprite("sprites/ship.gif", (16 << 16) + FixedPointUtil.ZERO_5, (11 << 16) + FixedPointUtil.ZERO_5);
         SpriteStore.get().getSprite("sprites/shot.gif", 6L << 16, (11 << 16) + FixedPointUtil.ZERO_5);
         SpriteStore.get().getSprite("sprites/alien.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
         SpriteStore.get().getSprite("sprites/alien2.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
         SpriteStore.get().getSprite("sprites/alien3.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/shieldAlien1.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+		SpriteStore.get().getSprite("sprites/shieldAlien1.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
         SpriteStore.get().getSprite("sprites/shieldAlien2.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
         SpriteStore.get().getSprite("sprites/shieldAlien3.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
         SpriteStore.get().getSprite("sprites/raiderAlien1.png", 32 << 16, 32 << 16);
         SpriteStore.get().getSprite("sprites/raiderAlien2.png", 32 << 16, 32 << 16);
         SpriteStore.get().getSprite("sprites/raiderAlien3.png", 32 << 16, 32 << 16);
+		//* Loading Skill Icon Sprites
 		SpriteStore.get().getSprite("sprites/testPassiveSkill.png", 32 << 16, 32 << 16);
 		SpriteStore.get().getSprite("sprites/testActiveSkill.png", 32 << 16, 32 << 16);
+		//* Loading ETC Sprites
+		SpriteStore.get().getSprite("sprites/testBarrier.png", 25 << 16, 8 << 16);
+		SpriteStore.get().getSprite("sprites/testLaser.png", 8 << 16, 512 << 16);
 
 		Game g = new Game(60L << 16);
 

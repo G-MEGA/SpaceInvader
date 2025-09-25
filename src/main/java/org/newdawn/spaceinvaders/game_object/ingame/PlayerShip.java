@@ -46,7 +46,6 @@ public class PlayerShip extends GameCharacter{
     private int currentShield = waveInitialShield; 
     public int getCurrentShield() { return currentShield; }
 
-
     private HashMap<PlayerPassiveSkillType, Integer> passiveSkills = new HashMap<>(); // < PlayerPassiveSkillType, level >
     public int getPassiveSkillLevel(PlayerPassiveSkillType type) { return passiveSkills.get(type); }
     public boolean isSkillMaxLevel(PlayerPassiveSkillType type) { return passiveSkills.get(type) == type.getMaxLevel(); }

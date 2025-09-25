@@ -32,6 +32,7 @@ import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.La
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.ReflectSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.store.StoreSlot;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BarrierSkill;
 
 public class GameLoop extends Loop {
     long currentFrame;
@@ -164,7 +165,6 @@ public class GameLoop extends Loop {
         playerHealthText.setText("Health : " + Long.toString(ship.getHealth()) + 
         (ship.getCurrentShield() == 0 ? "" : " ( " + Integer.toString(ship.getCurrentShield())  + " ) "));
 
-        //TODO 쿨타임 텍스트 출력 안되는 버그 고치기
         String activeSkillTextContent = "Active Skill : " + ship.getActiveSkillName();
         activeSkillTextContent += ship.isActiveSkillActable() ? "" : "( " + Long.toString(ship.getRemainCoolTime() >> 16) + " )";
         activeSkillText.setText(activeSkillTextContent);
@@ -221,8 +221,8 @@ public class GameLoop extends Loop {
         }
 
         //* 상점 아이템 생성 슬롯
-        ReflectSkill reflectSkill = new ReflectSkill(ship, this); 
-        StoreSlot storeSlot = new StoreSlot(this, 0, reflectSkill, 600 << 16, 300 << 16);
+        BarrierSkill barrierSkill = new BarrierSkill(ship, this); 
+        StoreSlot storeSlot = new StoreSlot(this, 0, barrierSkill, 600 << 16, 300 << 16);
         gameObjects.add(storeSlot);
 
         LaserSkill laserSkill = new LaserSkill(ship, this);

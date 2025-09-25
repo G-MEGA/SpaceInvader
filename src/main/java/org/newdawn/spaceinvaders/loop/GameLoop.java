@@ -221,12 +221,12 @@ public class GameLoop extends Loop {
         }
 
         //* 상점 아이템 생성 슬롯
-        BarrierSkill barrierSkill = new BarrierSkill(ship, this); 
-        StoreSlot storeSlot = new StoreSlot(this, 0, barrierSkill, 600 << 16, 300 << 16);
+        LaserSkill laserSKill = new LaserSkill(ship, this); 
+        StoreSlot storeSlot = new StoreSlot(this, 0, laserSKill, 600 << 16, 300 << 16);
         gameObjects.add(storeSlot);
 
-        LaserSkill laserSkill = new LaserSkill(ship, this);
-        storeSlot = new StoreSlot(this, 0, laserSkill, 700 << 16, 300 << 16);
+        BarrierSkill barrierSkill = new BarrierSkill(ship, this);
+        storeSlot = new StoreSlot(this, 0, barrierSkill, 700 << 16, 300 << 16);
         gameObjects.add(storeSlot);
 
         // (타입, x, y) 정보를 담은 배열

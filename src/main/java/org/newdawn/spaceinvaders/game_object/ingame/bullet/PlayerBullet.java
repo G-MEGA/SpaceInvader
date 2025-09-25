@@ -23,7 +23,7 @@ public class PlayerBullet extends Bullet{
 
             if(enemy.isDestroyed()) return;
 
-            enemy.onHitByBullet(damage);
+            enemy.onHit(damage);
             destroy();
 
             used = true;

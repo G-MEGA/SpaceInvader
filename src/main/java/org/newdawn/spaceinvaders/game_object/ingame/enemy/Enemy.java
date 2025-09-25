@@ -110,11 +110,10 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
         }
     }
 
-    public void onHitByBullet(int damage){
+    public void onHit(int damage){
         if(isDestroyed()) return;
         
         decreaseHealth(damage);
-
     }
 
     @Override

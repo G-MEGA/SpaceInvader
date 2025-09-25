@@ -23,7 +23,7 @@ public class Guardian extends SweeperEnemy{
     }
 
     @Override
-    public void onHitByBullet(int damage) {
+    public void onHit(int damage) {
         if(isDestroyed()) return;
 
         if (hasShield){

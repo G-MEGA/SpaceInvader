@@ -5,8 +5,12 @@ import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PlayerSkill;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public abstract class ActiveSkill extends PlayerSkill{
-    public ActiveSkill(String skillName, String skillSpriteRef, PlayerShip playerShip, GameLoop gameLoop) {
+    private long coolTime;
+    public long getCoolTime() { return coolTime; }
+
+    public ActiveSkill(String skillName, String skillSpriteRef, long coolTime, PlayerShip playerShip, GameLoop gameLoop) {
         super(skillName, skillSpriteRef, playerShip, gameLoop);
+        this.coolTime = coolTime;
     }
 
     @Override

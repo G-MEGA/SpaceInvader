@@ -8,6 +8,7 @@ public class FixedPointUtil {
     public static final long ONE = 1L << 16;
 
     public static final long ZERO_1 = 6553;
+    public static final long ZERO_15 = 9830;
     public static final long ZERO_2 = 13107;
     public static final long ZERO_3 = 19660;
     public static final long ZERO_4 = 26214;

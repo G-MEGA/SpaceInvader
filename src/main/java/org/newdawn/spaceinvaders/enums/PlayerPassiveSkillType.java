@@ -1,16 +1,16 @@
 package org.newdawn.spaceinvaders.enums;
 
 public enum PlayerPassiveSkillType {
-    AttackSpeed("AttackSpeed", "sprites/testPassiveSkill.png", 3L),
-    Penetrating("Penetrating", "sprites/testPassiveSkill.png", 3L),
-    AdditionalEngine("AdditionalEngine", "sprites/testPassiveSkill.png", 3L),
-    RepiarKit("RepairKit", "sprites/testPassiveSkill.png", 3L);
+    FireSpeed("FireSpeed", "sprites/testPassiveSkill.png", 3),
+    DamageUp("DamageUp", "sprites/testPassiveSkill.png", 5),
+    AdditionalEngine("AdditionalEngine", "sprites/testPassiveSkill.png", 3),
+    RepairKit("RepairKit", "sprites/testPassiveSkill.png", 3);
 
     private final String name;
     private final String spriteRef;
-    private final Long maxLevel;
+    private final int maxLevel;
     
-    PlayerPassiveSkillType(String name, String spriteRef, long maxLevel) {
+    PlayerPassiveSkillType(String name, String spriteRef, int maxLevel) {
         this.name = name;
         this.spriteRef = spriteRef;
         this.maxLevel = maxLevel;
@@ -18,5 +18,5 @@ public enum PlayerPassiveSkillType {
     
     public String getName() { return name; }
     public String getSpriteRef() { return spriteRef; }
-    public Long getMaxLevel() { return maxLevel; }
+    public int getMaxLevel() { return maxLevel; }
 }

@@ -5,8 +5,12 @@ import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class PlayerBullet extends Bullet{
-    public PlayerBullet(GameLoop gameLoop, long spawnAngle, long spawnCentralX, long spawnCentralY, long spawnOffset, long spawnSpeed) {
+    private int damage;
+    public int getDamage() { return damage; }
+
+    public PlayerBullet(int damage, GameLoop gameLoop, long spawnAngle, long spawnCentralX, long spawnCentralY, long spawnOffset, long spawnSpeed) {
         super(gameLoop, spawnAngle, spawnCentralX, spawnCentralY, spawnOffset, spawnSpeed);
+        this.damage = damage;
     }
     
     @Override
@@ -19,7 +23,7 @@ public class PlayerBullet extends Bullet{
 
             if(enemy.isDestroyed()) return;
 
-            enemy.onHitByBullet();
+            enemy.onHit(damage);
             destroy();
 
             used = true;

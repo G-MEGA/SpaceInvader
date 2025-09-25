@@ -8,9 +8,13 @@ public abstract class GameCharacter extends Mover2D implements ICollider2DOwner{
 
     public void increaseHealth(long amount) { _health += amount; }
     public void increaseHealth() { increaseHealth(1); }
-    public void decreaseHealth(long amount) { _health -= amount; }
+    public void decreaseHealth(long amount) { 
+        _health = Math.max(0, _health - amount);
+    }
     public void decreaseHealth() { decreaseHealth(1); }
     public long getHealth() { return _health; }
+
+    public boolean isDead() { return _health <= 0; }
 
     public GameCharacter(Loop loop, long intitalHealth){
         super(loop);

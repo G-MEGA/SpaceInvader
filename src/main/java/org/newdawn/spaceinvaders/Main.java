@@ -164,6 +164,9 @@ public class Main {
         loginNotificationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         loginButton.addActionListener(e -> {
+            loginButton.setEnabled(false);
+            registerButton.setEnabled(false);
+
             String email = loginEmailText.getText().trim();
             String password = String.valueOf(loginPasswordText.getPassword()).trim();
 
@@ -178,6 +181,8 @@ public class Main {
                 JsonObject json = JsonParser.parseString(ex.getMessage()).getAsJsonObject();
 
                 loginNotificationLabel.setText(json.getAsJsonObject("error").get("message").getAsString());
+                loginButton.setEnabled(true);
+                registerButton.setEnabled(true);
                 authFrame.pack();
             }
         });
@@ -187,6 +192,9 @@ public class Main {
         registerNotificationLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         registerButton.addActionListener(e -> {
+            loginButton.setEnabled(false);
+            registerButton.setEnabled(false);
+
             String email = registerEmailText.getText().trim();
             String password = String.valueOf(registerPasswordText.getPassword()).trim();
             String passwordConfirmation = String.valueOf(registerPasswordConfirmationText.getPassword()).trim();
@@ -215,6 +223,8 @@ public class Main {
                 JsonObject json = JsonParser.parseString(ex.getMessage()).getAsJsonObject();
 
                 registerNotificationLabel.setText(json.getAsJsonObject("error").get("message").getAsString());
+                loginButton.setEnabled(true);
+                registerButton.setEnabled(true);
                 authFrame.pack();
             }
         });

@@ -217,17 +217,6 @@ public class GameLoop extends Loop {
                 else{
                     enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.ARTILLERY, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                 }
-                // Enemy enemy;
-                // if (row <= 3L){
-                //     enemy = new Artillery(this, enemyHiveMind, ship);
-                // }
-                // else{
-                //     enemy = new Alien(this, enemyHiveMind);
-                // }
-                // enemy.setPos((100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
-                // addGameObject(enemy);
-                // enemies.add(enemy);
-                // enemyHiveMind.addListener(enemy);
                 enemyCount++;
             }
         }

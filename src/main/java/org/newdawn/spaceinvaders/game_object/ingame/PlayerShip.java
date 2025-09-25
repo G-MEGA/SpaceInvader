@@ -31,7 +31,11 @@ public class PlayerShip extends GameCharacter{
     private long activeSkillActivateElapsed = Long.MAX_VALUE;
     private boolean isActiveSkillActable = true;
     private ActiveSkill activeSkill = null;
-    public void setActiveSkill(ActiveSkill activeSkill) { this.activeSkill = activeSkill;}   
+    public void setActiveSkill(ActiveSkill activeSkill) { 
+        this.activeSkill = activeSkill;
+        isActiveSkillActable = true;
+        activeSkillActivateElapsed = 0;
+    }   
     public String getActiveSkillName() { 
         if (activeSkill != null) { return activeSkill.getName(); }
         return null;

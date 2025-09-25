@@ -219,6 +219,10 @@ public class Main {
             }
         });
 
+        //아이디 비번 기본값
+        loginEmailText.setText("s@s.ss");
+        loginPasswordText.setText("111111");
+
         //GUI 표시
         authFrame.pack();
         authFrame.setResizable(false);

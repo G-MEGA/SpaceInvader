@@ -16,12 +16,13 @@ public class TextRenderer extends GameObject2D {
     }
     int fontSize;
     Color color;
+    
     int fontStyle;// 0 기본 1 굵게 2 이탤릭
-
+    
     public int alignment = 0;// 0 오른쪽 1 중앙 2 왼쪽 표시
-
+    
     Font font;
-
+  
     String[] lines;
 
     public TextRenderer(Loop loop, String text, int fontSize, Color color, int fontStyle) {
@@ -65,4 +66,5 @@ public class TextRenderer extends GameObject2D {
             g.drawString(line,x, startY + i * height);
         }
     }
+
 }

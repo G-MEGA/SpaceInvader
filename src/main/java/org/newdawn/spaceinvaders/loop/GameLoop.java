@@ -1,6 +1,8 @@
 package org.newdawn.spaceinvaders.loop;
 
 import org.newdawn.spaceinvaders.Game;
+import org.newdawn.spaceinvaders.enums.IndicatorTextType;
+import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputLog;
@@ -16,12 +18,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JFileChooser;
 
+import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Alien;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Artillery;
-import org.newdawn.spaceinvaders.game_object.ingame.enemy.Raider;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BasicActiveSkill;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.LaserSkill;
+import org.newdawn.spaceinvaders.game_object.ingame.store.StoreSlot;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 
 public class GameLoop extends Loop {
@@ -42,16 +49,118 @@ public class GameLoop extends Loop {
 
     boolean forReplay = false;
 
+    //* 게임 화면에 존재하는 Text UI들
+    private TextRenderer coinCountText;
+    private TextRenderer playerHealthText;
+    private TextRenderer activeSkill;
+    private TextRenderer passiveSkillHeaderText;
+    private HashMap<PlayerPassiveSkillType, TextRenderer> passiveSkillsTexts;
+    private void updatePassiveSkillText(){
+        for (PlayerPassiveSkillType type : PlayerPassiveSkillType.values()) {
+            TextRenderer text = passiveSkillsTexts.get(type);
+            if (text == null){
+                text = new TextRenderer(this, "", 10);
+                passiveSkillsTexts.put(type, text);
+
+                addGameObject(text);
+            }
+
+            text.setText(type.getName() + " : " + ship.getPassiveSkillLevel(type));
+        }
+    }
+
+    private TextRenderer indicatorText;
+    private boolean isIndicatorShown = false;
+    private final long indicatorShowTime = 2 << 16;
+    private long indicatorShownElapsed = 0;
+    public void showIndicatorText(String text) { showIndicatorText(text, IndicatorTextType.Default);}
+    public void showIndicatorText(String text, IndicatorTextType type){ showIndicatorText(text, type.getColor(), type.getFontStyle()); }
+    public void showIndicatorText(String text, Color color, int fontStyle){
+        indicatorText.setText(text);
+        indicatorText.setColor(color);
+        indicatorText.setFontStyle(fontStyle);
+
+        isIndicatorShown = true;
+    }
+
     private long coinCount = 0;
-    public void addCoin(){ addCoin(1); }
-    public void addCoin(long count){ coinCount += count; }
+    public long getCoinCount() { return coinCount; }
+    public void increaseCoin(){ increaseCoin(1); }
+    public void increaseCoin(long count){ coinCount += count; }
+    /**
+     * 현재 코인의 개수를 1만큼 감소시킵니다.
+     * <p>
+     * 내부적으로 {@link #decreaseCoin(long)}을 호출하며,
+     * 감소가 가능하다면 코인을 차감하고 {@code true}를 반환합니다.
+     * 만약 코인의 개수가 부족하여 차감이 불가능하다면 {@code false}를 반환합니다.
+     *
+     * @return 코인을 정상적으로 감소시켰다면 {@code true}, 그렇지 않다면 {@code false}
+     */
+    public boolean decreaseCoin() { return decreaseCoin(1); }
+    /**
+     * 현재 코인의 개수를 지정된 수치만큼 감소시킵니다.
+     * <p>
+     * {@code coinCount}가 감소시키려는 값 이상일 경우 차감이 가능하며,
+     * 차감 후 {@code true}를 반환합니다.  
+     * 만약 차감이 불가능하다면 코인의 개수는 변하지 않고 {@code false}를 반환합니다.
+     *
+     * @param count 감소시키려는 코인의 개수 (양수)
+     * @return 코인을 정상적으로 감소시켰다면 {@code true}, 그렇지 않다면 {@code false}
+     */
+    public boolean decreaseCoin(long count) { 
+        if (coinCount - count >= 0) {
+            coinCount -= count;
+            return true;
+        }
+        return false;    
+    }
 
     public GameLoop(Game game){
         super(game);
         // initialise the entities in our game so there's something
         // to see at startup
         initEntities();
+        initText();
     }
+
+    private void initText() {
+        //* 좌측 상단 Text 관련 초기화
+        passiveSkillsTexts = new HashMap<>();
+        
+        coinCountText = new TextRenderer(this, "Coin : " + Long.toString(coinCount), 15);
+        playerHealthText = new TextRenderer(this, "Health : " + Long.toString(ship.getHealth()), 15);
+        activeSkill = new TextRenderer(this, "Active Skill : " + ship.getActiveSkillName(), 15);
+        passiveSkillHeaderText = new TextRenderer(this, "(Passive Skills)", 15);
+
+        gameObjects.add(coinCountText);
+        gameObjects.add(playerHealthText);
+        gameObjects.add(activeSkill);
+        gameObjects.add(passiveSkillHeaderText);
+        updatePassiveSkillText();
+
+        coinCountText.setPos(0 , 10 << 16);
+        playerHealthText.setPos(0, 30 << 16);
+        activeSkill.setPos(0, 50 << 16);
+        passiveSkillHeaderText.setPos(0, 70 << 16);
+        int index = 0;
+        for (TextRenderer text : passiveSkillsTexts.values()) {
+            text.setPos(0, (90 + index++ * 10) << 16);
+        }
+
+        //* Indicator Text 관련 초기화
+        indicatorText = new TextRenderer(this, "", 20);
+        indicatorText.alignment = 1;
+        indicatorText.setPos(400 << 16, 50 << 16);
+        gameObjects.add(indicatorText);
+    }
+
+    private void updateText() {
+        coinCountText.setText("Coin : " + Long.toString(coinCount));
+        playerHealthText.setText("Health : " + Long.toString(ship.getHealth()));
+        activeSkill.setText("Active Skill : " + ship.getActiveSkillName());
+        updatePassiveSkillText();
+    }
+
     public GameLoop(Game game, boolean forReplay){
         this(game);
 
@@ -68,6 +177,7 @@ public class GameLoop extends Loop {
         }
         clearGameObjects();
         initEntities();
+        initText();
     }
 
     /**
@@ -98,6 +208,40 @@ public class GameLoop extends Loop {
                 enemyCount++;
             }
         }
+
+        //* 상점 아이템 생성 슬롯
+        BasicActiveSkill basicActiveSkill = new BasicActiveSkill(ship, this);
+        StoreSlot storeSlot = new StoreSlot(this, 0, basicActiveSkill, 600 << 16, 300 << 16);
+        gameObjects.add(storeSlot);
+
+        LaserSkill laserSkill = new LaserSkill(ship, this);
+        storeSlot = new StoreSlot(this, 0, laserSkill, 700 << 16, 300 << 16);
+        gameObjects.add(storeSlot);
+
+        // (타입, x, y) 정보를 담은 배열
+        Object[][] skillData = {
+            { PlayerPassiveSkillType.AttackSpeed, 100 << 16, 300 << 16 },
+            { PlayerPassiveSkillType.AttackSpeed, 200 << 16, 300 << 16 },
+            { PlayerPassiveSkillType.AttackSpeed, 300 << 16, 300 << 16 },
+            { PlayerPassiveSkillType.AttackSpeed, 400 << 16, 300 << 16 },
+            { PlayerPassiveSkillType.AdditionalEngine, 100 << 16, 400 << 16 },
+            { PlayerPassiveSkillType.AdditionalEngine, 200 << 16, 400 << 16 }
+        };
+
+        // 반복문으로 생성
+        for (Object[] data : skillData) {
+            PlayerPassiveSkillType type = (PlayerPassiveSkillType) data[0];
+            int x = (int) data[1];
+            int y = (int) data[2];
+
+            PassiveSkill passiveSkill = new PassiveSkill(type, ship, this);
+            storeSlot = new StoreSlot(this, 0, passiveSkill, x, y);
+            gameObjects.add(storeSlot);
+        }
+
+        // PassiveSkill passiveSkill = new PassiveSkill("Fuck", "sprites/testPassiveSkill.png", ship, this, "응애");
+        // storeSlot = new StoreSlot(this,1, passiveSkill, 500 << 16, 300 << 16);
+        // gameObjects.add(storeSlot);
 
         enemyHiveMind.cancelBroadcast();
         System.gc();
@@ -253,6 +397,17 @@ public class GameLoop extends Loop {
             processGameObjects();
         }
 
+        //* TextUI 관련 로직
+        updateText();
+        if (isIndicatorShown){
+            if (indicatorShownElapsed > indicatorShowTime){
+                isIndicatorShown = false;
+                indicatorShownElapsed = 0;
+                indicatorText.setText("");
+            }
+            else { indicatorShownElapsed += getGame().fixedDeltaTime; } //? 흠 deltaTime 아니긴 한데 괜찮겠지?
+        }
+
         //endreigon
 
         currentFrame++;
@@ -268,12 +423,5 @@ public class GameLoop extends Loop {
             g.drawString("Press 'Accept' key",(800-g.getFontMetrics().stringWidth("Press 'Accept' key"))/2,300);
         }
         
-        String coinText = "Coin : " + Long.toString(coinCount);
-        g.setColor(Color.white);
-        g.drawString(coinText,0,10);
-
-        String shieldText = "Health : " + Long.toString(ship.getHealth());
-        g.setColor(Color.white);
-        g.drawString(shieldText,0,30);
     }
 }

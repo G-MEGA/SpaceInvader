@@ -1,15 +1,23 @@
 package org.newdawn.spaceinvaders;
 
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import firebase.FirebaseClientAuth;
+import networking.Network;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.io.IOException;
 
 public class Main {
+    final String SERVER_IP = "34.67.77.26";
+//    final String SERVER_IP = "127.0.0.1";
+
+    Client client;
+
     JFrame authFrame;
     Container authContainer;
 
@@ -17,6 +25,45 @@ public class Main {
     Container registerContainer;
 
     public Main(){
+        client =  new Client();
+        Network.register(client);
+        client.addListener(new Listener(){
+            @Override
+            public void connected(Connection connection) {
+                System.out.println("connected");
+            }
+
+            @Override
+            public void received(Connection connection, Object object) {
+                if(object instanceof Network.S2CAuthOK) {
+                    if (((Network.S2CAuthOK)object).ok)
+                        authFrame.dispose();
+                    startGame();
+                }
+                else if(object instanceof Network.Hello) {
+                    System.out.print(connection.getID());
+                    System.out.print(" Hello ");
+                    System.out.println(((Network.Hello) object).content);
+                }
+            }
+
+            @Override
+            public void disconnected(Connection connection) {
+                System.out.println("disconnected");
+                System.exit(0);
+            }
+        });
+
+        client.start();
+        try {
+            client.connect(5000, SERVER_IP, Network.PORT_TCP, Network.PORT_UDP);
+        } catch (IOException e) {
+            System.out.println("서버에 연결할 수 없습니다.");
+            System.out.println(e.getMessage());
+            System.exit(0);
+            throw new RuntimeException(e);
+        }
+
         authFrame = new JFrame("로그인/회원가입");
         authFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -124,6 +171,8 @@ public class Main {
                 String authToken = auth.signIn(email, password);
                 System.out.println("Firebase 로그인 완료 " + authToken);
                 authFrame.setVisible(false);
+
+                tryAuth(authToken);
             } catch (Exception ex) {
                 //인증 실패시 실패사유 출력
                 JsonObject json = JsonParser.parseString(ex.getMessage()).getAsJsonObject();
@@ -159,6 +208,8 @@ public class Main {
                 String authToken = auth.signUp(email, password);
                 System.out.println("Firebase 회원가입 완료 " + authToken);
                 authFrame.setVisible(false);
+
+                tryAuth(authToken);
             } catch (Exception ex) {
                 //인증 실패시 실패사유 출력
                 JsonObject json = JsonParser.parseString(ex.getMessage()).getAsJsonObject();
@@ -172,11 +223,14 @@ public class Main {
         authFrame.pack();
         authFrame.setResizable(false);
         authFrame.setLocationRelativeTo(null);//창을 디스플레이 가운데 배치
-        authFrame.setVisible(true);//TODO 서버랑 연결되면 dispose
+        authFrame.setVisible(true);
     }
     public void startGame(){
         Game g = new Game(60L << 16);
         g.loop();
+    }
+    public void tryAuth(String authToken){
+        client.sendTCP(new Network.C2SAuth(authToken));
     }
 
     public static void main(String[] argv) {

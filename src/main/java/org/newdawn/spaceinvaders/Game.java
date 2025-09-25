@@ -39,7 +39,7 @@ public class Game extends Canvas
     public final long fixedFPS;
     public final long fixedDeltaTime;
 
-    private Loop loop = new MainMenuLoop(this);
+    private Loop loop;
 
     private MapList mapList;
 
@@ -77,6 +77,9 @@ public class Game extends Canvas
         SpriteStore.get().getSprite("sprites/raiderAlien1.png", 32 << 16, 32 << 16);
         SpriteStore.get().getSprite("sprites/raiderAlien2.png", 32 << 16, 32 << 16);
         SpriteStore.get().getSprite("sprites/raiderAlien3.png", 32 << 16, 32 << 16);
+
+
+        loop = new MainMenuLoop(this);  // 게임 시작 후 가장 처음 진입할 Loop
 
         mapList = new MapList();
 

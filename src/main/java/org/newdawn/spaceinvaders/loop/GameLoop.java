@@ -32,11 +32,14 @@ import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.La
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.ReflectSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.store.StoreSlot;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.EnemyFactory;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BarrierSkill;
 
 public class GameLoop extends Loop {
     long currentFrame;
     ArrayList<GameLoopInputLog> inputLogs = new ArrayList<>();
+
+    private EnemyFactory enemyFactory;
 
     /** The entity representing the player */
     private PlayerShip ship;
@@ -140,7 +143,7 @@ public class GameLoop extends Loop {
 
         addGameObject(coinCountText);
         addGameObject(playerHealthText);
-//        addGameObject(activeSkill);
+        addGameObject(activeSkillText);
         addGameObject(passiveSkillHeaderText);
 
         updatePassiveSkillText();
@@ -197,6 +200,8 @@ public class GameLoop extends Loop {
      * entitiy will be added to the overall list of entities in the game.
      */
     private void initEntities() {
+        enemyFactory = new EnemyFactory(this, ship);
+
         // create the player ship and place it roughly in the center of the screen
         ship = new PlayerShip(this);
         ship.setPos(400 << 16, 550 << 16);
@@ -206,17 +211,23 @@ public class GameLoop extends Loop {
         enemyCount = 0;
         for (long row=0L;row<5L;row++) {
             for (long x=0L;x<12L;x++) {
-                Enemy enemy;
                 if (row <= 3L){
-                    enemy = new Artillery(this, enemyHiveMind, ship);
+                    enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.AILEN, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                 }
                 else{
-                    enemy = new Alien(this, enemyHiveMind);
+                    enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.ARTILLERY, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                 }
-                enemy.setPos((100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
-                addGameObject(enemy);
-                enemies.add(enemy);
-                enemyHiveMind.addListener(enemy);
+                // Enemy enemy;
+                // if (row <= 3L){
+                //     enemy = new Artillery(this, enemyHiveMind, ship);
+                // }
+                // else{
+                //     enemy = new Alien(this, enemyHiveMind);
+                // }
+                // enemy.setPos((100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+                // addGameObject(enemy);
+                // enemies.add(enemy);
+                // enemyHiveMind.addListener(enemy);
                 enemyCount++;
             }
         }

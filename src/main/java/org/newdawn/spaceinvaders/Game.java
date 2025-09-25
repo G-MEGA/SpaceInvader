@@ -14,6 +14,7 @@ import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputKey;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputMouseMove;
 import org.newdawn.spaceinvaders.loop.Loop;
 import org.newdawn.spaceinvaders.loop.MainMenuLoop;
+import org.newdawn.spaceinvaders.map_load.MapList;
 import org.newdawn.spaceinvaders.singleton.PlayerSetting;
 import org.newdawn.spaceinvaders.singleton.SystemTimer;
 import org.newdawn.spaceinvaders.sprite.SpriteStore;
@@ -40,6 +41,8 @@ public class Game extends Canvas
 
     private Loop loop = new MainMenuLoop(this);
 
+    private MapList mapList;
+
 	/** The stragey that allows us to use accelerate page flipping */
 	private BufferStrategy strategy;
     /** True if the game is currently "running", i.e. the game loop is looping */
@@ -62,6 +65,8 @@ public class Game extends Canvas
 	public Game(long fixedFPS) {
         this.fixedFPS = fixedFPS;
         this.fixedDeltaTime = FixedPointUtil.div(FixedPointUtil.ONE, fixedFPS);
+
+        mapList = new MapList();
 
 		// create a frame to contain our game
 		container = new JFrame("Space Invaders 102");
@@ -176,6 +181,10 @@ public class Game extends Canvas
 			SystemTimer.sleep(lastLoopTime+(long)(FixedPointUtil.toDouble(fixedDeltaTime)*1000)-SystemTimer.getTime());
 		}
 	}
+
+    public MapList getMapList() {
+        return mapList;
+    }
 	
 	/**
 	 * A class to handle keyboard input from the user. The class

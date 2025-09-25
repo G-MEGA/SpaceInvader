@@ -140,7 +140,7 @@ public class GameLoop extends Loop {
 
         addGameObject(coinCountText);
         addGameObject(playerHealthText);
-        addGameObject(activeSkill);
+//        addGameObject(activeSkill);
         addGameObject(passiveSkillHeaderText);
 
         updatePassiveSkillText();

@@ -1,13 +1,18 @@
 package org.newdawn.spaceinvaders.game_object.collision;
 
+import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.loop.Loop;
 
+import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.awt.Rectangle;
 
 public class Collider2D extends GameObject2D {
     private ICollider2DOwner owner;
+    private boolean drawBounds = false;
+    public void setDrawBounds(boolean drawBounds) {
+        this.drawBounds = drawBounds;
+    }
 
     public long boundsPosX = 0;
     public long boundsPosY = 0;
@@ -43,6 +48,22 @@ public class Collider2D extends GameObject2D {
         globalBounds[3] =  boundsHeight;
 
         return globalBounds;
+    }
+
+    public void draw(Graphics2D g2d) {
+        super.draw(g2d);
+
+        if(drawBounds){
+            long[] globalBounds = getGlobalBounds();
+
+            g2d.setColor(Color.RED);
+            g2d.drawRect(
+                    (int) FixedPointUtil.toDouble(globalBounds[0]),
+                    (int) FixedPointUtil.toDouble(globalBounds[1]),
+                    (int) FixedPointUtil.toDouble(globalBounds[2]),
+                    (int) FixedPointUtil.toDouble(globalBounds[3])
+            );
+        }
     }
 
     public boolean collidesWith(Collider2D other) {

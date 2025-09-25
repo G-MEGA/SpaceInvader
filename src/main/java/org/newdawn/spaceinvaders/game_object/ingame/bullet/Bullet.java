@@ -20,10 +20,10 @@ public abstract class Bullet extends Mover2D implements ICollider2DOwner {
         addChild(spriteRenderer);
 
         Collider2D collider2D = new Collider2D(gameLoop, this);
-        collider2D.boundsPosX = -23 << 16;
-        collider2D.boundsPosY = -21 << 16;
-        collider2D.boundsWidth = 20 << 16;
-        collider2D.boundsHeight = 20 << 16;
+        collider2D.boundsPosX = -spriteRenderer.getSpritePivotX();
+        collider2D.boundsPosY = -spriteRenderer.getSpritePivotY();
+        collider2D.boundsWidth = ((long)spriteRenderer.getSpriteWidth()) << 16;
+        collider2D.boundsHeight = ((long)spriteRenderer.getSpriteHeight()) << 16;
         addChild(collider2D);
         
         setRotation(spawnAngle);

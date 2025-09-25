@@ -15,11 +15,24 @@ public class TextRenderer extends GameObject2D {
         lines = this.text.split("\n");
     }
     int fontSize;
+    public void setFontSize(int size) {
+
+    }
     Color color;
-    
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     int fontStyle;// 0 기본 1 굵게 2 이탤릭
+    public void setFontStyle(int fontStyle) {
+        this.fontStyle = fontStyle;
+        font = new Font("Dialog.plain", fontStyle, fontSize);
+    }
     
     public int alignment = 0;// 0 오른쪽 1 중앙 2 왼쪽 표시
+    public void setAlignment(int alignment) {
+        this.alignment = alignment;
+    }
     
     Font font;
   
@@ -66,5 +79,4 @@ public class TextRenderer extends GameObject2D {
             g.drawString(line,x, startY + i * height);
         }
     }
-
 }

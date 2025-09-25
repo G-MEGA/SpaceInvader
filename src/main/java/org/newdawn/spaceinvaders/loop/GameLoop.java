@@ -27,9 +27,12 @@ import org.newdawn.spaceinvaders.game_object.ingame.enemy.Alien;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Artillery;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BasicActiveSkill;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BombSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.LaserSkill;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.ReflectSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.store.StoreSlot;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BarrierSkill;
 
 public class GameLoop extends Loop {
     long currentFrame;
@@ -52,7 +55,7 @@ public class GameLoop extends Loop {
     //* 게임 화면에 존재하는 Text UI들
     private TextRenderer coinCountText;
     private TextRenderer playerHealthText;
-    private TextRenderer activeSkill;
+    private TextRenderer activeSkillText;
     private TextRenderer passiveSkillHeaderText;
     private HashMap<PlayerPassiveSkillType, TextRenderer> passiveSkillsTexts;
     private void updatePassiveSkillText(){
@@ -82,6 +85,8 @@ public class GameLoop extends Loop {
 
         isIndicatorShown = true;
     }
+
+    private final int bombDamage = 4;
 
     private long coinCount = 0;
     public long getCoinCount() { return coinCount; }
@@ -129,18 +134,20 @@ public class GameLoop extends Loop {
         
         coinCountText = new TextRenderer(this, "Coin : " + Long.toString(coinCount), 15);
         playerHealthText = new TextRenderer(this, "Health : " + Long.toString(ship.getHealth()), 15);
-        activeSkill = new TextRenderer(this, "Active Skill : " + ship.getActiveSkillName(), 15);
+        
+        activeSkillText = new TextRenderer(this, "Active Skill : " + ship.getActiveSkillName(), 15);
         passiveSkillHeaderText = new TextRenderer(this, "(Passive Skills)", 15);
 
         addGameObject(coinCountText);
         addGameObject(playerHealthText);
         addGameObject(activeSkill);
         addGameObject(passiveSkillHeaderText);
+
         updatePassiveSkillText();
 
         coinCountText.setPos(0 , 10 << 16);
         playerHealthText.setPos(0, 30 << 16);
-        activeSkill.setPos(0, 50 << 16);
+        activeSkillText.setPos(0, 50 << 16);
         passiveSkillHeaderText.setPos(0, 70 << 16);
         int index = 0;
         for (TextRenderer text : passiveSkillsTexts.values()) {
@@ -156,8 +163,12 @@ public class GameLoop extends Loop {
 
     private void updateText() {
         coinCountText.setText("Coin : " + Long.toString(coinCount));
-        playerHealthText.setText("Health : " + Long.toString(ship.getHealth()));
-        activeSkill.setText("Active Skill : " + ship.getActiveSkillName());
+        playerHealthText.setText("Health : " + Long.toString(ship.getHealth()) + 
+        (ship.getCurrentShield() == 0 ? "" : " ( " + Integer.toString(ship.getCurrentShield())  + " ) "));
+
+        String activeSkillTextContent = "Active Skill : " + ship.getActiveSkillName();
+        activeSkillTextContent += ship.isActiveSkillActable() ? "" : "( " + Long.toString(ship.getRemainCoolTime() >> 16) + " )";
+        activeSkillText.setText(activeSkillTextContent);
         updatePassiveSkillText();
     }
 
@@ -178,6 +189,7 @@ public class GameLoop extends Loop {
         clearGameObjects();
         initEntities();
         initText();
+        ship.onWaveStart();
     }
 
     /**
@@ -196,10 +208,10 @@ public class GameLoop extends Loop {
             for (long x=0L;x<12L;x++) {
                 Enemy enemy;
                 if (row <= 3L){
-                    enemy = new Alien(this, enemyHiveMind);
+                    enemy = new Artillery(this, enemyHiveMind, ship);
                 }
                 else{
-                    enemy = new Artillery(this, enemyHiveMind, ship);
+                    enemy = new Alien(this, enemyHiveMind);
                 }
                 enemy.setPos((100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                 addGameObject(enemy);
@@ -220,12 +232,10 @@ public class GameLoop extends Loop {
 
         // (타입, x, y) 정보를 담은 배열
         Object[][] skillData = {
-            { PlayerPassiveSkillType.AttackSpeed, 100 << 16, 300 << 16 },
-            { PlayerPassiveSkillType.AttackSpeed, 200 << 16, 300 << 16 },
-            { PlayerPassiveSkillType.AttackSpeed, 300 << 16, 300 << 16 },
-            { PlayerPassiveSkillType.AttackSpeed, 400 << 16, 300 << 16 },
-            { PlayerPassiveSkillType.AdditionalEngine, 100 << 16, 400 << 16 },
-            { PlayerPassiveSkillType.AdditionalEngine, 200 << 16, 400 << 16 }
+            { PlayerPassiveSkillType.DamageUp, 100 << 16, 500 << 16 },
+            { PlayerPassiveSkillType.DamageUp, 200 << 16, 500 << 16 },
+            { PlayerPassiveSkillType.DamageUp, 300 << 16, 500 << 16 },
+            { PlayerPassiveSkillType.DamageUp, 400 << 16, 500 << 16 },
         };
 
         // 반복문으로 생성
@@ -252,6 +262,14 @@ public class GameLoop extends Loop {
     }
     public boolean isWaitingForKeyPress(){
         return waitingForKeyPress;
+    }
+
+    //TODO notify류 메소드는 이벤트 버스 패턴으로 리펙토링하자...
+    public void notifyBomb(){
+        System.out.println("펑");
+        for (Enemy enemy : enemies) {
+            enemy.decreaseHealth(bombDamage);
+        }
     }
 
     /**

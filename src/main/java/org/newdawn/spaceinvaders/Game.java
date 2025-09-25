@@ -77,8 +77,12 @@ public class Game extends Canvas
         SpriteStore.get().getSprite("sprites/raiderAlien1.png", 32 << 16, 32 << 16);
         SpriteStore.get().getSprite("sprites/raiderAlien2.png", 32 << 16, 32 << 16);
         SpriteStore.get().getSprite("sprites/raiderAlien3.png", 32 << 16, 32 << 16);
+        //* Loading Skill Icon Sprites
         SpriteStore.get().getSprite("sprites/testPassiveSkill.png", 32 << 16, 32 << 16);
         SpriteStore.get().getSprite("sprites/testActiveSkill.png", 32 << 16, 32 << 16);
+        //* Loading ETC Sprites
+        SpriteStore.get().getSprite("sprites/testBarrier.png", 25 << 16, 8 << 16);
+        SpriteStore.get().getSprite("sprites/testLaser.png", 8 << 16, 512 << 16);
 
         loop = new MainMenuLoop(this);  // 게임 시작 후 가장 처음 진입할 Loop
 

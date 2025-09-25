@@ -42,7 +42,7 @@ public class Guardian extends SweeperEnemy{
         if (_health <= 0){
             destroy();
     
-            LootItem item = LootItemFactory.getInstance().instantiateRandomItem(loop);
+            LootItem item = LootItemFactory.getInstance().instantiateRandomItem((GameLoop)loop);
     
             if (item != null){
                 item.setPos(getPosX(), getPosY());

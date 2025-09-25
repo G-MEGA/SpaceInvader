@@ -1,8 +1,6 @@
 package org.newdawn.spaceinvaders.game_object.ingame.bullet;
 
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
-import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
-import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class EnemyBullet extends Bullet{

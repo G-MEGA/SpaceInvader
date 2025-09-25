@@ -1,5 +1,8 @@
 package firebase;
 import com.google.gson.Gson;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -9,7 +12,7 @@ import java.util.Map;
 
 public class FirebaseClientAuth {
 
-    private static final String WEB_API_KEY = "YOUR_WEB_API_KEY"; // Firebase 콘솔에서 복사한 키
+    private static final String WEB_API_KEY = "AIzaSyAx6jRdo05AbC0eKQqDFO-NQEWemVd7bsg"; // Firebase 콘솔에서 복사한 키
     private static final Gson gson = new Gson();
 
     /**
@@ -53,9 +56,24 @@ public class FirebaseClientAuth {
                 return result.get("idToken"); // 성공 시 ID 토큰 반환
             }
         } else {
-            // 에러 처리 (예: 이미 존재하는 이메일, 잘못된 비밀번호 등)
-            // conn.getErrorStream()을 읽어 Firebase의 에러 메시지를 확인할 수 있습니다.
-            throw new RuntimeException("Firebase Auth Failed: " + responseCode);
+            // 1. 에러 스트림을 가져옵니다.
+            InputStream errorStream = conn.getErrorStream();
+            if (errorStream == null) {
+                throw new RuntimeException("Firebase Auth Failed with response code: " + responseCode);
+            }
+
+            // 2. 스트림의 내용을 문자열로 읽어들입니다.
+            StringBuilder response = new StringBuilder();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(errorStream, StandardCharsets.UTF_8))) {
+                String responseLine;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+            }
+
+            // 3. 실제 에러 메시지를 출력하고 예외를 발생시킵니다.
+            String actualErrorMessage = response.toString();
+            throw new RuntimeException(actualErrorMessage);
         }
     }
 }

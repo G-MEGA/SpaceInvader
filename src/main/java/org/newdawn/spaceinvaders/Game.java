@@ -14,6 +14,7 @@ import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputKey;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputMouseMove;
 import org.newdawn.spaceinvaders.loop.Loop;
 import org.newdawn.spaceinvaders.loop.MainMenuLoop;
+import org.newdawn.spaceinvaders.map_load.MapList;
 import org.newdawn.spaceinvaders.singleton.PlayerSetting;
 import org.newdawn.spaceinvaders.singleton.SystemTimer;
 import org.newdawn.spaceinvaders.sprite.SpriteStore;
@@ -38,7 +39,9 @@ public class Game extends Canvas
     public final long fixedFPS;
     public final long fixedDeltaTime;
 
-    private Loop loop = new MainMenuLoop(this);
+    private Loop loop;
+
+    private MapList mapList;
 
 	/** The stragey that allows us to use accelerate page flipping */
 	private BufferStrategy strategy;
@@ -62,6 +65,28 @@ public class Game extends Canvas
 	public Game(long fixedFPS) {
         this.fixedFPS = fixedFPS;
         this.fixedDeltaTime = FixedPointUtil.div(FixedPointUtil.ONE, fixedFPS);
+
+        SpriteStore.get().getSprite("sprites/ship.gif", (16 << 16) + FixedPointUtil.ZERO_5, (11 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/shot.gif", 6L << 16, (11 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/alien.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/alien2.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/alien3.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/shieldAlien1.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/shieldAlien2.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/shieldAlien3.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/raiderAlien1.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/raiderAlien2.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/raiderAlien3.png", 32 << 16, 32 << 16);
+        //* Loading Skill Icon Sprites
+        SpriteStore.get().getSprite("sprites/testPassiveSkill.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/testActiveSkill.png", 32 << 16, 32 << 16);
+        //* Loading ETC Sprites
+        SpriteStore.get().getSprite("sprites/testBarrier.png", 25 << 16, 8 << 16);
+        SpriteStore.get().getSprite("sprites/testLaser.png", 8 << 16, 512 << 16);
+
+        loop = new MainMenuLoop(this);  // 게임 시작 후 가장 처음 진입할 Loop
+
+        mapList = new MapList();
 
 		// create a frame to contain our game
 		container = new JFrame("Space Invaders 102");
@@ -91,6 +116,8 @@ public class Game extends Canvas
 				System.exit(0);
 			}
 		});
+
+        container.setLocationRelativeTo(null);
 		
 		// add a key input system (defined below) to our canvas
 		// so we can respond to key pressed
@@ -176,6 +203,10 @@ public class Game extends Canvas
 			SystemTimer.sleep(lastLoopTime+(long)(FixedPointUtil.toDouble(fixedDeltaTime)*1000)-SystemTimer.getTime());
 		}
 	}
+
+    public MapList getMapList() {
+        return mapList;
+    }
 	
 	/**
 	 * A class to handle keyboard input from the user. The class
@@ -299,40 +330,4 @@ public class Game extends Canvas
     public void changeLoop(Loop loop) {
         this.loop = loop;
     }
-
-
-    /**
-     * The entry point into the game. We'll simply create an
-     * instance of class which will start the display and game
-     * loop.
-     *
-     * @param argv The arguments that are passed into our games
-     */
-	public static void main(String[] argv) {
-		//* Loading GameCharacter Sprites
-        SpriteStore.get().getSprite("sprites/ship.gif", (16 << 16) + FixedPointUtil.ZERO_5, (11 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/shot.gif", 6L << 16, (11 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/alien.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/alien2.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/alien3.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
-		SpriteStore.get().getSprite("sprites/shieldAlien1.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/shieldAlien2.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/shieldAlien3.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/raiderAlien1.png", 32 << 16, 32 << 16);
-        SpriteStore.get().getSprite("sprites/raiderAlien2.png", 32 << 16, 32 << 16);
-        SpriteStore.get().getSprite("sprites/raiderAlien3.png", 32 << 16, 32 << 16);
-		//* Loading Skill Icon Sprites
-		SpriteStore.get().getSprite("sprites/testPassiveSkill.png", 32 << 16, 32 << 16);
-		SpriteStore.get().getSprite("sprites/testActiveSkill.png", 32 << 16, 32 << 16);
-		//* Loading ETC Sprites
-		SpriteStore.get().getSprite("sprites/testBarrier.png", 25 << 16, 8 << 16);
-		SpriteStore.get().getSprite("sprites/testLaser.png", 8 << 16, 512 << 16);
-
-		Game g = new Game(60L << 16);
-
-		// Start the main game loop, note: this method will not
-		// return until the game has finished running. Hence we are
-		// using the actual main thread to run the game.
-		g.loop();
-	}
 }

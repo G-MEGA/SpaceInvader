@@ -152,20 +152,20 @@ public class FixedPointUtil {
         return angle;
     }
 
-    public static long fromLong(long x) {
-        if (x >= 0) {
-            return x << SCALE;
+    public static long fromLong(long value) {
+        if (value >= 0) {
+            return value << SCALE;
         } else {
-            return -(-x << SCALE);
+            return -(-value << SCALE);
         }
     }
 
-    public static long fromDouble(double x) {
-        return (long) (x * ONE);
+    public static long fromDouble(double value) {
+        return (long) (value * ONE);
     }
 
-    public static double toDouble(long x) {
-        return ((double) x) / ONE;
+    public static double toDouble(long value) {
+        return ((double) value) / ONE;
     }
 
 

@@ -10,7 +10,19 @@ import java.awt.geom.AffineTransform;
 public class Button extends GameObject2D {
     IButtonListener buttonListener;
     int width;
+    public int getWidth() {
+        return width;
+    }
+    public long getWidthInFixedPoint() {
+        return FixedPointUtil.fromLong(width);
+    }
     int height;
+    public int getHeight() {
+        return height;
+    }
+    public long getHeightInFixedPoint() {
+        return FixedPointUtil.fromLong(height);
+    }
 
     public int alignment = 0;// 0 오른쪽 1 중앙 2 왼쪽 표시
 

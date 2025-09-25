@@ -6,7 +6,7 @@ import org.newdawn.spaceinvaders.loop.Loop;
 
 import java.awt.geom.AffineTransform;
 
-public abstract class GameObject2D extends GameObject{
+public class GameObject2D extends GameObject{
     long posX = 0;
     long posY = 0;
     long rotation = 0;

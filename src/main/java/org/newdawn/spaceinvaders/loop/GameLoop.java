@@ -138,10 +138,11 @@ public class GameLoop extends Loop {
         activeSkillText = new TextRenderer(this, "Active Skill : " + ship.getActiveSkillName(), 15);
         passiveSkillHeaderText = new TextRenderer(this, "(Passive Skills)", 15);
 
-        gameObjects.add(coinCountText);
-        gameObjects.add(playerHealthText);
-        gameObjects.add(activeSkillText);
-        gameObjects.add(passiveSkillHeaderText);
+        addGameObject(coinCountText);
+        addGameObject(playerHealthText);
+        addGameObject(activeSkill);
+        addGameObject(passiveSkillHeaderText);
+
         updatePassiveSkillText();
 
         coinCountText.setPos(0 , 10 << 16);
@@ -157,7 +158,7 @@ public class GameLoop extends Loop {
         indicatorText = new TextRenderer(this, "", 20);
         indicatorText.alignment = 1;
         indicatorText.setPos(400 << 16, 50 << 16);
-        gameObjects.add(indicatorText);
+        addGameObject(indicatorText);
     }
 
     private void updateText() {
@@ -182,10 +183,10 @@ public class GameLoop extends Loop {
      */
     private void startGame() {
         // clear out any existing entities and intialise a new set
-        for (GameObject gameObject : gameObjects) {
+        for (GameObject gameObject : getGameObjects()) {
             gameObject.destroy();
         }
-        gameObjects.clear();
+        clearGameObjects();
         initEntities();
         initText();
         ship.onWaveStart();
@@ -199,7 +200,7 @@ public class GameLoop extends Loop {
         // create the player ship and place it roughly in the center of the screen
         ship = new PlayerShip(this);
         ship.setPos(400 << 16, 550 << 16);
-        gameObjects.add(ship);
+        addGameObject(ship);
 
         // create a block of aliens (5 rows, by 12 aliens, spaced evenly)
         enemyCount = 0;
@@ -213,7 +214,7 @@ public class GameLoop extends Loop {
                     enemy = new Alien(this, enemyHiveMind);
                 }
                 enemy.setPos((100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
-                gameObjects.add(enemy);
+                addGameObject(enemy);
                 enemies.add(enemy);
                 enemyHiveMind.addListener(enemy);
                 enemyCount++;
@@ -221,13 +222,13 @@ public class GameLoop extends Loop {
         }
 
         //* 상점 아이템 생성 슬롯
-        LaserSkill laserSKill = new LaserSkill(ship, this); 
-        StoreSlot storeSlot = new StoreSlot(this, 0, laserSKill, 600 << 16, 300 << 16);
-        gameObjects.add(storeSlot);
+        BasicActiveSkill basicActiveSkill = new BasicActiveSkill(ship, this);
+        StoreSlot storeSlot = new StoreSlot(this, 0, basicActiveSkill, 600 << 16, 300 << 16);
+        addGameObject(storeSlot);
 
-        BarrierSkill barrierSkill = new BarrierSkill(ship, this);
-        storeSlot = new StoreSlot(this, 0, barrierSkill, 700 << 16, 300 << 16);
-        gameObjects.add(storeSlot);
+        LaserSkill laserSkill = new LaserSkill(ship, this);
+        storeSlot = new StoreSlot(this, 0, laserSkill, 700 << 16, 300 << 16);
+        addGameObject(storeSlot);
 
         // (타입, x, y) 정보를 담은 배열
         Object[][] skillData = {
@@ -245,12 +246,12 @@ public class GameLoop extends Loop {
 
             PassiveSkill passiveSkill = new PassiveSkill(type, ship, this);
             storeSlot = new StoreSlot(this, 0, passiveSkill, x, y);
-            gameObjects.add(storeSlot);
+            addGameObject(storeSlot);
         }
 
         // PassiveSkill passiveSkill = new PassiveSkill("Fuck", "sprites/testPassiveSkill.png", ship, this, "응애");
         // storeSlot = new StoreSlot(this,1, passiveSkill, 500 << 16, 300 << 16);
-        // gameObjects.add(storeSlot);
+        // addGameObject(storeSlot);
 
         enemyHiveMind.cancelBroadcast();
         System.gc();
@@ -299,13 +300,34 @@ public class GameLoop extends Loop {
             notifyWin();
         }
 
-        for(GameObject gameObject : gameObjects){
+        for(GameObject gameObject : getGameObjects()){
             if(gameObject instanceof Enemy){
                 ((Enemy) gameObject).velocityX = FixedPointUtil.mul(
                         ((Enemy) gameObject).velocityX,
                         FixedPointUtil.ONE + FixedPointUtil.ZERO_02);
             }
         }
+    }
+
+    public String getReplayData(){
+//            forReplay 변수가 있으니 리플레이 녹화 버튼 입력이 리플레이 데이터에 들어가도 괜찮음
+//            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외
+//            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외
+
+        StringBuilder sb = new StringBuilder();
+        for(GameLoopInputLog gameLoopInputLog : inputLogs){
+            String gameLoopInputLogData = gameLoopInputLog.toSaveData();
+
+//            forReplay 변수가 있으니 리플레이 녹화 버튼 입력이 리플레이 데이터에 들어가도 괜찮음
+//                if(gameLoopInputLogData.contains("record"))
+//                    continue;
+
+            sb.append(gameLoopInputLogData).append("\n");
+        }
+
+        String data = sb.toString();
+
+        return data;
     }
 
     //* LootItem을 먹었을때, 나타나는 효과를 호출하는 메소드
@@ -343,23 +365,9 @@ public class GameLoop extends Loop {
             getGame().changeLoop(new MainMenuLoop(getGame()));
         }
 
+        //TODO 리플레이 저장 (임시)
         if(!forReplay && isKeyInputJustPressed("record")) {
-//            forReplay 변수가 있으니 리플레이 녹화 버튼 입력이 리플레이 데이터에 들어가도 괜찮음
-//            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외
-//            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외
-
-            StringBuilder sb = new StringBuilder();
-            for(GameLoopInputLog gameLoopInputLog : inputLogs){
-                String gameLoopInputLogData = gameLoopInputLog.toSaveData();
-
-//            forReplay 변수가 있으니 리플레이 녹화 버튼 입력이 리플레이 데이터에 들어가도 괜찮음
-//                if(gameLoopInputLogData.contains("record"))
-//                    continue;
-
-                sb.append(gameLoopInputLogData).append("\n");
-            }
-
-            String data = sb.toString();
+            String data = getReplayData();
 
             // JFileChooser 객체 생성
             JFileChooser chooser = new JFileChooser();

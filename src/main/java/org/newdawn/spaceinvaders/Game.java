@@ -108,7 +108,7 @@ public class Game extends Canvas
 		// request the focus so key events come to us
 		requestFocus();
 
-		// create the buffering strategy which will allow AWT
+		// create the buffering strategy which will allow AWTㄴ
 		// to manage our accelerated graphics
 		createBufferStrategy(2);
 		strategy = getBufferStrategy();
@@ -329,6 +329,8 @@ public class Game extends Canvas
         SpriteStore.get().getSprite("sprites/raiderAlien1.png", 32 << 16, 32 << 16);
         SpriteStore.get().getSprite("sprites/raiderAlien2.png", 32 << 16, 32 << 16);
         SpriteStore.get().getSprite("sprites/raiderAlien3.png", 32 << 16, 32 << 16);
+		SpriteStore.get().getSprite("sprites/testPassiveSkill.png", 32 << 16, 32 << 16);
+		SpriteStore.get().getSprite("sprites/testActiveSkill.png", 32 << 16, 32 << 16);
 
 		Game g = new Game(60L << 16);
 

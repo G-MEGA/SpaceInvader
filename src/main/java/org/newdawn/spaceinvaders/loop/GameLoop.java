@@ -132,10 +132,10 @@ public class GameLoop extends Loop {
         activeSkill = new TextRenderer(this, "Active Skill : " + ship.getActiveSkillName(), 15);
         passiveSkillHeaderText = new TextRenderer(this, "(Passive Skills)", 15);
 
-        gameObjects.add(coinCountText);
-        gameObjects.add(playerHealthText);
-        gameObjects.add(activeSkill);
-        gameObjects.add(passiveSkillHeaderText);
+        addGameObject(coinCountText);
+        addGameObject(playerHealthText);
+        addGameObject(activeSkill);
+        addGameObject(passiveSkillHeaderText);
         updatePassiveSkillText();
 
         coinCountText.setPos(0 , 10 << 16);
@@ -151,7 +151,7 @@ public class GameLoop extends Loop {
         indicatorText = new TextRenderer(this, "", 20);
         indicatorText.alignment = 1;
         indicatorText.setPos(400 << 16, 50 << 16);
-        gameObjects.add(indicatorText);
+        addGameObject(indicatorText);
     }
 
     private void updateText() {
@@ -212,11 +212,11 @@ public class GameLoop extends Loop {
         //* 상점 아이템 생성 슬롯
         BasicActiveSkill basicActiveSkill = new BasicActiveSkill(ship, this);
         StoreSlot storeSlot = new StoreSlot(this, 0, basicActiveSkill, 600 << 16, 300 << 16);
-        gameObjects.add(storeSlot);
+        addGameObject(storeSlot);
 
         LaserSkill laserSkill = new LaserSkill(ship, this);
         storeSlot = new StoreSlot(this, 0, laserSkill, 700 << 16, 300 << 16);
-        gameObjects.add(storeSlot);
+        addGameObject(storeSlot);
 
         // (타입, x, y) 정보를 담은 배열
         Object[][] skillData = {
@@ -236,12 +236,12 @@ public class GameLoop extends Loop {
 
             PassiveSkill passiveSkill = new PassiveSkill(type, ship, this);
             storeSlot = new StoreSlot(this, 0, passiveSkill, x, y);
-            gameObjects.add(storeSlot);
+            addGameObject(storeSlot);
         }
 
         // PassiveSkill passiveSkill = new PassiveSkill("Fuck", "sprites/testPassiveSkill.png", ship, this, "응애");
         // storeSlot = new StoreSlot(this,1, passiveSkill, 500 << 16, 300 << 16);
-        // gameObjects.add(storeSlot);
+        // addGameObject(storeSlot);
 
         enemyHiveMind.cancelBroadcast();
         System.gc();

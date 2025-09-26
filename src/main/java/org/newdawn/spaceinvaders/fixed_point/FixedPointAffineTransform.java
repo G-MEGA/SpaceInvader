@@ -72,10 +72,10 @@ public class FixedPointAffineTransform {
     public long getScale() {return scale;}
 
     public AffineTransform getAffineTransform() {return affineTransform;}
-    public long getxAxisX() {return xAxisX;}
-    public long getxAxisY() {return xAxisY;}
-    public long getyAxisX() {return yAxisX;}
-    public long getyAxisY() {return yAxisY;}
+    public long getXAxisX() {return xAxisX;}
+    public long getXAxisY() {return xAxisY;}
+    public long getYAxisX() {return yAxisX;}
+    public long getYAxisY() {return yAxisY;}
     public double getRotationInRadians() {return rotationInRadians;}
 
     void update(){
@@ -96,8 +96,8 @@ public class FixedPointAffineTransform {
         tempTransform.setToTranslation(x, y);
         affineTransform.preConcatenate(tempTransform);
         //endregion
-        xAxisX = FixedPointUtil.cos(this.rotation);
-        xAxisY = FixedPointUtil.sin(this.rotation);
+        xAxisX = FixedPointUtil.mul(FixedPointUtil.cos(this.rotation), this.scale);
+        xAxisY = FixedPointUtil.mul(FixedPointUtil.sin(this.rotation), this.scale);
         yAxisX = -xAxisY;
         yAxisY = xAxisX;
         rotationInRadians = Math.toRadians(FixedPointUtil.toDouble(this.rotation));

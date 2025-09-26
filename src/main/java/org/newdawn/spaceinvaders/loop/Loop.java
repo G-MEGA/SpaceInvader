@@ -156,8 +156,11 @@ public abstract class Loop implements Serializable {
     }
 
     public final void processCollision2D(){
+//        int count = 0;
+//        long nanos = System.nanoTime();
         for (int p=0;p<colliders.size();p++) {
             for (int s=p+1;s<colliders.size();s++) {
+//                count++;
                 Collider2D me = colliders.get(p);
                 Collider2D him = colliders.get(s);
 
@@ -172,6 +175,7 @@ public abstract class Loop implements Serializable {
                 }
             }
         }
+//        System.out.println((System.nanoTime() - nanos)/1000_000.0 + "밀리초");
     }
 
     protected final void processGameObjects(){

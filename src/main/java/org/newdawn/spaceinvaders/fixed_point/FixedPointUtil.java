@@ -153,6 +153,13 @@ public class FixedPointUtil {
         return angle;
     }
 
+    public static long dot(long x1, long y1, long x2, long y2) {
+        return mul(x1, x2) + mul(y1, y2);
+    }
+    public static long dotAbs(long x1, long y1, long x2, long y2) {
+        return Math.abs(dot(x1, y1, x2, y2));
+    }
+
     public static long fromLong(long value) {
         if (value >= 0) {
             return value << SCALE;
@@ -167,6 +174,9 @@ public class FixedPointUtil {
 
     public static double toDouble(long value) {
         return ((double) value) / ONE;
+    }
+    public static int toInt(long value) {
+        return (int) (value >> SCALE);
     }
 
 

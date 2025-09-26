@@ -126,13 +126,20 @@ public abstract class Loop implements Serializable {
             throw new IllegalArgumentException("부모가 있는 게임오브젝트는 Loop에 직접 연결할 수 없음");
         }
         if (gameObjects.contains(gameObject))return;
-        
+
         gameObjects.add(gameObject);
+        gameObject.setInLoop(true);
     }
     public final void removeGameObject(GameObject gameObject){
+        if(!gameObjects.contains(gameObject))return;
+
         gameObjects.remove(gameObject);
+        gameObject.setInLoop(false);
     }
     public final void clearGameObjects() {
+        for (GameObject gameObject : gameObjects) {
+            gameObject.setInLoop(false);
+        }
         gameObjects.clear();
     }
     public final ArrayList<GameObject> getGameObjects(){

@@ -9,6 +9,18 @@ import java.util.ArrayList;
 public abstract class GameObject implements Serializable {
     protected final Loop loop;
 
+    boolean inLoop = false;
+    public final void setInLoop(boolean value) {
+        this.inLoop = value;
+
+        for (GameObject gameObject: children) {
+            gameObject.setInLoop(this.inLoop);
+        }
+
+        onInLoopUpdated(this.inLoop);
+    }
+    protected void onInLoopUpdated(boolean value) {
+    }
     boolean destroyed = false;
 
     GameObject parent;
@@ -82,11 +94,15 @@ public abstract class GameObject implements Serializable {
         if(children.contains(child) || child.parent != null) return;
         children.add(child);
         child.parent = this;
+
+        child.setInLoop(inLoop);
     }
     public void removeChild(GameObject child){
         if(!children.contains(child) || child.parent != this) return;
         child.parent = null;
         children.remove(child);
+
+        child.setInLoop(false);
     }
 
     public boolean isDestroyed(){

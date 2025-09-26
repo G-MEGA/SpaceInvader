@@ -28,12 +28,10 @@ public class Collider2D extends GameObject2D {
     public Collider2D(Loop loop, ICollider2DOwner owner) {
         super(loop);
         this.owner = owner;
-        this.loop.addCollider(this);
     }
     public void onDestroy() {
         super.onDestroy();
         this.owner = null;
-        loop.removeCollider(this);
     }
 
     public ICollider2DOwner getOwner() {
@@ -48,6 +46,18 @@ public class Collider2D extends GameObject2D {
         globalBounds[3] =  boundsHeight;
 
         return globalBounds;
+    }
+
+    @Override
+    protected void onInLoopUpdated(boolean value) {
+        super.onInLoopUpdated(value);
+
+        if (value) {
+            loop.addCollider(this);
+        }
+        else{
+            loop.removeCollider(this);
+        }
     }
 
     public void draw(Graphics2D g2d) {

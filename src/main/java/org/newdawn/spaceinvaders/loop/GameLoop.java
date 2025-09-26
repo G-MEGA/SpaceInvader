@@ -30,6 +30,7 @@ import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.La
 import org.newdawn.spaceinvaders.game_object.ingame.store.StoreSlot;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.EnemyFactory;
+import org.newdawn.spaceinvaders.singleton.PseudoRandom;
 
 public class GameLoop extends Loop {
     long currentFrame;
@@ -192,6 +193,7 @@ public class GameLoop extends Loop {
      * create a new set.
      */
     private void startGame() {
+        PseudoRandom.getInstance().setLoop(this);
         // clear out any existing entities and intialise a new set
         for (GameObject gameObject : getGameObjects()) {
             gameObject.destroy();

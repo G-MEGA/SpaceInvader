@@ -16,7 +16,7 @@ public abstract class Mover2D extends GameObject2D{
     protected void process(long deltaTime) {
         super.process(deltaTime);
 
-        posX += FixedPointUtil.mul(velocityX, deltaTime);
-        posY += FixedPointUtil.mul(velocityY, deltaTime);
+        setPosX(getPosX() + FixedPointUtil.mul(velocityX, deltaTime));
+        setPosY(getPosY() + FixedPointUtil.mul(velocityY, deltaTime));
     }
 }

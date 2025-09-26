@@ -1,112 +1,121 @@
 package org.newdawn.spaceinvaders.game_object;
 
 import org.newdawn.spaceinvaders.Game;
+import org.newdawn.spaceinvaders.fixed_point.FixedPointAffineTransform;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.loop.Loop;
 
 import java.awt.geom.AffineTransform;
 
 public class GameObject2D extends GameObject{
-    long posX = 0;
-    long posY = 0;
-    long rotation = 0;
-    long scale = 1 << 16;
+    FixedPointAffineTransform localTransform = new FixedPointAffineTransform();
 
     // 0 posX
     // 1 posY
     // 2 rotation
     // 3 scale
-    long[] globalTransform = new long[4];
+    FixedPointAffineTransform globalTransform = new FixedPointAffineTransform();
 
-    AffineTransform globalTransformForDraw = new AffineTransform();
-    AffineTransform tempTransform = new AffineTransform();
-    
+    boolean globalTransformDirty = true;
+
     public GameObject2D(Loop loop) {
         super(loop);
     }
 
-    public long[] getGlobalTransform(){
-        if (getParent() instanceof GameObject2D) {
-            long[] parentGlobalTransform =  ((GameObject2D)getParent()).getGlobalTransform();
+    @Override
+    protected void onInLoopUpdated(boolean value) {
+        super.onInLoopUpdated(value);
 
-            long globalRotation = parentGlobalTransform[2] + rotation;
-            long globalScale = FixedPointUtil.mul(parentGlobalTransform[3], scale);
-
-            long newX = FixedPointUtil.mul(posX, FixedPointUtil.cos(parentGlobalTransform[2])) - FixedPointUtil.mul(posY, FixedPointUtil.sin(parentGlobalTransform[2]));
-            long newY = FixedPointUtil.mul(posX, FixedPointUtil.sin(parentGlobalTransform[2])) + FixedPointUtil.mul(posY, FixedPointUtil.cos(parentGlobalTransform[2]));
-            long globalPosX = parentGlobalTransform[0] + newX;
-            long globalPosY =  parentGlobalTransform[1] + newY;
-
-            globalTransform[0] = globalPosX;
-            globalTransform[1] = globalPosY;
-            globalTransform[2] = globalRotation;
-            globalTransform[3] = globalScale;
-            return globalTransform;
-        }
-        else{
-            globalTransform[0] = posX;
-            globalTransform[1] = posY;
-            globalTransform[2] = rotation;
-            globalTransform[3] = scale;
-            return globalTransform;
-        }
+        setGlobalTransformDirty();
     }
-    protected AffineTransform getGlobalTransformForDraw(){
-        long[] xform = getGlobalTransform();
 
-        double x = FixedPointUtil.toDouble(xform[0]);
-        double y = FixedPointUtil.toDouble(xform[1]);
-        double rotation = Math.toRadians(FixedPointUtil.toDouble(xform[2]));
-        double scale = FixedPointUtil.toDouble(xform[3]);
+    public FixedPointAffineTransform getGlobalTransform(){
+        if(!isInLoop()){throw new RuntimeException("not in loop");}
 
-        globalTransformForDraw.setToIdentity();
+        if(globalTransformDirty){
+            if (getParent() instanceof GameObject2D) {
+                FixedPointAffineTransform parentGlobalTransform =  ((GameObject2D)getParent()).getGlobalTransform();
 
-        tempTransform.setToScale(scale, scale);
-        globalTransformForDraw.preConcatenate(tempTransform);
+                long globalRotation = parentGlobalTransform.getRotation() + localTransform.getRotation();
+                long globalScale = FixedPointUtil.mul(parentGlobalTransform.getScale(), localTransform.getScale());
 
-        tempTransform.setToRotation(rotation);
-        globalTransformForDraw.preConcatenate(tempTransform);
+                long newX = FixedPointUtil.mul(localTransform.getPosX(), FixedPointUtil.cos(parentGlobalTransform.getRotation()))
+                        - FixedPointUtil.mul(localTransform.getPosY(), FixedPointUtil.sin(parentGlobalTransform.getRotation()));
+                long newY = FixedPointUtil.mul(localTransform.getPosX(), FixedPointUtil.sin(parentGlobalTransform.getRotation()))
+                        + FixedPointUtil.mul(localTransform.getPosY(), FixedPointUtil.cos(parentGlobalTransform.getRotation()));
+                long globalPosX = parentGlobalTransform.getPosX() + newX;
+                long globalPosY =  parentGlobalTransform.getPosY() + newY;
 
-        tempTransform.setToTranslation(x, y);
-        globalTransformForDraw.preConcatenate(tempTransform);
+                globalTransform.setTransform(globalPosX, globalPosY, globalRotation, globalScale);
+            }
+            else{
+                globalTransform.setTransform(localTransform.getPosX(), localTransform.getPosY(), localTransform.getRotation(), localTransform.getScale());
+            }
 
-        return globalTransformForDraw;
+            globalTransformDirty = false;
+        }
+
+        return globalTransform;
     }
 
     public long getPosX(){
-        return posX;
+        return localTransform.getPosX();
     }
     public long getPosY(){
-        return posY;
+        return localTransform.getPosY();
     }
     public long getRotation(){
-        return rotation;
+        return localTransform.getRotation();
     }
     public long getScale(){
-        return scale;
+        return localTransform.getScale();
     }
 
     public void setPosX(long x){
-        posX = x;
+        localTransform.setPosX(x);
+        setGlobalTransformDirty();
     }
     public void setPosY(long y){
-        posY = y;
+        localTransform.setPosY(y);
+        setGlobalTransformDirty();
     }
     public void setPos(long x, long y){
-        posX = x;
-        posY = y;
+        localTransform.setPos(x, y);
+        setGlobalTransformDirty();
     }
     public void setRotation(long degrees){
-        while (degrees > 360 << 16) {
-            degrees -= 360 << 16;
-        }
-        while (degrees < 0) {
-            degrees += 360 << 16;
-        }
-
-        rotation = degrees;
+        localTransform.setRotation(degrees);
+        setGlobalTransformDirty();
+    }
+    public void setPosRotation(long x, long y, long degrees){
+        localTransform.setPosRotation(x, y, degrees);
+        setGlobalTransformDirty();
     }
     public void setScale(long scale){
-        this.scale = scale;
+        localTransform.setScale(scale);
+        setGlobalTransformDirty();
+    }
+
+    void setGlobalTransformDirty(){
+        globalTransformDirty = true;
+
+        for(GameObject gameObject : getChildren()){
+            if(gameObject instanceof GameObject2D){
+                ((GameObject2D)gameObject).setGlobalTransformDirty();
+            }
+        }
+    }
+
+    @Override
+    protected void onAddedToParent() {
+        super.onAddedToParent();
+
+        setGlobalTransformDirty();
+    }
+    @Override
+    protected void onRemovedFromParent() {
+        super.onRemovedFromParent();
+
+        setGlobalTransformDirty();
     }
 }

@@ -52,6 +52,6 @@ public class SpriteRenderer extends GameObject2D {
             sprite = SpriteStore.get().getSprite(spriteRef);
         }
 
-        sprite.draw(g, getGlobalTransformForDraw());
+        sprite.draw(g, getGlobalTransform().getAffineTransform());
     }
 }

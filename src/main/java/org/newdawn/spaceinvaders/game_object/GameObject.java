@@ -10,6 +10,9 @@ public abstract class GameObject implements Serializable {
     protected final Loop loop;
 
     boolean inLoop = false;
+    public final boolean isInLoop() {
+        return inLoop;
+    }
     public final void setInLoop(boolean value) {
         this.inLoop = value;
 
@@ -51,7 +54,7 @@ public abstract class GameObject implements Serializable {
     protected void draw(Graphics2D g){}
     //endregion
 
-    final public void destroy(){
+    public final void destroy(){
         if(!destroyed){
             onDestroy();
         }
@@ -60,7 +63,7 @@ public abstract class GameObject implements Serializable {
     }
 
     //region Loop가 호출하는거
-    final public void propagateProcess(long deltaTime){
+    public final void propagateProcess(long deltaTime){
         if(destroyed) return;
 
         process(deltaTime);
@@ -69,7 +72,7 @@ public abstract class GameObject implements Serializable {
             child.propagateProcess(deltaTime);
         }
     }
-    final public void propagatePostProcess(long deltaTime){
+    public final void propagatePostProcess(long deltaTime){
         if(destroyed) return;
 
         postProcess(deltaTime);
@@ -78,7 +81,7 @@ public abstract class GameObject implements Serializable {
             child.propagatePostProcess(deltaTime);
         }
     }
-    final public void propagateDraw(Graphics2D g){
+    public final void propagateDraw(Graphics2D g){
         draw(g);
 
         for(GameObject child : children){
@@ -87,25 +90,32 @@ public abstract class GameObject implements Serializable {
     }
     //endregion
 
-    public GameObject getParent(){
+    public final GameObject getParent(){
         return parent;
     }
-    public void addChild(GameObject child){
+    public final void addChild(GameObject child){
         if(children.contains(child) || child.parent != null) return;
         children.add(child);
         child.parent = this;
 
         child.setInLoop(inLoop);
+        child.onAddedToParent();
     }
-    public void removeChild(GameObject child){
+    protected void onAddedToParent(){}
+    public final void removeChild(GameObject child){
         if(!children.contains(child) || child.parent != this) return;
         child.parent = null;
         children.remove(child);
 
         child.setInLoop(false);
+        child.onRemovedFromParent();
+    }
+    protected void onRemovedFromParent(){}
+    public final ArrayList<GameObject> getChildren(){
+        return children;
     }
 
-    public boolean isDestroyed(){
+    public final boolean isDestroyed(){
         return destroyed;
     }
 }

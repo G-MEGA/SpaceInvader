@@ -1,5 +1,6 @@
 package org.newdawn.spaceinvaders.game_object.collision;
 
+import org.newdawn.spaceinvaders.fixed_point.FixedPointAffineTransform;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.loop.Loop;
@@ -38,10 +39,10 @@ public class Collider2D extends GameObject2D {
         return owner;
     }
     public long[] getGlobalBounds() {
-        long[] globalTransform = getGlobalTransform();
+        FixedPointAffineTransform globalTransform = getGlobalTransform();
 
-        globalBounds[0] = globalTransform[0] + boundsPosX;
-        globalBounds[1] =  globalTransform[1] + boundsPosY;
+        globalBounds[0] = globalTransform.getPosX() + boundsPosX;
+        globalBounds[1] =  globalTransform.getPosY() + boundsPosY;
         globalBounds[2] = boundsWidth;
         globalBounds[3] =  boundsHeight;
 
@@ -60,12 +61,21 @@ public class Collider2D extends GameObject2D {
         }
     }
 
+    AffineTransform tempTransformToDraw = new AffineTransform();
     public void draw(Graphics2D g2d) {
         super.draw(g2d);
 
         if(drawBounds){
             long[] globalBounds = getGlobalBounds();
 
+            AffineTransform saveTransform = g2d.getTransform();
+
+            tempTransformToDraw.setTransform(g2d.getTransform());
+            tempTransformToDraw.rotate(
+                    getGlobalTransform().getRotationInRadians(),
+                    getGlobalTransform().getAffineTransform().getTranslateX(),
+                    getGlobalTransform().getAffineTransform().getTranslateY());
+            g2d.setTransform(tempTransformToDraw);
             g2d.setColor(Color.RED);
             g2d.drawRect(
                     (int) FixedPointUtil.toDouble(globalBounds[0]),
@@ -73,6 +83,8 @@ public class Collider2D extends GameObject2D {
                     (int) FixedPointUtil.toDouble(globalBounds[2]),
                     (int) FixedPointUtil.toDouble(globalBounds[3])
             );
+
+            g2d.setTransform(saveTransform);
         }
     }
 

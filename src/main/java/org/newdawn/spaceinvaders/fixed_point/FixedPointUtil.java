@@ -23,21 +23,21 @@ public class FixedPointUtil {
     public static final long ZERO_02 = 1310;
     public static final long ZERO_01 = 655;
 
-    public static long add(long x, long y) {
-        return x + y;
+    public static long add(long a, long b) {
+        return a + b;
     }
 
-    public static long sub(long x, long y) {
-        return x - y;
+    public static long sub(long a, long b) {
+        return a - b;
     }
 
-    public static long mul(long x, long y) {
-        return (x * y) >> SCALE;
+    public static long mul(long a, long b) {
+        return (a * b) >> SCALE;
     }
 
-    public static long div(long x, long y) {
-        long sign = (x < 0) ^ (y < 0) ? -1 : 1;
-        long result = (Math.abs(x) << SCALE) / Math.abs(y);
+    public static long div(long a, long b) {
+        long sign = (a < 0) ^ (b < 0) ? -1 : 1;
+        long result = (Math.abs(a) << SCALE) / Math.abs(b);
 
         return sign * result;
     }

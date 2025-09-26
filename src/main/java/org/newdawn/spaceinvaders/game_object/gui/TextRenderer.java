@@ -57,7 +57,7 @@ public class TextRenderer extends GameObject2D {
 
     public void draw(Graphics2D g){
         super.draw(g);
-        AffineTransform t = getGlobalTransformForDraw();
+        AffineTransform t = getGlobalTransform().getAffineTransform();
 
         g.setFont(font);
         int height = g.getFontMetrics().getHeight();

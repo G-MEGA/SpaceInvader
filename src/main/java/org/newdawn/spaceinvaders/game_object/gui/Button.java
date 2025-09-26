@@ -1,5 +1,6 @@
 package org.newdawn.spaceinvaders.game_object.gui;
 
+import org.newdawn.spaceinvaders.fixed_point.FixedPointAffineTransform;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.loop.Loop;
@@ -40,10 +41,10 @@ public class Button extends GameObject2D {
         super.process(deltaTime);
 
         //region 마우스 호버링 판정
-        long[] gt = getGlobalTransform();
+        FixedPointAffineTransform gt = getGlobalTransform();
 
-        long x = gt[0];
-        long y = gt[1];
+        long x = gt.getPosX();
+        long y = gt.getPosY();
 
         if(alignment==1){
             x += FixedPointUtil.fromLong(- width/2);
@@ -68,7 +69,7 @@ public class Button extends GameObject2D {
     public void draw(Graphics2D g){
         super.draw(g);
 
-        AffineTransform t = getGlobalTransformForDraw();
+        AffineTransform t = getGlobalTransform().getAffineTransform();
 
         int x = (int)t.getTranslateX();
         int y = (int)t.getTranslateY();

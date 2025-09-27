@@ -22,9 +22,15 @@ public class Guardian extends SweeperEnemy{
     
     @Override
     protected void addSprites() {
-        frames.add("sprites/shieldAlien1.png");
-        frames.add("sprites/shieldAlien2.png");
-        frames.add("sprites/shieldAlien3.png");
+        frames.add("sprites/enemy/shieldAlien1.png");
+        frames.add("sprites/enemy/shieldAlien2.png");
+        frames.add("sprites/enemy/shieldAlien3.png");
+    }
+    @Override
+    protected void addHitSprites() {
+        onHitFrames.add("sprites/enemy/enemyOnHit1.png");
+        onHitFrames.add("sprites/enemy/enemyOnHit2.png");
+        onHitFrames.add("sprites/enemy/enemyOnHit3.png");
     }
 
     @Override
@@ -35,9 +41,9 @@ public class Guardian extends SweeperEnemy{
             hasShield = false;
             
             frames.clear();
-            frames.add("sprites/alien.gif");
-            frames.add("sprites/alien2.gif");
-            frames.add("sprites/alien3.gif");
+            frames.add("sprites/enemy/alien.gif");
+            frames.add("sprites/enemy/alien2.gif");
+            frames.add("sprites/enemy/alien3.gif");
             
             return;
         }
@@ -54,4 +60,5 @@ public class Guardian extends SweeperEnemy{
             }
         }
     }
+    
 }

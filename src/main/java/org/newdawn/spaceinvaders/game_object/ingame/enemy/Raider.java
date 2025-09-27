@@ -22,9 +22,15 @@ public class Raider extends SweeperEnemy{
 
     @Override
     protected void addSprites() {
-        frames.add("sprites/raiderAlien1.png");
-        frames.add("sprites/raiderAlien2.png");
-        frames.add("sprites/raiderAlien3.png");
+        frames.add("sprites/enemy/raiderAlien1.png");
+        frames.add("sprites/enemy/raiderAlien2.png");
+        frames.add("sprites/enemy/raiderAlien3.png");
+    }
+    @Override
+    protected void addHitSprites() {
+        onHitFrames.add("sprites/enemy/enemyOnHit1.png");
+        onHitFrames.add("sprites/enemy/enemyOnHit2.png"); 
+        onHitFrames.add("sprites/enemy/enemyOnHit3.png");
     }
 
     @Override

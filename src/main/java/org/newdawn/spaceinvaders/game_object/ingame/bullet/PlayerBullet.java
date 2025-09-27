@@ -8,6 +8,10 @@ public class PlayerBullet extends Bullet{
     private int damage;
     public int getDamage() { return damage; }
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public PlayerBullet() {
+        super();
+    }
     public PlayerBullet(int damage, GameLoop gameLoop, long spawnAngle, long spawnCentralX, long spawnCentralY, long spawnOffset, long spawnSpeed) {
         super(gameLoop, spawnAngle, spawnCentralX, spawnCentralY, spawnOffset, spawnSpeed);
         this.damage = damage;

@@ -6,6 +6,10 @@ import org.newdawn.spaceinvaders.loop.GameLoop;
 public abstract class SweeperEnemy extends Enemy {
     private long moveSpeed = 100L << 16;
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public SweeperEnemy(){
+        super();
+    }
     public SweeperEnemy(GameLoop gameLoop, HiveMind hiveMind, long initialHealth) {
         super(gameLoop, hiveMind, initialHealth);
 
@@ -46,7 +50,7 @@ public abstract class SweeperEnemy extends Enemy {
         
         setPosY(getPosY() + (10 << 16));
         if (getPosY() > (570 << 16)) {
-            ((GameLoop)loop).notifyDeath();
+            ((GameLoop)getLoop()).notifyDeath();
         }
     }
 }

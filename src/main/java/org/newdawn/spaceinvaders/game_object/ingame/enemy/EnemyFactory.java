@@ -15,7 +15,11 @@ public class EnemyFactory extends GameObject{
     static public final int ARTILLERY = 1;
     static public final int GUARDIAN = 2;
     static public final int RAIDER = 3;
-    
+
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public EnemyFactory(){
+        super();
+    }
     public EnemyFactory(GameLoop gameLoop, PlayerShip playerShip) {
         super(gameLoop);
 

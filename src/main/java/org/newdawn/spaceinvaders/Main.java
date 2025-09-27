@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import firebase.FirebaseClientAuth;
 import networking.Network;
+import serializer.GameLoopSerializer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,6 +26,8 @@ public class Main {
     Container registerContainer;
 
     public Main(){
+        GameLoopSerializer.getInstance();// GameLoopSerializer 초기화
+
         client =  new Client();
         Network.register(client);
         client.addListener(new Listener(){

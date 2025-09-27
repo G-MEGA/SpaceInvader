@@ -9,11 +9,11 @@ import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 
 import java.awt.*;
-import java.io.Serializable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public abstract class Loop implements Serializable {
+public abstract class Loop  {
     private transient Game game;
 
     private final ArrayList<GameObject> gameObjects = new ArrayList<>();
@@ -27,6 +27,10 @@ public abstract class Loop implements Serializable {
     private int mousePosX = 400;
     private int mousePosY = 300;
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public Loop(){
+        super();
+    }
     public Loop(Game game) {
         this.game = game;
     }

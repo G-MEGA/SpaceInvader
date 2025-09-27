@@ -15,6 +15,10 @@ public class Laser extends GameObject2D implements ICollider2DOwner{
     private long spawnElapsed = 0;
     private SpriteRenderer spriteRenderer;
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public Laser(){
+        super();
+    }
     public Laser(Loop loop, long spawnPosX, long spawnPosY, long spawnOffset, long spawnAngle){
         super(loop);
 

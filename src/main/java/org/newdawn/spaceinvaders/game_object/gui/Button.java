@@ -29,6 +29,10 @@ public class Button extends GameObject2D {
 
     boolean hovered = false;
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public Button(){
+        super();
+    }
     public Button(Loop loop, IButtonListener buttonListener, int width, int height) {
         super(loop);
         this.buttonListener = buttonListener;
@@ -55,13 +59,13 @@ public class Button extends GameObject2D {
 
         long xEnd = x + FixedPointUtil.fromLong(width);
         long yEnd = y + FixedPointUtil.fromLong(height);
-        long mousePosX = FixedPointUtil.fromLong(loop.getMousePosX());
-        long mousePosY = FixedPointUtil.fromLong(loop.getMousePosY());
+        long mousePosX = FixedPointUtil.fromLong(getLoop().getMousePosX());
+        long mousePosY = FixedPointUtil.fromLong(getLoop().getMousePosY());
 
         hovered = mousePosX >= x && mousePosX <= xEnd && mousePosY >= y && mousePosY <= yEnd;
         //endregion
 
-        if(loop.isKeyInputJustPressed("mouse_button_left") && hovered){
+        if(getLoop().isKeyInputJustPressed("mouse_button_left") && hovered){
             buttonListener.buttonPressed();
         }
     }
@@ -98,7 +102,7 @@ public class Button extends GameObject2D {
     }
 
     public TextRenderer addTextRenderer(String text, int fontSize, Color color, int fontStyle){
-        TextRenderer tr = new TextRenderer(loop, text, fontSize, color, fontStyle);
+        TextRenderer tr = new TextRenderer(getLoop(), text, fontSize, color, fontStyle);
         tr.alignment = alignment;
         addChild(tr);
         return tr;

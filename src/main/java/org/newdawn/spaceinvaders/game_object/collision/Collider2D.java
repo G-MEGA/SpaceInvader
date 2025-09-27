@@ -23,6 +23,10 @@ public class Collider2D extends GameObject2D {
     // left-top, right_top, right_bottom, left_bottom
     long[] globalVertices = new long[8];
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public Collider2D(){
+        super();
+    }
     public Collider2D(Loop loop, ICollider2DOwner owner) {
         super(loop);
         this.owner = owner;
@@ -83,10 +87,10 @@ public class Collider2D extends GameObject2D {
         super.onInLoopUpdated(value);
 
         if (value) {
-            loop.addCollider(this);
+            getLoop().addCollider(this);
         }
         else{
-            loop.removeCollider(this);
+            getLoop().removeCollider(this);
         }
     }
 

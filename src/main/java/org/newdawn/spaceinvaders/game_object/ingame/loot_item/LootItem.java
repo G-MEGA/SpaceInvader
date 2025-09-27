@@ -13,6 +13,10 @@ import org.newdawn.spaceinvaders.sprite.SpriteStore;
 public abstract class LootItem extends Mover2D implements ICollider2DOwner {
     private Long moveSpeed = 100L << 16;
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public LootItem(){
+        super();
+    }
     public LootItem(Loop loop, String ref) {
         super(loop);
 

@@ -13,6 +13,10 @@ public class SpriteRenderer extends GameObject2D {
     public String spriteRef;
     private transient Sprite sprite;
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public SpriteRenderer(){
+        super();
+    }
     public SpriteRenderer(Loop loop) {
         super(loop);
     }

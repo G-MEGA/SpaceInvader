@@ -3,6 +3,7 @@ package org.newdawn.spaceinvaders.loop;
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
 import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputLog;
+import serializer.GameLoopSerializer;
 
 import java.awt.*;
 import java.io.*;
@@ -72,18 +73,9 @@ public class ReplayerLoop extends Loop{
 
             rollbackFrame = currentFrame;
             rollbackLogIndex = currentLogIndex;
-            // MainObject만 직렬화합니다.
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = null;
-            try {
-                oos = new ObjectOutputStream(baos);
-                oos.writeObject(gameLoop);
-                oos.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
 
-            rollbackSnapshot = baos.toByteArray();
+            // 직렬화
+            rollbackSnapshot = GameLoopSerializer.getInstance().serialize(gameLoop);
 
             long endTime = System.nanoTime();
             // 4. 소요 시간 계산 및 출력
@@ -98,22 +90,10 @@ public class ReplayerLoop extends Loop{
 
             currentFrame = rollbackFrame;
             currentLogIndex = rollbackLogIndex;
+
             // 역직렬화
-            ByteArrayInputStream bais = new ByteArrayInputStream(rollbackSnapshot);
-            ObjectInputStream ois = null;
-            try {
-                ois = new ObjectInputStream(bais);
-                try {
-                    GameLoop restored = (GameLoop) ois.readObject();
-                    gameLoop = restored;
-                    gameLoop.setGame(getGame());
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-                ois.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            gameLoop = GameLoopSerializer.getInstance().deserialize(rollbackSnapshot);;
+            gameLoop.setGame(getGame());
 
             long endTime = System.nanoTime();
             // 소요 시간 계산 및 출력

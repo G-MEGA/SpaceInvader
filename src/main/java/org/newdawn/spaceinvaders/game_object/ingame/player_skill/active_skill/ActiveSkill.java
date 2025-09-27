@@ -8,6 +8,10 @@ public abstract class ActiveSkill extends PlayerSkill{
     private long coolTime;
     public long getCoolTime() { return coolTime; }
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public ActiveSkill(){
+        super();
+    }
     public ActiveSkill(String skillName, String skillSpriteRef, long coolTime, PlayerShip playerShip, GameLoop gameLoop) {
         super(skillName, skillSpriteRef, playerShip, gameLoop);
         this.coolTime = coolTime;

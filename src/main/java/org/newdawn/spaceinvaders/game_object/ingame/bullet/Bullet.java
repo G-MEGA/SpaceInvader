@@ -14,6 +14,10 @@ public abstract class Bullet extends Mover2D implements ICollider2DOwner {
     protected long spawnSpeed = 0;;
     public long getSpawnSpeed() { return spawnSpeed; }
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public Bullet(){
+        super();
+    }
     public Bullet(GameLoop gameLoop, long spawnAngle, long spawnCentralX, long spawnCentralY, long spawnOffset, long spawnSpeed) {
         super(gameLoop);
 

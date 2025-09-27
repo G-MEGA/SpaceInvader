@@ -11,6 +11,10 @@ public class Artillery extends SweeperEnemy{
     private long fireElapsed = 0;
     private PlayerShip _playerShip;
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public Artillery(){
+        super();
+    }
     public Artillery(GameLoop gameLoop, HiveMind hiveMind, PlayerShip playerShip) {
         super(gameLoop, hiveMind, 1);
 
@@ -29,8 +33,8 @@ public class Artillery extends SweeperEnemy{
         if (fireElapsed >= fireInterval){
             fireElapsed = 0;
 
-            EnemyBullet enemyBullet = new EnemyBullet((GameLoop)loop, getRotation(), getPosX(), getPosY(), -30, FixedPointUtil.fromLong(-300));
-            loop.addGameObject(enemyBullet);
+            EnemyBullet enemyBullet = new EnemyBullet((GameLoop)getLoop(), getRotation(), getPosX(), getPosY(), -30, FixedPointUtil.fromLong(-300));
+            getLoop().addGameObject(enemyBullet);
         }
         else{
             fireElapsed += deltaTime;

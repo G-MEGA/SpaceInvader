@@ -4,6 +4,10 @@ import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class EnemyBullet extends Bullet{
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public EnemyBullet(){
+        super();
+    }
     public EnemyBullet(GameLoop gameLoop, long spawnAngle, long spawnCentralX, long spawnCentralY, long spawnOffset, long spawnSpeed) {
         super(gameLoop, spawnAngle, spawnCentralX, spawnCentralY, spawnOffset, spawnSpeed);
     }

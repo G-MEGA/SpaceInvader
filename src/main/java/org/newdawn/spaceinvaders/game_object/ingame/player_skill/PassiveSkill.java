@@ -8,6 +8,10 @@ import org.newdawn.spaceinvaders.loop.GameLoop;
 public class PassiveSkill extends PlayerSkill{
     private PlayerPassiveSkillType type;
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public PassiveSkill(){
+        super();
+    }
     public PassiveSkill(PlayerPassiveSkillType type, PlayerShip playerShip, GameLoop gameLoop) {
         super(type.getName(), type.getSpriteRef(), playerShip, gameLoop);
 

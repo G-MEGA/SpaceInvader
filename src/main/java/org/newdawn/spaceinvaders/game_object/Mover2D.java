@@ -8,6 +8,10 @@ public abstract class Mover2D extends GameObject2D{
     public long velocityX;
     public long velocityY;
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public  Mover2D(){
+        super();
+    }
     public Mover2D(Loop loop) {
         super(loop);
     }

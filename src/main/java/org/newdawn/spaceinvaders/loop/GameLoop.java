@@ -226,13 +226,15 @@ public class GameLoop extends Loop {
         for (long row=0L;row<5L;row++) {
             for (long x=0L;x<12L;x++) {
                 if (row == 4L){
-                    enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.GUARDIAN, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+                    Enemy enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.GUARDIAN, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+                    enemy.setRotation(180 << 16);
                 }
                 else if (row == 3L){
                     enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.ARTILLERY, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                 }
-                else if (row == 2L){
-                    enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.RAIDER, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+                else if (row == 10L){
+                    Enemy enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.RAIDER, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+                    enemy.setRotation(180 << 16);
                 }
                 else{
                     enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.AILEN, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);

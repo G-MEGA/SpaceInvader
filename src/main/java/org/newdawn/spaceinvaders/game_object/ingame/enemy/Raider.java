@@ -18,9 +18,6 @@ public class Raider extends SweeperEnemy{
         super(gameLoop, hiveMind, 1);
 
         _playerShip = playerShip;
-
-        //* 유저를 생성시 아래 방향을 바라보도록 하는 작업
-        setRotation(180);
     }
 
     @Override

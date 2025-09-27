@@ -18,19 +18,25 @@ public class Guardian extends SweeperEnemy{
     }
     public Guardian(GameLoop gameLoop, HiveMind hiveMind){
         super(gameLoop, hiveMind,1);
+
     }
     
     @Override
     protected void addSprites() {
-        frames.add("sprites/enemy/shieldAlien1.png");
-        frames.add("sprites/enemy/shieldAlien2.png");
-        frames.add("sprites/enemy/shieldAlien3.png");
+        frames.add("sprites/enemy/guardian1.png");
+        frames.add("sprites/enemy/guardian2.png");
+        frames.add("sprites/enemy/guardian3.png");
     }
     @Override
     protected void addHitSprites() {
-        onHitFrames.add("sprites/enemy/enemyOnHit1.png");
-        onHitFrames.add("sprites/enemy/enemyOnHit2.png");
-        onHitFrames.add("sprites/enemy/enemyOnHit3.png");
+        onHitFrames.add("sprites/enemy/guardianOnHit1.png");
+        onHitFrames.add("sprites/enemy/guardianOnHit2.png");
+        onHitFrames.add("sprites/enemy/guardianOnHit3.png");
+    }
+
+    @Override
+    protected void process(long deltaTime) {
+        super.process(deltaTime);
     }
 
     @Override

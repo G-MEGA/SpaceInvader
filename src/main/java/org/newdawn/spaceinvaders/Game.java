@@ -68,15 +68,35 @@ public class Game extends Canvas
 
         SpriteStore.get().getSprite("sprites/ship.gif", (16 << 16) + FixedPointUtil.ZERO_5, (11 << 16) + FixedPointUtil.ZERO_5);
         SpriteStore.get().getSprite("sprites/shot.gif", 6L << 16, (11 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/alien.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/alien2.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/alien3.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/shieldAlien1.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/shieldAlien2.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/shieldAlien3.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/raiderAlien1.png", 32 << 16, 32 << 16);
-        SpriteStore.get().getSprite("sprites/raiderAlien2.png", 32 << 16, 32 << 16);
-        SpriteStore.get().getSprite("sprites/raiderAlien3.png", 32 << 16, 32 << 16);
+		//* Enemies Sprites
+        SpriteStore.get().getSprite("sprites/enemy/alien.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/enemy/alien2.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/enemy/alien3.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+
+		SpriteStore.get().getSprite("sprites/enemy/alien.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/enemy/alien2.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/enemy/alien3.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+		
+		SpriteStore.get().getSprite("sprites/enemy/guardian1.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/enemy/guardian2.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/enemy/guardian3.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+		SpriteStore.get().getSprite("sprites/enemy/guardianOnHit1.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/guardianOnHit2.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/guardianOnHit3.png", 32 << 16, 32 << 16);
+
+		SpriteStore.get().getSprite("sprites/enemy/artillery1.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/artillery2.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/artillery3.png", 32 << 16, 32 << 16);
+
+		SpriteStore.get().getSprite("sprites/enemy/raider1.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/raider2.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/raider3.png", 32 << 16, 32 << 16);
+
+		SpriteStore.get().getSprite("sprites/enemy/enemyOnHit1.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/enemyOnHit2.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/enemyOnHit3.png", 32 << 16, 32 << 16);
+
+		SpriteStore.get().getSprite("sprites/enemy/enemyBullet.png", 6L << 16, (11 << 16) + FixedPointUtil.ZERO_5);
         //* Loading Skill Icon Sprites
         SpriteStore.get().getSprite("sprites/testPassiveSkill.png", 32 << 16, 32 << 16);
         SpriteStore.get().getSprite("sprites/testActiveSkill.png", 32 << 16, 32 << 16);
@@ -85,6 +105,8 @@ public class Game extends Canvas
         SpriteStore.get().getSprite("sprites/testLaser.png", 8 << 16, 512 << 16);
 		SpriteStore.get().getSprite("sprites/testWarning.png", 10 << 16, 10 << 16);
 		SpriteStore.get().getSprite("sprites/scoringItem.png", 12 << 16, 12 << 16);
+		SpriteStore.get().getSprite("sprites/whiteBackground.png", 400 << 16, 300 << 16);
+		//! sprites/whiteBackground.png 크기 늘려 주시면 됩니다.
 
         loop = new MainMenuLoop(this);  // 게임 시작 후 가장 처음 진입할 Loop
 

@@ -18,11 +18,11 @@ public abstract class Bullet extends Mover2D implements ICollider2DOwner {
     public Bullet(){
         super();
     }
-    public Bullet(GameLoop gameLoop, long spawnAngle, long spawnCentralX, long spawnCentralY, long spawnOffset, long spawnSpeed) {
+    public Bullet(GameLoop gameLoop, long spawnAngle, long spawnCentralX, long spawnCentralY, long spawnOffset, long spawnSpeed, String spriteRef) {
         super(gameLoop);
 
         SpriteRenderer spriteRenderer = new SpriteRenderer(gameLoop);
-        spriteRenderer.setSpriteRef("sprites/shot.gif");
+        spriteRenderer.setSpriteRef(spriteRef);
         addChild(spriteRenderer);
 
         Collider2D collider2D = new Collider2D(gameLoop, this);

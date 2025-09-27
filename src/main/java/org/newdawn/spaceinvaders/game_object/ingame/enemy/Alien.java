@@ -14,9 +14,17 @@ public class Alien extends SweeperEnemy{
 
     @Override
     protected void addSprites(){
-        frames.add("sprites/alien2.gif");
-        frames.add("sprites/alien.gif");
-        frames.add("sprites/alien.gif");
-        frames.add("sprites/alien3.gif");
+        frames.add("sprites/enemy/alien2.gif");
+        frames.add("sprites/enemy/alien.gif");
+        frames.add("sprites/enemy/alien.gif");
+        frames.add("sprites/enemy/alien3.gif");
+    }
+
+    @Override
+    protected void addHitSprites() {
+        onHitFrames.add("sprites/enemy/enemyOnHit2.png");
+        onHitFrames.add("sprites/enemy/enemyOnHit1.png");
+        onHitFrames.add("sprites/enemy/enemyOnHit1.png");
+        onHitFrames.add("sprites/enemy/enemyOnHit3.png");
     }
 }

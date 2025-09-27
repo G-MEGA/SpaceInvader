@@ -139,21 +139,26 @@ public class ReplayerLoop extends Loop{
         super.draw(g);
 
         String message;
-        int messageY = 20;
+        int messageY = 590;
 
         message = "● Replay - 좌우 방향키로 배속조절, 엔터로 일시정지";
         g.setColor(Color.red);
         g.drawString(message,5,messageY);
-        messageY += 15;
+
+        message = "PlaySpeed : x" + String.valueOf(playSpeed);
+        g.setColor(Color.red);
+        g.drawString(message,660,messageY);
+
+        messageY -= 20;
 
         message = "Frame Number : " + String.valueOf(currentFrame);
         g.setColor(Color.red);
         g.drawString(message,5,messageY);
-        messageY += 15;
+        messageY -= 20;
 
-        message = "PlaySpeed : x" + String.valueOf(playSpeed);
-        g.setColor(Color.red);
-        g.drawString(message,5,messageY);
-        messageY += 15;
+//        message = "PlaySpeed : x" + String.valueOf(playSpeed);
+//        g.setColor(Color.red);
+//        g.drawString(message,5,messageY);
+//        messageY -= 20;
     }
 }

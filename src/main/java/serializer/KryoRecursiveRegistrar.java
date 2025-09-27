@@ -89,7 +89,7 @@ public class KryoRecursiveRegistrar {
 
     // (scanSubclasses, addToQueue 메서드는 이전과 동일)
     private void scanSubclasses(Class<?> clazz) {
-        Set<Class<?>> subTypes = (Set<Class<?>>) reflections.getSubTypesOf(clazz);
+        Set<? extends Class<?>> subTypes = reflections.getSubTypesOf(clazz);
         if (!subTypes.isEmpty()) {
             for (Class<?> subType : subTypes) {
                 addToQueue(subType);

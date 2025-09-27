@@ -21,6 +21,9 @@ public abstract class Loop  {
     private final ArrayList<GameObject> gameObjects = new ArrayList<>();
     private final ArrayList<GameObject> gameObjectsInProcessing = new ArrayList<>();
     private final ArrayList<Collider2D> colliders = new ArrayList<>();
+    public int getGameObjcetsCount() { return gameObjects.size(); }
+    public int getGameObjectsInProcessingCount() { return gameObjectsInProcessing.size(); }
+    public int getCollidersCount() { return colliders.size(); }
 
     private final HashMap<String, Boolean> isKeyInputPressed = new HashMap<String, Boolean>();
     private final HashMap<String, Boolean> isKeyInputJustPressed = new HashMap<String, Boolean>();

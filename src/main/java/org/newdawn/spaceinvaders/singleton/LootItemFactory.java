@@ -43,7 +43,7 @@ public class LootItemFactory {
         }
         
         //TODO 시드 기반으로 만들어 놓기
-        long random = (long)Math.ceil(Math.random() * totalWeight);
+        long random = (long)Math.ceil(PseudoRandom.getInstance().random() * totalWeight);
 
         for (String key : _itemWeights.keySet()){
             random -= _itemWeights.get(key);

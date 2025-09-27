@@ -23,11 +23,15 @@ public class Artillery extends SweeperEnemy{
 
     @Override
     protected void addSprites() {
-        frames.add("sprites/enemy/alien.gif");
+        frames.add("sprites/enemy/artillery1.png");
+        frames.add("sprites/enemy/artillery2.png");
+        frames.add("sprites/enemy/artillery3.png");
     }
     @Override
     protected void addHitSprites() {
         onHitFrames.add("sprites/enemy/enemyOnHit1.png");
+        onHitFrames.add("sprites/enemy/enemyOnHit2.png");
+        onHitFrames.add("sprites/enemy/enemyOnHit3.png");
     }
 
     @Override

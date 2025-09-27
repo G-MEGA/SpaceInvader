@@ -72,13 +72,27 @@ public class Game extends Canvas
         SpriteStore.get().getSprite("sprites/enemy/alien.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
         SpriteStore.get().getSprite("sprites/enemy/alien2.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
         SpriteStore.get().getSprite("sprites/enemy/alien3.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/enemy/shieldAlien1.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/enemy/shieldAlien2.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/enemy/shieldAlien3.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
-        SpriteStore.get().getSprite("sprites/enemy/raiderAlien1.png", 32 << 16, 32 << 16);
-        SpriteStore.get().getSprite("sprites/enemy/raiderAlien2.png", 32 << 16, 32 << 16);
-        SpriteStore.get().getSprite("sprites/enemy/raiderAlien3.png", 32 << 16, 32 << 16);
-        SpriteStore.get().getSprite("sprites/enemy/enemyOnHit1.png", 32 << 16, 32 << 16);
+
+		SpriteStore.get().getSprite("sprites/enemy/alien.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/enemy/alien2.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/enemy/alien3.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+		
+		SpriteStore.get().getSprite("sprites/enemy/guardian1.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/enemy/guardian2.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/enemy/guardian3.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+		SpriteStore.get().getSprite("sprites/enemy/guardianOnHit1.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/guardianOnHit2.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/guardianOnHit3.png", 32 << 16, 32 << 16);
+
+		SpriteStore.get().getSprite("sprites/enemy/artillery1.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/artillery2.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/artillery3.png", 32 << 16, 32 << 16);
+
+		SpriteStore.get().getSprite("sprites/enemy/raider1.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/raider2.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/raider3.png", 32 << 16, 32 << 16);
+
+		SpriteStore.get().getSprite("sprites/enemy/enemyOnHit1.png", 32 << 16, 32 << 16);
         SpriteStore.get().getSprite("sprites/enemy/enemyOnHit2.png", 32 << 16, 32 << 16);
         SpriteStore.get().getSprite("sprites/enemy/enemyOnHit3.png", 32 << 16, 32 << 16);
         //* Loading Skill Icon Sprites

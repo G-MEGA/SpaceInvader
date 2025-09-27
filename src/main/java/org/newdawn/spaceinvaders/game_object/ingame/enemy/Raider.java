@@ -18,13 +18,16 @@ public class Raider extends SweeperEnemy{
         super(gameLoop, hiveMind, 1);
 
         _playerShip = playerShip;
+
+        //* 유저를 생성시 아래 방향을 바라보도록 하는 작업
+        setRotation(180);
     }
 
     @Override
     protected void addSprites() {
-        frames.add("sprites/enemy/raiderAlien1.png");
-        frames.add("sprites/enemy/raiderAlien2.png");
-        frames.add("sprites/enemy/raiderAlien3.png");
+        frames.add("sprites/enemy/raider1.png");
+        frames.add("sprites/enemy/raider2.png");
+        frames.add("sprites/enemy/raider3.png");
     }
     @Override
     protected void addHitSprites() {

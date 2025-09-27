@@ -26,6 +26,7 @@ import javax.swing.JFileChooser;
 import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BasicActiveSkill;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BombSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.LaserSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.store.StoreSlot;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
@@ -95,7 +96,7 @@ public class GameLoop extends Loop {
         isIndicatorShown = true;
     }
 
-    private final int bombDamage = 4;
+    private final int bombDamage = 100;
 
     private long coinCount = 0;
     public long getCoinCount() { return coinCount; }
@@ -224,28 +225,30 @@ public class GameLoop extends Loop {
         // create a block of aliens (5 rows, by 12 aliens, spaced evenly)
         enemyCount = 0;
         for (long row=0L;row<5L;row++) {
+            Enemy enemy = null;
             for (long x=0L;x<12L;x++) {
                 if (row == 4L){
-                    Enemy enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.GUARDIAN, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+                    enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.GUARDIAN, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                     enemy.setRotation(180 << 16);
                 }
                 else if (row == 3L){
-                    enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.ARTILLERY, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+                    enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.ARTILLERY, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                 }
                 else if (row == 10L){
-                    Enemy enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.RAIDER, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+                    enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.RAIDER, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                     enemy.setRotation(180 << 16);
                 }
                 else{
-                    enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.AILEN, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+                    enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.AILEN, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                 }
                 enemyCount++;
+                enemies.add(enemy);
             }
         }
 
         //* 상점 아이템 생성 슬롯
-        BasicActiveSkill basicActiveSkill = new BasicActiveSkill(ship, this);
-        StoreSlot storeSlot = new StoreSlot(this, 0, basicActiveSkill, 600 << 16, 300 << 16);
+        BombSkill bombSkill = new BombSkill(ship, this);
+        StoreSlot storeSlot = new StoreSlot(this, 0, bombSkill, 600 << 16, 300 << 16);
         addGameObject(storeSlot);
 
         LaserSkill laserSkill = new LaserSkill(ship, this);
@@ -270,10 +273,6 @@ public class GameLoop extends Loop {
             storeSlot = new StoreSlot(this, 0, passiveSkill, x, y);
             addGameObject(storeSlot);
         }
-
-        // PassiveSkill passiveSkill = new PassiveSkill("Fuck", "sprites/testPassiveSkill.png", ship, this, "응애");
-        // storeSlot = new StoreSlot(this,1, passiveSkill, 500 << 16, 300 << 16);
-        // addGameObject(storeSlot);
 
         enemyHiveMind.cancelBroadcast();
         System.gc();

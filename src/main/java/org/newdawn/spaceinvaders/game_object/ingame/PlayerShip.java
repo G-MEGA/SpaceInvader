@@ -167,6 +167,10 @@ public class PlayerShip extends GameCharacter{
         speedUpElapsed = 0;
     }
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public PlayerShip(){
+        super();
+    }
     public PlayerShip(GameLoop gameLoop) {
         super(gameLoop, 3);
         
@@ -192,7 +196,7 @@ public class PlayerShip extends GameCharacter{
     protected void process(long deltaTime) {
         super.process(deltaTime);
 
-        GameLoop gameLoop = (GameLoop)loop;
+        GameLoop gameLoop = (GameLoop)getLoop();
 
         if(!gameLoop.isWaitingForKeyPress()){
             //region 이동
@@ -307,7 +311,7 @@ public class PlayerShip extends GameCharacter{
 
     private void onHurt(ICollider2DOwner collider){
         if (isReflexible && collider instanceof EnemyBullet){
-            GameLoop gameLoop = (GameLoop)loop;
+            GameLoop gameLoop = (GameLoop)getLoop();
             EnemyBullet enemyBullet = (EnemyBullet)collider;
 
             PlayerBullet bullet = new PlayerBullet(
@@ -329,7 +333,7 @@ public class PlayerShip extends GameCharacter{
             return;
         }
         if (--_health == 0){
-            ((GameLoop)loop).notifyDeath();
+            ((GameLoop)getLoop()).notifyDeath();
         }
     }
 
@@ -348,7 +352,7 @@ public class PlayerShip extends GameCharacter{
      * point, i.e. has he/she waited long enough between shots
      */
     public void tryToFire() {
-        GameLoop gameLoop = (GameLoop)loop;
+        GameLoop gameLoop = (GameLoop)getLoop();
         // check that we have waiting long enough to fire
         if (gameLoop.getCurrentTime() - lastFire < firingInterval) {
             return;

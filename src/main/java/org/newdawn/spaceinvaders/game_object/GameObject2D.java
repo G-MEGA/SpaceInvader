@@ -18,6 +18,10 @@ public class GameObject2D extends GameObject{
 
     boolean globalTransformDirty = true;
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public GameObject2D(){
+        super();
+    }
     public GameObject2D(Loop loop) {
         super(loop);
     }

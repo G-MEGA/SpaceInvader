@@ -1,14 +1,18 @@
 package org.newdawn.spaceinvaders.game_loop_input;
 
-import java.io.Serializable;
+
 import java.util.ArrayList;
 
-public class GameLoopInputLog implements Serializable {
+public class GameLoopInputLog  {
     public long inputFrame;
     public ArrayList<GameLoopInput> inputs;
 
     private StringBuilder stringBuilder = new StringBuilder();
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public GameLoopInputLog(){
+        super();
+    }
     public GameLoopInputLog(long inputFrame, ArrayList<GameLoopInput> inputs){
         this.inputFrame = inputFrame;
         this.inputs = inputs;

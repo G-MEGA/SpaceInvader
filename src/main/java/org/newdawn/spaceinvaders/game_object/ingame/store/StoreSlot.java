@@ -22,6 +22,10 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner {
     private TextRenderer itemNameText;
     private TextRenderer priceText;
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public StoreSlot(){
+        super();
+    }
     public StoreSlot(GameLoop loop, long price, IStoreItem item, long spawnX, long spawnY) {
         super(loop);
         this.item = item;

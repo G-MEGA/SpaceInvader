@@ -38,6 +38,10 @@ public class TextRenderer extends GameObject2D {
   
     String[] lines;
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public TextRenderer(){
+        super();
+    }
     public TextRenderer(Loop loop, String text, int fontSize, Color color, int fontStyle) {
         super(loop);
 

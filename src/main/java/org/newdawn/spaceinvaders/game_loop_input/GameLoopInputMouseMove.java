@@ -3,6 +3,11 @@ package org.newdawn.spaceinvaders.game_loop_input;
 public class GameLoopInputMouseMove extends GameLoopInput {
     public int posX;
     public int posY;
+
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public GameLoopInputMouseMove(){
+        super();
+    }
     public GameLoopInputMouseMove(int posX, int posY){
         this.posX = posX;
         this.posY = posY;

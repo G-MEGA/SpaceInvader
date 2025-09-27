@@ -32,6 +32,10 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
     protected long slowDownTime = 3 << 16;
     protected long slowDownElapsed = 0;
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public Enemy(){
+        super();
+    }
     public Enemy(GameLoop gameLoop, long initialHealth){
         super(gameLoop, initialHealth);
 
@@ -102,7 +106,7 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
         
         if (isDead()){
             destroy();
-            LootItem item = LootItemFactory.getInstance().instantiateRandomItem((GameLoop)loop);
+            LootItem item = LootItemFactory.getInstance().instantiateRandomItem((GameLoop)getLoop());
             
             if (item != null){
                 item.setPos(getPosX(), getPosY());
@@ -167,6 +171,6 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        ((GameLoop)loop).notifyAlienKilled();// GameLoop에 부고소식 전달
+        ((GameLoop)getLoop()).notifyAlienKilled();// GameLoop에 부고소식 전달
     }
 }

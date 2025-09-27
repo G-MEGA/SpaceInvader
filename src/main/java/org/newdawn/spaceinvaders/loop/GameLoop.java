@@ -128,6 +128,10 @@ public class GameLoop extends Loop {
         return false;    
     }
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public GameLoop(){
+        super();
+    }
     public GameLoop(Game game){
         super(game);
 

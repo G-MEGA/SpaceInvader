@@ -1,11 +1,16 @@
 package org.newdawn.spaceinvaders.game_object.logic;
 
-import java.io.Serializable;
+
 import java.util.ArrayList;
 
-public class HiveMind implements Serializable {
+public class HiveMind  {
     boolean broadcastRequested = false;
     ArrayList<IHiveMindListener> listeners = new  ArrayList<>();
+
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public HiveMind(){
+        super();
+    }
 
     public void requestBroadcast(){
         broadcastRequested =  true;

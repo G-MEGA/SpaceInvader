@@ -3,11 +3,14 @@ package org.newdawn.spaceinvaders.game_object;
 import org.newdawn.spaceinvaders.loop.Loop;
 
 import java.awt.*;
-import java.io.Serializable;
+
 import java.util.ArrayList;
 
-public abstract class GameObject implements Serializable {
-    protected final Loop loop;
+public abstract class GameObject  {
+    private Loop loop;
+    protected Loop getLoop() {
+        return loop;
+    }
 
     boolean inLoop = false;
     public final boolean isInLoop() {
@@ -29,6 +32,10 @@ public abstract class GameObject implements Serializable {
     GameObject parent;
     ArrayList<GameObject> children = new ArrayList<GameObject>();
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public GameObject(){
+        super();
+    }
     public GameObject(Loop loop){
         this.loop = loop;
     }

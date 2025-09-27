@@ -4,6 +4,10 @@ public class GameLoopInputKey extends GameLoopInput{
     public String name;
     public boolean pressed;
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public GameLoopInputKey(){
+        super();
+    }
     public GameLoopInputKey(String name, boolean pressed){
         this.name = name;
         this.pressed = pressed;

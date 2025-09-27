@@ -2,6 +2,7 @@ package org.newdawn.spaceinvaders.fixed_point;
 
 import java.awt.geom.AffineTransform;
 
+
 public class FixedPointAffineTransform {
     long posX = 0;
     long posY = 0;
@@ -15,6 +16,11 @@ public class FixedPointAffineTransform {
     long yAxisX = 0L;
     long yAxisY = FixedPointUtil.ONE;
     double rotationInRadians = 0.0;
+
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public  FixedPointAffineTransform(){
+        super();
+    }
 
     public void setTransform(long posX, long posY, long rotation, long scale) {
         this.posX = posX;

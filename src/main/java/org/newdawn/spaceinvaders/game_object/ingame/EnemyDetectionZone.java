@@ -17,6 +17,10 @@ public class EnemyDetectionZone extends GameObject2D implements ICollider2DOwner
     private long detectElapsed = 0;
     private boolean hasDetected = false;
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public EnemyDetectionZone(){
+        super();
+    }
     public EnemyDetectionZone(GameLoop loop, PlayerShip ship) {
         super(loop);
 
@@ -51,7 +55,7 @@ public class EnemyDetectionZone extends GameObject2D implements ICollider2DOwner
     public void collidedWith(ICollider2DOwner collider) {
         if (!hasDetected){
             if (collider instanceof Enemy || collider instanceof EnemyBullet){
-                GameLoop gameLoop = (GameLoop)loop;
+                GameLoop gameLoop = (GameLoop)getLoop();
                 gameLoop.increaseScore(detectScore);
                 hasDetected = true;
             }

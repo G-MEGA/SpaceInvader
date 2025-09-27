@@ -1,6 +1,7 @@
 package org.newdawn.spaceinvaders.game_object.ingame.enemy;
 
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
+import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.ingame.loot_item.LootItem;
 import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
 import org.newdawn.spaceinvaders.loop.GameLoop;
@@ -11,6 +12,10 @@ import org.newdawn.spaceinvaders.sprite.SpriteStore;
 public class Guardian extends SweeperEnemy{
     private Boolean hasShield = true;
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public Guardian(){
+        super();
+    }
     public Guardian(GameLoop gameLoop, HiveMind hiveMind){
         super(gameLoop, hiveMind,1);
     }
@@ -42,7 +47,7 @@ public class Guardian extends SweeperEnemy{
         if (_health <= 0){
             destroy();
     
-            LootItem item = LootItemFactory.getInstance().instantiateRandomItem((GameLoop)loop);
+            LootItem item = LootItemFactory.getInstance().instantiateRandomItem((GameLoop)getLoop());
     
             if (item != null){
                 item.setPos(getPosX(), getPosY());

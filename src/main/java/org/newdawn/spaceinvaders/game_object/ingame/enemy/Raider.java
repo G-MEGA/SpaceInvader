@@ -9,7 +9,11 @@ import org.newdawn.spaceinvaders.loop.GameLoop;
 public class Raider extends SweeperEnemy{
     private Boolean _hasCharged = false;
     private PlayerShip _playerShip;
-    
+
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public Raider(){
+        super();
+    }
     public Raider(GameLoop gameLoop, HiveMind hiveMind, PlayerShip playerShip) {
         super(gameLoop, hiveMind, 1);
 

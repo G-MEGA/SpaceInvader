@@ -14,6 +14,11 @@ public class EnemyWarner extends GameObject2D{
     private GameLoop gameLoop;
     private Enemy enemy;
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public EnemyWarner(){
+        super();
+    }
+
     public EnemyWarner(Enemy enemy, GameLoop gameLoop) {
         super(gameLoop);
 

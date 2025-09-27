@@ -16,6 +16,10 @@ public abstract class GameCharacter extends Mover2D implements ICollider2DOwner{
 
     public boolean isDead() { return _health <= 0; }
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public  GameCharacter(){
+        super();
+    }
     public GameCharacter(Loop loop, long intitalHealth){
         super(loop);
 

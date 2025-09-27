@@ -18,19 +18,40 @@ public class Sprite {
 	/** The image to be drawn for this sprite */
 	private Image image;
     private long pivotX, pivotY;
+    private long scale;
     private AffineTransform transform = new AffineTransform();
-	
+	private int width;
+	private int height;
 	/**
 	 * Create a new sprite based on an image
 	 * 
 	 * @param image The image that is this sprite
 	 */
-	public Sprite(Image image, long pivotX, long pivotY) {
+	public Sprite(Image image, long pivotX, long pivotY, long scale) {
         this.image = image;
-        this.pivotX = pivotX;
-        this.pivotY = pivotY;
+
+        this.scale = scale;
+
+        this.pivotX = FixedPointUtil.mul(pivotX, scale);
+        this.pivotY = FixedPointUtil.mul(pivotY, scale);
+
         this.transform.setToTranslation(
-                FixedPointUtil.toDouble(-pivotX), FixedPointUtil.toDouble(-pivotY));
+                FixedPointUtil.toDouble(-this.pivotX),
+                FixedPointUtil.toDouble(-this.pivotY));
+        this.transform.scale(FixedPointUtil.toDouble(this.scale), FixedPointUtil.toDouble(this.scale));
+
+        width = FixedPointUtil.toInt(
+                FixedPointUtil.mul(
+                        FixedPointUtil.fromLong(image.getWidth(null)),
+                        scale
+                        )
+                );
+        height = FixedPointUtil.toInt(
+                FixedPointUtil.mul(
+                        FixedPointUtil.fromLong(image.getHeight(null)),
+                        scale
+                )
+        );
 	}
 	
 	/**
@@ -39,7 +60,7 @@ public class Sprite {
 	 * @return The width in pixels of this sprite
 	 */
 	public int getWidth() {
-		return image.getWidth(null);
+        return width;
 	}
 
 	/**
@@ -48,7 +69,7 @@ public class Sprite {
 	 * @return The height in pixels of this sprite
 	 */
 	public int getHeight() {
-		return image.getHeight(null);
+		return height;
 	}
 
     public long getPivotX() {

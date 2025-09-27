@@ -9,7 +9,6 @@ import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputLog;
 import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
-import org.w3c.dom.Text;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -31,13 +30,18 @@ import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.La
 import org.newdawn.spaceinvaders.game_object.ingame.store.StoreSlot;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.EnemyFactory;
-import org.newdawn.spaceinvaders.singleton.PseudoRandom;
+import random.SerializableRandom;
 
 public class GameLoop extends Loop {
     long currentFrame;
     ArrayList<GameLoopInputLog> inputLogs = new ArrayList<>();
 
     private EnemyFactory enemyFactory;
+
+    SerializableRandom random;
+    public SerializableRandom getRandom() {
+        return random;
+    }
 
     private int score = 0;
     public int getScore() { return score; }
@@ -134,10 +138,17 @@ public class GameLoop extends Loop {
     public GameLoop(){
         super();
     }
-    public GameLoop(Game game){
+    public GameLoop(Game game, int randomSeed){
+        this(game, randomSeed, false);
+    }
+    public GameLoop(Game game, int randomSeed, boolean forReplay){
         super(game);
 
         startGame();
+
+        random = new SerializableRandom(17L * randomSeed); // 소수 17을 곱해서 더 랜덤하게
+
+        this.forReplay = forReplay;
     }
 
     private void initText() {
@@ -187,18 +198,11 @@ public class GameLoop extends Loop {
         activeSkillText.setText(activeSkillTextContent);
         updatePassiveSkillText();
     }
-
-    public GameLoop(Game game, boolean forReplay){
-        this(game);
-
-        this.forReplay = forReplay;
-    }
     /**
      * Start a fresh game, this should clear out any old data and
      * create a new set.
      */
     private void startGame() {
-        PseudoRandom.getInstance().setLoop(this);
         // clear out any existing entities and intialise a new set
         for (GameObject gameObject : getGameObjects()) {
             gameObject.destroy();

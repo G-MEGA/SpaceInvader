@@ -52,7 +52,7 @@ public class MainMenuLoop extends Loop {
         Button startButton = new Button(this, new IButtonListener() {
             @Override
             public void buttonPressed() {
-                game.changeLoop(new GameLoop(game));
+                game.changeLoop(new GameLoop(game, 37));
             }
         }, 250, 50);
         startButton.setPos(400L << 16, subTitleText.getPosY() + (100L << 16));

@@ -30,7 +30,7 @@ public class ReplayerLoop extends Loop{
 
         this.replaySaveData = replaySaveData;
 
-        gameLoop = new GameLoop(game, true);
+        gameLoop = new GameLoop(game, 37, true);
 
         String[] splited = replaySaveData.trim().split("\n");
 

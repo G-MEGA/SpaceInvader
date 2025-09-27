@@ -5,6 +5,7 @@ import org.newdawn.spaceinvaders.loop.Loop;
 import java.awt.*;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 public abstract class GameObject  {
     private Loop loop;
@@ -31,6 +32,11 @@ public abstract class GameObject  {
 
     GameObject parent;
     ArrayList<GameObject> children = new ArrayList<GameObject>();
+
+    int sortingLayer = 0;
+    public void setSortingLayer(int value) {
+        this.sortingLayer = value;
+    }
 
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public GameObject(){
@@ -88,11 +94,20 @@ public abstract class GameObject  {
             child.propagatePostProcess(deltaTime);
         }
     }
-    public final void propagateDraw(Graphics2D g){
-        draw(g);
+    public final void propagateDraw(Graphics2D g, int sortingLayer){
+        if(this.sortingLayer == sortingLayer){
+            draw(g);
+        }
 
         for(GameObject child : children){
-            child.propagateDraw(g);
+            child.propagateDraw(g, sortingLayer);
+        }
+    }
+    public final void propagateGetLayerSet(Set<Integer> layerSet){
+        layerSet.add(sortingLayer);
+
+        for(GameObject child : children){
+            child.propagateGetLayerSet(layerSet);
         }
     }
     //endregion

@@ -12,6 +12,8 @@ import java.awt.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public abstract class Loop  {
     private transient Game game;
@@ -35,12 +37,23 @@ public abstract class Loop  {
         this.game = game;
     }
 
+    Set<Integer> layerSet = new HashSet<Integer>();
     public void draw(Graphics2D g){
-        // cycle round drawing all the entities we have in the game
+        layerSet.clear();
+
         for (int i=0;i<gameObjects.size();i++) {
             GameObject gameObject = gameObjects.get(i);
 
-            gameObject.propagateDraw(g);
+            gameObject.propagateGetLayerSet(layerSet);
+        }
+
+        for (Integer layer : layerSet) {
+            // cycle round drawing all the entities we have in the game
+            for (int i=0;i<gameObjects.size();i++) {
+                GameObject gameObject = gameObjects.get(i);
+
+                gameObject.propagateDraw(g, layer);
+            }
         }
     }
     public void process(ArrayList<GameLoopInput> inputs){

@@ -23,9 +23,13 @@ public class Artillery extends SweeperEnemy{
 
     @Override
     protected void addSprites() {
-        frames.add("sprites/alien.gif");
+        frames.add("sprites/enemy/alien.gif");
     }
-    
+    @Override
+    protected void addHitSprites() {
+        onHitFrames.add("sprites/enemy/enemyOnHit1.png");
+    }
+
     @Override
     protected void process(long deltaTime) {
         super.process(deltaTime);
@@ -46,4 +50,5 @@ public class Artillery extends SweeperEnemy{
         long currentAngle = FixedPointUtil.atan2(bulletToPlayerY, bulletToPlayerX) + (90 << 16);
         setRotation(currentAngle);
     }
+
 }

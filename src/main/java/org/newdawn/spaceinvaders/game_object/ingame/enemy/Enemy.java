@@ -20,7 +20,9 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
     protected HiveMind hiveMind;
 
     protected SpriteRenderer spriteRenderer;
+    //* 이미지 등록시 frames와 onHitFrames의 원소 갯수는 같아야 한다.
     protected ArrayList<String> frames = new ArrayList<>();
+    protected ArrayList<String> onHitFrames = new ArrayList<>();
     protected long lastFrameChange = 0L;
     protected long frameDuration = FixedPointUtil.ZERO_25;
     /** The current frame of animation being displayed */
@@ -32,6 +34,10 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
     protected long slowDownTime = 3 << 16;
     protected long slowDownElapsed = 0;
 
+    protected Boolean isHitAnimation = false;
+    protected final long hitAnimationDuration = FixedPointUtil.ZERO_1;
+    protected long hitAnimationElapsed = 0;
+
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public Enemy(){
         super();
@@ -41,6 +47,7 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
 
         spriteRenderer = new SpriteRenderer(gameLoop);
         addSprites();
+        addHitSprites();
         
         //* 자식 클래스에서 addSprites()을 구현 할 때, 적어도 1개 이상의 sprite를 frames에 삽입 했음을 전제로 한다.
         try{
@@ -86,8 +93,9 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
             if (frameNumber >= frames.size()) {
                 frameNumber = 0;
             }
-
-            spriteRenderer.setSpriteRef(frames.get(frameNumber));
+            
+            if (isHitAnimation){ spriteRenderer.setSpriteRef(onHitFrames.get(frameNumber)); }
+            else{ spriteRenderer.setSpriteRef(frames.get(frameNumber)); }
         }
 
         if (isSlowDown){
@@ -96,6 +104,16 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
             }
             else{
                 slowDownElapsed += deltaTime;
+            }
+        }
+
+        if (isHitAnimation){
+            if (hitAnimationElapsed >= hitAnimationDuration){
+                isHitAnimation = false;
+                hitAnimationElapsed = 0;
+            }
+            else{
+                hitAnimationElapsed += deltaTime;
             }
         }
     }
@@ -118,6 +136,11 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
         if(isDestroyed()) return;
         
         decreaseHealth(damage);
+
+        isHitAnimation = true;
+        hitAnimationElapsed = 0;
+
+        spriteRenderer.setSpriteRef(onHitFrames.get(frameNumber));
     }
 
     @Override
@@ -144,6 +167,19 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
      * {@code frames}에 삽입해야 한다.</p>
     */
     protected abstract void addSprites();
+    /**
+     * Enemy 객체의 타격 효과를 표시할 {@code Sprite}를 등록하는 메서드이다.
+     *
+     * <p>등록은 {@code onHitFreames.add()}를 통해 수행하며,
+     * 동일 메서드가 2회 이상 호출될 경우 애니메이션으로 실행된다.
+     * 각 프레임의 재생 시간은 {@code frameDuration}에 의해 결정된다.</p>
+     *
+     * <p><b>주의:</b> 구현 시 반드시 하나 이상의 {@code Sprite}를
+     * {@code onHitFreames}에 삽입해야 한다.</p>
+    */
+    protected abstract void addHitSprites();
+
+
     /**
      * FrozenItem의 지속시간이 끝났을 때, 원래 속도로 복구하는 로직을 구현한다
      */

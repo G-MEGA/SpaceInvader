@@ -2,14 +2,11 @@ package org.newdawn.spaceinvaders.singleton;
 
 import java.util.HashMap;
 
-import org.newdawn.spaceinvaders.game_object.ingame.loot_item.BatteryItem;
+import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.ingame.loot_item.CoinItem;
-import org.newdawn.spaceinvaders.game_object.ingame.loot_item.FrozenItem;
 import org.newdawn.spaceinvaders.game_object.ingame.loot_item.LootItem;
 import org.newdawn.spaceinvaders.game_object.ingame.loot_item.ScoringItem;
-import org.newdawn.spaceinvaders.game_object.ingame.loot_item.ShieldItem;
 import org.newdawn.spaceinvaders.loop.GameLoop;
-import org.newdawn.spaceinvaders.loop.Loop;
 
 public class LootItemFactory {
     private static LootItemFactory instance = new LootItemFactory();
@@ -30,10 +27,6 @@ public class LootItemFactory {
         // _itemWeights.put("frozen", 10L);
     }
 
-    /**
-     * 랜덤 가중치 알고리즘 기반으로 LootItem을 소환함
-     * @param loop
-     */
     public LootItem instantiateRandomItem(GameLoop gameLoop){
         long totalWeight = 0L;
         LootItem lootItem = null;
@@ -41,9 +34,13 @@ public class LootItemFactory {
         for (String key : _itemWeights.keySet()){
             totalWeight += _itemWeights.get(key);
         }
-        
-        //TODO 시드 기반으로 만들어 놓기
-        long random = (long)Math.ceil(Math.random() * totalWeight);
+
+
+        long random = FixedPointUtil.toInt(
+                // totalWeight가 고정 소수점이 아니라 정수라서 걍 곱해도 됨
+                // bound 매개변수는 exclusive하므로 1을 더함
+                gameLoop.getRandom().nextLong(FixedPointUtil.ONE + 1L) * totalWeight
+        );
 
         for (String key : _itemWeights.keySet()){
             random -= _itemWeights.get(key);

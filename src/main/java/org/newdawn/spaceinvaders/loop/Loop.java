@@ -12,6 +12,8 @@ import java.awt.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public abstract class Loop  {
     private transient Game game;
@@ -19,6 +21,9 @@ public abstract class Loop  {
     private final ArrayList<GameObject> gameObjects = new ArrayList<>();
     private final ArrayList<GameObject> gameObjectsInProcessing = new ArrayList<>();
     private final ArrayList<Collider2D> colliders = new ArrayList<>();
+    public int getGameObjcetsCount() { return gameObjects.size(); }
+    public int getGameObjectsInProcessingCount() { return gameObjectsInProcessing.size(); }
+    public int getCollidersCount() { return colliders.size(); }
 
     private final HashMap<String, Boolean> isKeyInputPressed = new HashMap<String, Boolean>();
     private final HashMap<String, Boolean> isKeyInputJustPressed = new HashMap<String, Boolean>();
@@ -35,12 +40,23 @@ public abstract class Loop  {
         this.game = game;
     }
 
+    Set<Integer> layerSet = new HashSet<Integer>();
     public void draw(Graphics2D g){
-        // cycle round drawing all the entities we have in the game
+        layerSet.clear();
+
         for (int i=0;i<gameObjects.size();i++) {
             GameObject gameObject = gameObjects.get(i);
 
-            gameObject.propagateDraw(g);
+            gameObject.propagateGetLayerSet(layerSet);
+        }
+
+        for (Integer layer : layerSet) {
+            // cycle round drawing all the entities we have in the game
+            for (int i=0;i<gameObjects.size();i++) {
+                GameObject gameObject = gameObjects.get(i);
+
+                gameObject.propagateDraw(g, layer);
+            }
         }
     }
     public void process(ArrayList<GameLoopInput> inputs){

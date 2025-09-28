@@ -35,11 +35,6 @@ public class Guardian extends SweeperEnemy{
     }
 
     @Override
-    protected void process(long deltaTime) {
-        super.process(deltaTime);
-    }
-
-    @Override
     public void onHit(int damage) {
         if(isDestroyed()) return;
 
@@ -51,20 +46,19 @@ public class Guardian extends SweeperEnemy{
             frames.add("sprites/enemy/alien2.gif");
             frames.add("sprites/enemy/alien3.gif");
             
+            onHitFrames.clear();
+            onHitFrames.add("sprites/enemy/enemyOnHit1.png");
+            onHitFrames.add("sprites/enemy/enemyOnHit2.png");
+            onHitFrames.add("sprites/enemy/enemyOnHit3.png");
+            
+            isHitAnimation = true;
+            hitAnimationElapsed = 0;
+    
+            spriteRenderer.setSpriteRef(onHitFrames.get(frameNumber));
             return;
         }
-
-        decreaseHealth(damage);
         
-        if (_health <= 0){
-            destroy();
-    
-            LootItem item = LootItemFactory.getInstance().instantiateRandomItem((GameLoop)getLoop());
-    
-            if (item != null){
-                item.setPos(getPosX(), getPosY());
-            }
-        }
+        super.onHit(damage);
     }
     
 }

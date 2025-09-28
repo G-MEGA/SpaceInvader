@@ -27,17 +27,17 @@ public class EnemyFactory extends GameObject{
         this.playerShip = playerShip;
     }
 
-    public void spawnEnemy(HiveMind hiveMind, int enemyType, long spawnPosX, long spawnPosY) {
-        spawnEnemy(hiveMind, enemyType, spawnPosX, spawnPosY, 0, true);
+    public Enemy spawnEnemy(HiveMind hiveMind, int enemyType, long spawnPosX, long spawnPosY) {
+        return spawnEnemy(hiveMind, enemyType, spawnPosX, spawnPosY, 0, true);
     }
-    public void spawnEnemy(HiveMind hiveMind, int enemyType, long spawnPosX, long spawnPosY, long spawnAngle) {
-        spawnEnemy(hiveMind, enemyType, spawnPosX, spawnPosY, spawnAngle, true);
+    public Enemy spawnEnemy(HiveMind hiveMind, int enemyType, long spawnPosX, long spawnPosY, long spawnAngle) {
+        return spawnEnemy(hiveMind, enemyType, spawnPosX, spawnPosY, spawnAngle, true);
     }
-    public void spawnEnemy(HiveMind hiveMind, int enemyType, long spawnPosX, long spawnPosY, boolean isWarning){
-        spawnEnemy(hiveMind, enemyType, spawnPosX, spawnPosY, 0, isWarning);
+    public Enemy spawnEnemy(HiveMind hiveMind, int enemyType, long spawnPosX, long spawnPosY, boolean isWarning){
+        return spawnEnemy(hiveMind, enemyType, spawnPosX, spawnPosY, 0, isWarning);
     }
 
-    public void spawnEnemy(HiveMind hiveMind, int enemyType, long spawnPosX, long spawnPosY, long spawnAngle, boolean isWarning) {
+    public Enemy spawnEnemy(HiveMind hiveMind, int enemyType, long spawnPosX, long spawnPosY, long spawnAngle, boolean isWarning) {
         Enemy enemy = null;
         
         switch (enemyType) {
@@ -56,20 +56,20 @@ public class EnemyFactory extends GameObject{
         }
         if (enemy == null){
             System.err.println(enemyType + "은 존재하지 않은 enemyType 입니다.");
-            return;
+            return null;
         }
         
-        enemy.setPos(spawnPosX, spawnPosY);
-        enemy.setRotation(spawnAngle);
+        enemy.setPosRotation(spawnPosX, spawnPosY, spawnAngle);
         hiveMind.addListener(enemy);
         
         if (isWarning){
             EnemyWarner enemyWarner = new EnemyWarner(enemy, gameLoop);
             gameLoop.addGameObject(enemyWarner);
-            return;
+            return enemy;
         }
 
         gameLoop.addGameObject(enemy);
+        return enemy;
     }
 }
 

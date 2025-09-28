@@ -5,6 +5,8 @@ import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class PlayerBullet extends Bullet{
+    private static final String spriteRef = "sprites/shot.gif";
+
     private int damage;
     public int getDamage() { return damage; }
 
@@ -13,7 +15,7 @@ public class PlayerBullet extends Bullet{
         super();
     }
     public PlayerBullet(int damage, GameLoop gameLoop, long spawnAngle, long spawnCentralX, long spawnCentralY, long spawnOffset, long spawnSpeed) {
-        super(gameLoop, spawnAngle, spawnCentralX, spawnCentralY, spawnOffset, spawnSpeed);
+        super(gameLoop, spawnAngle, spawnCentralX, spawnCentralY, spawnOffset, spawnSpeed, spriteRef);
         this.damage = damage;
     }
     

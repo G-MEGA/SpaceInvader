@@ -95,6 +95,7 @@ public class Game extends Canvas
 		SpriteStore.get().getSprite("sprites/enemy/enemyOnHit1.png", 32 << 16, 32 << 16);
         SpriteStore.get().getSprite("sprites/enemy/enemyOnHit2.png", 32 << 16, 32 << 16);
         SpriteStore.get().getSprite("sprites/enemy/enemyOnHit3.png", 32 << 16, 32 << 16);
+		SpriteStore.get().getSprite("sprites/enemy/enemyBullet.png", 6L << 16, (11 << 16) + FixedPointUtil.ZERO_5);
         //* Loading Skill Icon Sprites
         SpriteStore.get().getSprite("sprites/testPassiveSkill.png", 32 << 16, 32 << 16);
         SpriteStore.get().getSprite("sprites/testActiveSkill.png", 32 << 16, 32 << 16);
@@ -103,6 +104,8 @@ public class Game extends Canvas
         SpriteStore.get().getSprite("sprites/testLaser.png", 8 << 16, 512 << 16);
 		SpriteStore.get().getSprite("sprites/testWarning.png", 10 << 16, 10 << 16);
 		SpriteStore.get().getSprite("sprites/scoringItem.png", 12 << 16, 12 << 16);
+		SpriteStore.get().getSprite("sprites/whiteBackground.png", 400 << 16, 300 << 16);
+		//! sprites/whiteBackground.png 크기 늘려 주시면 됩니다.
 
         loop = new MainMenuLoop(this);  // 게임 시작 후 가장 처음 진입할 Loop
 

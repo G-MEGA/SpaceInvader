@@ -99,7 +99,7 @@ public class GameLoop extends Loop {
         isIndicatorShown = true;
     }
 
-    private final int bombDamage = 100;
+    private final int bombDamage = 1;
 
     private long coinCount = 0;
     public long getCoinCount() { return coinCount; }

@@ -10,7 +10,7 @@ public class BombSkill extends ActiveSkill {
     private static final String skillName = "Bomb Skill";
     private static final long coolTime = 5 << 16;
 
-    private static final long bombEffectDuration = FixedPointUtil.ZERO_3;
+    private static final long bombEffectDuration = FixedPointUtil.ZERO_1;
 
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public BombSkill(){

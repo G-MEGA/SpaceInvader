@@ -115,10 +115,10 @@ public class Boss extends Enemy{
             }
         }
         else{
-            executeNextPattern();
-            
             isPatternEnded = false;
             patternElapsed = 0;
+
+            executeNextPattern();
         }
     }
     
@@ -126,7 +126,7 @@ public class Boss extends Enemy{
         currentPatternIndex++;
 
         int currentPatternType = patternSequence[currentPatternIndex % patternSequence.length];
-        BossPattern currentPattern = null;
+        currentPattern = null;
 
         switch (currentPatternType) {
             case BossPattern.SIDE_BULLET_STREAM:
@@ -146,11 +146,11 @@ public class Boss extends Enemy{
                 break;
         }
         if (currentPattern == null){
-            throw new IllegalStateException("Unknown enemy pattern type: " + currentPatternType);
+            throw new IllegalStateException("Unknown boss pattern type: " + currentPatternType);
         }
         
-        currentPattern.executePattern();
         getLoop().addGameObject(currentPattern);
+        currentPattern.executePattern();
     }
 
     public void endCurrentPattern(){ isPatternEnded = true; }

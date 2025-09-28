@@ -15,5 +15,7 @@ public class FanShotSeriesPattern extends BossPattern {
 
     @Override
     public void executePattern() {
+        System.out.println("FanShotSeriesPattern executed");
+        notifyPatternEnd();
     }
 }

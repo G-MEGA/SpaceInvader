@@ -21,6 +21,8 @@ public class LaserPattern extends BossPattern {
     
     @Override
     public void executePattern() {
+        System.out.println("LaserPattern executed");
+        notifyPatternEnd();
     }
 
 }

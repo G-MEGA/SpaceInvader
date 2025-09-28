@@ -15,5 +15,7 @@ public class SideBulletStreamPattern extends BossPattern {
 
     @Override
     public void executePattern() {
+        System.out.println("SideBulletStreamPattern executed");
+        notifyPatternEnd();
     }
 }

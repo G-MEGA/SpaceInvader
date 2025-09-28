@@ -15,5 +15,7 @@ public class PlayerSlowPattern extends BossPattern {
 
     @Override
     public void executePattern() {
+        System.out.println("PlayerSlowPattern executed");
+        notifyPatternEnd();
     }
 }

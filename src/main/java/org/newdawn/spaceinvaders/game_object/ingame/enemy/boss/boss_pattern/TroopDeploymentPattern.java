@@ -15,5 +15,7 @@ public class TroopDeploymentPattern extends BossPattern {
 
     @Override
     public void executePattern() {
+        System.out.println("TroopDeploymentPattern executed");
+        notifyPatternEnd();
     }
 }

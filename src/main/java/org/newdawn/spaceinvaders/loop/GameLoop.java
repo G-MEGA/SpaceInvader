@@ -381,6 +381,12 @@ public class GameLoop extends Loop {
         }
     }
 
+    public void notifyPlayerShipsSlowDown(long slowDownRatio, long slowDownTime){
+        for (PlayerShip ship : ships) {
+            ship.notifySlowDown(slowDownRatio, slowDownTime);
+        }
+    }
+
     public String getReplayData(){
 //            리플레이 저장 입력 및 처리를 이 클래스에서 안하니 리플레이 녹화 버튼 입력이 리플레이 데이터에 들어가도 괜찮음
 //            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외

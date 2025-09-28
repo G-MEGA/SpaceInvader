@@ -5,12 +5,13 @@ import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class EnemyWarner extends GameObject2D{
-    private final String spriteRef = "sprites/testWarning.png";
-    private final Long warningTime = 1L << 16;
+    private final static String spriteRef = "sprites/testWarning.png";
+    private final static long defaultWarningTime = 1L << 16;
+    private long warningTime;
 
     private SpriteRenderer spriteRenderer;
 
-    private long spawnElapsed;
+    private long warnElapsed;
     private GameLoop gameLoop;
     private Enemy enemy;
 
@@ -19,15 +20,18 @@ public class EnemyWarner extends GameObject2D{
         super();
     }
 
-    public EnemyWarner(Enemy enemy, GameLoop gameLoop) {
+    public EnemyWarner(Enemy enemy, GameLoop gameLoop) { this(enemy, gameLoop, defaultWarningTime); }
+
+    public EnemyWarner(Enemy enemy, GameLoop gameLoop, long warningTime) {
         super(gameLoop);
+
+        this.warningTime = warningTime;
 
         spriteRenderer = new SpriteRenderer(gameLoop);
         spriteRenderer.setSpriteRef(spriteRef);
         addChild(spriteRenderer);
 
-
-        spawnElapsed = 0l;
+        warnElapsed = 0l;
         this.gameLoop = gameLoop;
         this.enemy = enemy;
 
@@ -39,12 +43,12 @@ public class EnemyWarner extends GameObject2D{
     protected void process(long deltaTime) {
         super.process(deltaTime);
 
-        if (spawnElapsed >= warningTime){
+        if (warnElapsed >= warningTime){
             gameLoop.addGameObject(enemy);
             destroy();
         }
         else{
-            spawnElapsed += deltaTime;
+            warnElapsed += deltaTime;
         }
     }
 }

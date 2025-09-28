@@ -30,7 +30,8 @@ public class ReplayerLoop extends Loop{
 
         this.replaySaveData = replaySaveData;
 
-        gameLoop = new GameLoop(game, 37, true);
+        //TODO 시드 반영
+        gameLoop = new GameLoop(game, 37, 1, "");
 
         String[] splited = replaySaveData.trim().split("\n");
 

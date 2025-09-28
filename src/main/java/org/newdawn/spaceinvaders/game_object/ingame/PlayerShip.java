@@ -198,54 +198,52 @@ public class PlayerShip extends GameCharacter{
 
         GameLoop gameLoop = (GameLoop)getLoop();
 
-        if(!gameLoop.isWaitingForKeyPress()){
-            //region 이동
-            velocityX = 0;
-            if ((gameLoop.isKeyInputPressed("left")) && (!gameLoop.isKeyInputPressed("right"))) {
-                velocityX = -moveSpeed;
-            } else if ((gameLoop.isKeyInputPressed("right")) && (!gameLoop.isKeyInputPressed("left"))) {
-                velocityX = moveSpeed;
+        //region 이동
+        velocityX = 0;
+        if ((gameLoop.isKeyInputPressed("left")) && (!gameLoop.isKeyInputPressed("right"))) {
+            velocityX = -moveSpeed;
+        } else if ((gameLoop.isKeyInputPressed("right")) && (!gameLoop.isKeyInputPressed("left"))) {
+            velocityX = moveSpeed;
+        }
+
+        velocityY = 0;
+        if ((gameLoop.isKeyInputPressed("up")) && (!gameLoop.isKeyInputPressed("down"))) {
+            velocityY = -moveSpeed;
+        } else if ((gameLoop.isKeyInputPressed("down")) && (!gameLoop.isKeyInputPressed("up"))) {
+            velocityY = moveSpeed;
+        }
+
+        //* 만약 SpeedUp된 상태면 PlayerShip의 이동 속도를 증가 시킴
+        if (isSpeedUp){
+            if (speedUpElapsed >= speedUpTime){
+                isSpeedUp = false;
+                speedUpElapsed = 0;
             }
-
-            velocityY = 0;
-            if ((gameLoop.isKeyInputPressed("up")) && (!gameLoop.isKeyInputPressed("down"))) {
-                velocityY = -moveSpeed;
-            } else if ((gameLoop.isKeyInputPressed("down")) && (!gameLoop.isKeyInputPressed("up"))) {
-                velocityY = moveSpeed;
+            else{
+                speedUpElapsed += deltaTime;
+                velocityX = FixedPointUtil.mul(velocityX, speedUpRatio);
+                velocityY = FixedPointUtil.mul(velocityY, speedUpRatio);
             }
-            
-            //* 만약 SpeedUp된 상태면 PlayerShip의 이동 속도를 증가 시킴
-            if (isSpeedUp){
-                if (speedUpElapsed >= speedUpTime){
-                    isSpeedUp = false;
-                    speedUpElapsed = 0;
-                }
-                else{
-                    speedUpElapsed += deltaTime;
-                    velocityX = FixedPointUtil.mul(velocityX, speedUpRatio);
-                    velocityY = FixedPointUtil.mul(velocityY, speedUpRatio);
-                }
-            }
+        }
 
-            //endregion
+        //endregion
 
-            //region 마우스를 향해 회전
-            long mousePosX = FixedPointUtil.fromLong(gameLoop.getMousePosX());
-            long mousePosY = FixedPointUtil.fromLong(gameLoop.getMousePosY());
+        //region 마우스를 향해 회전
+        long mousePosX = FixedPointUtil.fromLong(gameLoop.getMousePosX());
+        long mousePosY = FixedPointUtil.fromLong(gameLoop.getMousePosY());
 
-            long fromMeToMouseX = mousePosX - getPosX();
-            long fromMeToMouseY = mousePosY - getPosY();
+        long fromMeToMouseX = mousePosX - getPosX();
+        long fromMeToMouseY = mousePosY - getPosY();
 
-            setRotation(FixedPointUtil.atan2(fromMeToMouseY,  fromMeToMouseX) + (90 << 16));
-            //endregion
+        setRotation(FixedPointUtil.atan2(fromMeToMouseY,  fromMeToMouseX) + (90 << 16));
+        //endregion
 
-            // 탄 발사
-            if (gameLoop.isKeyInputPressed("mouse_button_left")) {
-                tryToFire();
-            }
-            if (gameLoop.isKeyInputJustPressed("mouse_button_right")) {
-                tryToDoActiveSkill(deltaTime);
-            }
+        // 탄 발사
+        if (gameLoop.isKeyInputPressed("mouse_button_left")) {
+            tryToFire();
+        }
+        if (gameLoop.isKeyInputJustPressed("mouse_button_right")) {
+            tryToDoActiveSkill(deltaTime);
         }
 
         //region 화면 밖으로 나가지 못하게 제약
@@ -334,6 +332,7 @@ public class PlayerShip extends GameCharacter{
         }
         if (--_health == 0){
             ((GameLoop)getLoop()).notifyDeath();
+            destroy();
         }
     }
 

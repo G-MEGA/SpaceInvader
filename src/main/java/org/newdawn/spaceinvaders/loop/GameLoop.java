@@ -1,5 +1,16 @@
 package org.newdawn.spaceinvaders.loop;
 
+import org.newdawn.spaceinvaders.Game;
+import org.newdawn.spaceinvaders.enums.GameLoopResultType;
+import org.newdawn.spaceinvaders.enums.IndicatorTextType;
+import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
+import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
+import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
+import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputLog;
+import org.newdawn.spaceinvaders.game_object.GameObject;
+import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
+import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.io.File;
@@ -12,23 +23,14 @@ import java.util.HashMap;
 
 import javax.swing.JFileChooser;
 
-import org.newdawn.spaceinvaders.Game;
-import org.newdawn.spaceinvaders.enums.IndicatorTextType;
-import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
-import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputLog;
-import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
-import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
-import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
-import org.newdawn.spaceinvaders.game_object.ingame.enemy.EnemyFactory;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BasicActiveSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BombSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.LaserSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.store.StoreSlot;
-import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
-
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.EnemyFactory;
 import random.SerializableRandom;
 
 public class GameLoop extends Loop {
@@ -99,7 +101,7 @@ public class GameLoop extends Loop {
         isIndicatorShown = true;
     }
 
-    private final int bombDamage = 1;
+    private final int bombDamage = 100;
 
     private long coinCount = 0;
     public long getCoinCount() { return coinCount; }
@@ -233,9 +235,6 @@ public class GameLoop extends Loop {
                 if (row == 4L){
                     enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.GUARDIAN, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                     enemy.setRotation(180 << 16);
-                }
-                else if (row == 3L){
-                    enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.ARTILLERY, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                 }
                 else if (row == 3L){
                     enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.ARTILLERY, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);

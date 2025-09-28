@@ -25,11 +25,13 @@ public class LoopInputLog {
 
         inputs = new ArrayList<>();
         for(int i = 1; i < splited.length; i++){
-            if(splited[i].startsWith("K")){
+            char type = splited[i].charAt(splited[i].indexOf(" ") + 1);
+
+            if(type == 'K'){
                 inputs.add(new LoopInputKey(splited[i]));
                 continue;
             }
-            else if(splited[i].startsWith("M")){
+            else if(type == 'M'){
                 inputs.add(new LoopInputMouseMove(splited[i]));
                 continue;
             }

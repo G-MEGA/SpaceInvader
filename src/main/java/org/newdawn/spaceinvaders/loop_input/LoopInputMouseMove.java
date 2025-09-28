@@ -8,22 +8,25 @@ public class LoopInputMouseMove extends LoopInput {
     public LoopInputMouseMove(){
         super();
     }
-    public LoopInputMouseMove(int posX, int posY){
+    public LoopInputMouseMove(int playerID, int posX, int posY){
+        super(playerID);
         this.posX = posX;
         this.posY = posY;
     }
     public LoopInputMouseMove(String data){
         String[] splited = data.trim().split(" ");
 
-        if(!splited[0].equals("M")){
+        playerID = Integer.parseInt(splited[0]);
+
+        if(!splited[1].equals("M")){
             throw new IllegalArgumentException();
         }
-        posX=Integer.parseInt(splited[1]);
-        posY=Integer.parseInt(splited[2]);
+        posX=Integer.parseInt(splited[2]);
+        posY=Integer.parseInt(splited[3]);
     }
 
     @Override
     public String toSaveData(){
-        return "M " + posX + " " + posY;
+        return super.toSaveData() + "M " + posX + " " + posY;
     }
 }

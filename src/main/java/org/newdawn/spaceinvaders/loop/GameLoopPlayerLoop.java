@@ -16,9 +16,10 @@ import java.util.ArrayList;
 public class GameLoopPlayerLoop extends Loop{
     GameLoop gameLoop;
 
-    public GameLoopPlayerLoop(Game game, int randomSeed, int playerCount, String rawMapData){
+    public GameLoopPlayerLoop(Game game){
         super(game);
-        gameLoop = new GameLoop(game, randomSeed, playerCount, rawMapData);
+        //TODO 멀티플레이 정보에 따라서 시드, 플레이어 카운트, 마이 픓레이어 아이디, 맵데이터 넣어줘야함
+        gameLoop = new GameLoop(game, 37, 4, 0, "");
     }
 
     @Override
@@ -43,11 +44,11 @@ public class GameLoopPlayerLoop extends Loop{
         // 게임 종료 시
         if(gameLoop.getGameResult() != GameLoopResultType.InGame){
             //메인메뉴로 나가기
-            if(isKeyInputJustPressed("escape")) {
+            if(isKeyInputJustPressed(0, "escape")) {
                 getGame().changeLoop(new MainMenuLoop(getGame()));
             }
             //리플레이 저장하고 메인메뉴로 나가기
-            else if(isKeyInputJustPressed("record")) {
+            else if(isKeyInputJustPressed(0, "record")) {
                 String data = gameLoop.getReplayData();
 
                 // JFileChooser 객체 생성

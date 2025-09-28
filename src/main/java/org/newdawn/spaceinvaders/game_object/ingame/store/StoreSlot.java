@@ -69,7 +69,7 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner {
     public void collidedWith(ICollider2DOwner collider) {
         if (collider instanceof PlayerShip){
             if(gameLoop.decreaseCoin(price)){
-                if(item.onAcquire(gameLoop)){
+                if(item.onAcquire(gameLoop, (PlayerShip)collider)){
                     destroy();
                 }
             }

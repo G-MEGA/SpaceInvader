@@ -18,6 +18,11 @@ import java.util.Set;
 public abstract class Loop  {
     private transient Game game;
 
+    private int playerCount = -1;
+    public int getPlayerCount() {
+        return playerCount;
+    }
+
     private final ArrayList<GameObject> gameObjects = new ArrayList<>();
     private final ArrayList<GameObject> gameObjectsInProcessing = new ArrayList<>();
     private final ArrayList<Collider2D> colliders = new ArrayList<>();
@@ -25,19 +30,31 @@ public abstract class Loop  {
     public int getGameObjectsInProcessingCount() { return gameObjectsInProcessing.size(); }
     public int getCollidersCount() { return colliders.size(); }
 
-    private final HashMap<String, Boolean> isKeyInputPressed = new HashMap<String, Boolean>();
-    private final HashMap<String, Boolean> isKeyInputJustPressed = new HashMap<String, Boolean>();
-    private final HashMap<String, Boolean> isKeyInputJustReleased = new HashMap<String, Boolean>();
+    private final ArrayList<HashMap<String, Boolean>> isKeyInputPressed = new ArrayList<>();
+    private final ArrayList<HashMap<String, Boolean>> isKeyInputJustPressed = new ArrayList<>();
+    private final ArrayList<HashMap<String, Boolean>> isKeyInputJustReleased = new ArrayList<>();
 
-    private int mousePosX = 400;
-    private int mousePosY = 300;
+    private ArrayList<Integer> mousePosX = new ArrayList<>();
+    private ArrayList<Integer> mousePosY = new ArrayList<>();
 
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public Loop(){
         super();
     }
     public Loop(Game game) {
+        this(game, 1);
+    }
+    public Loop(Game game, int playerCount) {
         this.game = game;
+        this.playerCount = playerCount;
+
+        for (int i = 0; i < playerCount; i++) {
+            isKeyInputPressed.add(new HashMap<>());
+            isKeyInputJustPressed.add(new HashMap<>());
+            isKeyInputJustReleased.add(new HashMap<>());
+            mousePosX.add(400);
+            mousePosY.add(300);
+        }
     }
 
     Set<Integer> layerSet = new HashSet<Integer>();
@@ -60,11 +77,13 @@ public abstract class Loop  {
         }
     }
     public void process(ArrayList<LoopInput> inputs){
-        for(String keyInputName:isKeyInputJustPressed.keySet()){
-            isKeyInputJustPressed.put(keyInputName, false);
-        }
-        for(String keyInputName:isKeyInputJustReleased.keySet()){
-            isKeyInputJustReleased.put(keyInputName, false);
+        for (int playerID=0; playerID<playerCount; playerID++) {
+            for(String keyInputName:isKeyInputJustPressed.get(playerID).keySet()){
+                isKeyInputJustPressed.get(playerID).put(keyInputName, false);
+            }
+            for(String keyInputName:isKeyInputJustReleased.get(playerID).keySet()){
+                isKeyInputJustReleased.get(playerID).put(keyInputName, false);
+            }
         }
 
 
@@ -89,48 +108,48 @@ public abstract class Loop  {
 
     private void inputKey(LoopInputKey input){
         if(input.pressed){
-            if(isKeyInputPressed.get(input.name) == null || !isKeyInputPressed.get(input.name)){
-                isKeyInputJustPressed.put(input.name, true);
+            if(isKeyInputPressed.get(input.playerID).get(input.name) == null || !isKeyInputPressed.get(input.playerID).get(input.name)){
+                isKeyInputJustPressed.get(input.playerID).put(input.name, true);
             }
         }
         else{
-            if(isKeyInputPressed.get(input.name) != null && isKeyInputPressed.get(input.name)){
-                isKeyInputJustReleased.put(input.name, true);
+            if(isKeyInputPressed.get(input.playerID).get(input.name) != null && isKeyInputPressed.get(input.playerID).get(input.name)){
+                isKeyInputJustReleased.get(input.playerID).put(input.name, true);
             }
         }
 
-        isKeyInputPressed.put(input.name, input.pressed);
+        isKeyInputPressed.get(input.playerID).put(input.name, input.pressed);
     }
 
     private void inputMouseMove(LoopInputMouseMove input) {
-        mousePosX = input.posX;
-        mousePosY = input.posY;
+        mousePosX.set(input.playerID, input.posX);
+        mousePosY.set(input.playerID, input.posY);
     }
 
-    public boolean isKeyInputPressed(String inputName){
-        if(isKeyInputPressed.containsKey(inputName)){
-            return isKeyInputPressed.get(inputName);
+    public boolean isKeyInputPressed(int playerID, String inputName){
+        if(isKeyInputPressed.get(playerID).containsKey(inputName)){
+            return isKeyInputPressed.get(playerID).get(inputName);
         }
         return false;
 
     }
-    public boolean isKeyInputJustPressed(String inputName){
-        if(isKeyInputJustPressed.containsKey(inputName)){
-            return isKeyInputJustPressed.get(inputName);
+    public boolean isKeyInputJustPressed(int playerID, String inputName){
+        if(isKeyInputJustPressed.get(playerID).containsKey(inputName)){
+            return isKeyInputJustPressed.get(playerID).get(inputName);
         }
         return false;
     }
-    public boolean isKeyInputJustReleased(String inputName){
-        if(isKeyInputJustReleased.containsKey(inputName)){
-            return isKeyInputJustReleased.get(inputName);
+    public boolean isKeyInputJustReleased(int playerID, String inputName){
+        if(isKeyInputJustReleased.get(playerID).containsKey(inputName)){
+            return isKeyInputJustReleased.get(playerID).get(inputName);
         }
         return false;
     }
-    public int getMousePosX() {
-        return mousePosX;
+    public int getMousePosX(int playerID) {
+        return mousePosX.get(playerID);
     }
-    public int getMousePosY() {
-        return mousePosY;
+    public int getMousePosY(int playerID) {
+        return mousePosY.get(playerID);
     }
 
     public Game getGame() {

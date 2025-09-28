@@ -1,6 +1,7 @@
 package org.newdawn.spaceinvaders.game_object.ingame.loot_item;
 
 import org.newdawn.spaceinvaders.Game;
+import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 import org.newdawn.spaceinvaders.loop.Loop;
 
@@ -13,7 +14,7 @@ public class CoinItem extends LootItem {
         super(loop, "sprites/coin.png");
     }
 
-    protected void onCollideWithPlayerShip(){
+    protected void onCollideWithPlayerShip(PlayerShip ship){
         if (getLoop() instanceof GameLoop){
             GameLoop gameLoop = (GameLoop)getLoop();
             gameLoop.increaseCoin();

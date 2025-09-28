@@ -8,16 +8,13 @@ import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class Raider extends SweeperEnemy{
     private Boolean _hasCharged = false;
-    private PlayerShip _playerShip;
 
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public Raider(){
         super();
     }
-    public Raider(GameLoop gameLoop, HiveMind hiveMind, PlayerShip playerShip) {
+    public Raider(GameLoop gameLoop, HiveMind hiveMind) {
         super(gameLoop, hiveMind, 1);
-
-        _playerShip = playerShip;
 
         //* 유저를 생성시 아래 방향을 바라보도록 하는 작업
         setRotation(180);
@@ -40,10 +37,22 @@ public class Raider extends SweeperEnemy{
     protected void process(long deltaTime) {
         super.process(deltaTime);
 
-        if (!_hasCharged && Math.abs(_playerShip.getPosX() - getPosX()) < 29 << 16){
-            _hasCharged = true;
-            velocityX = 0;
-            velocityY = FixedPointUtil.fromLong(300L);
+        if(!_hasCharged){
+            for (int aliveShipIndex=0; aliveShipIndex < ((GameLoop)getLoop()).getAliveShipCount(); aliveShipIndex++) {
+                PlayerShip playerShip = ((GameLoop)getLoop()).getAliveShip(aliveShipIndex);
+                if (Math.abs(playerShip.getPosX() - getPosX()) < 29 << 16){
+                    _hasCharged = true;
+                    velocityX = 0;
+                    velocityY = FixedPointUtil.fromLong(300L);
+                    break;
+                }
+            }
         }
+    }
+
+    @Override
+    protected void onTouchBoundary(){
+        // 얘는 화면 아래에 닿아도 게임 오버가 되지 않도록 onTouchBoundary를 오버라이딩함
+        decreaseHealth(getHealth());
     }
 }

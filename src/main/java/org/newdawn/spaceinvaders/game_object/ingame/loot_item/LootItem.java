@@ -37,7 +37,7 @@ public abstract class LootItem extends Mover2D implements ICollider2DOwner {
 
     public void collidedWith(ICollider2DOwner collider){
         if (collider instanceof PlayerShip){
-            onCollideWithPlayerShip();
+            onCollideWithPlayerShip((PlayerShip) collider);
 
             destroy();
         }
@@ -46,7 +46,7 @@ public abstract class LootItem extends Mover2D implements ICollider2DOwner {
     /**
      * 플레이어가 LootItem을 먹었을 때, 발동할 효과를 구현함
      */
-    protected abstract void onCollideWithPlayerShip();
+    protected abstract void onCollideWithPlayerShip(PlayerShip ship);
     
     @Override
     protected void process(long deltaTime) {

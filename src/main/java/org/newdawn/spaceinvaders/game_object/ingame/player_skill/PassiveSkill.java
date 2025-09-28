@@ -12,19 +12,20 @@ public class PassiveSkill extends PlayerSkill{
     public PassiveSkill(){
         super();
     }
-    public PassiveSkill(PlayerPassiveSkillType type, PlayerShip playerShip, GameLoop gameLoop) {
-        super(type.getName(), type.getSpriteRef(), playerShip, gameLoop);
+    public PassiveSkill(PlayerPassiveSkillType type, GameLoop gameLoop) {
+        super(type.getName(), type.getSpriteRef(), gameLoop);
 
         this.type = type;
     }
 
     @Override
-    public boolean onAcquire(GameLoop gameLoop) {
+    public boolean onAcquire(GameLoop gameLoop, PlayerShip playerShip) {
         if (playerShip.isSkillMaxLevel(type)) {
             gameLoop.showIndicatorText("'" + type.name() + "'" + " 패시브 스킬은 현재 최대 레벨 입니다.", IndicatorTextType.Warning);
             return false;
         }
         playerShip.upgradePassiveSkill(type);
+        this.playerShip = playerShip;
         return true;
     }
 }

@@ -44,8 +44,25 @@ public class GameLoop extends Loop {
     private final int scoringScore = 1;
     private long scoredTimeElapsed = 0;
 
+    int myPlayerID = -1;
+
     /** The entity representing the player */
-    private PlayerShip ship;
+    private ArrayList<PlayerShip> ships = new ArrayList<>();
+    public ArrayList<PlayerShip> getPlayerShips() { return ships; }
+    public PlayerShip getPlayerShip(int id) { return ships.get(id); }
+
+    private ArrayList<PlayerShip> aliveShips = new ArrayList<>();
+    public PlayerShip getAliveShip(int index) { return aliveShips.get(index); }
+    public int getAliveShipCount() { return aliveShips.size(); }
+    public PlayerShip getRandomAlivePlayerShip(){
+        if(aliveShips.isEmpty()){
+            return null;
+        } else if (aliveShips.size() == 1) {
+            return aliveShips.get(0);
+        } else{
+            return aliveShips.get(getRandom().nextInt(aliveShips.size()));
+        }
+    }
     /** The number of enemies left on the screen */
     private int enemyCount;
     private HiveMind enemyHiveMind = new HiveMind();
@@ -83,7 +100,7 @@ public class GameLoop extends Loop {
                 addGameObject(text);
             }
 
-            text.setText(type.getName() + " : " + ship.getPassiveSkillLevel(type));
+            text.setText(type.getName() + " : " + ships.get(myPlayerID).getPassiveSkillLevel(type));
         }
     }
 
@@ -139,8 +156,10 @@ public class GameLoop extends Loop {
     public GameLoop(){
         super();
     }
-    public GameLoop(Game game, int randomSeed, int playerCount, String rawMapData){
-        super(game);
+    public GameLoop(Game game, int randomSeed, int playerCount, int myPlayerID, String rawMapData){
+        super(game, playerCount);
+
+        this.myPlayerID = myPlayerID;
 
         random = new SerializableRandom(17L * randomSeed); // 소수 17을 곱해서 더 랜덤하게
         parseMapData(rawMapData);
@@ -159,8 +178,8 @@ public class GameLoop extends Loop {
         scoreText = new TextRenderer(this, "Score : 0", 15);
         scoreText.setFontStyle(1);
         coinCountText = new TextRenderer(this, "Coin : " + Long.toString(coinCount), 15);
-        playerHealthText = new TextRenderer(this, "Health : " + Long.toString(ship.getHealth()), 15);
-        activeSkillText = new TextRenderer(this, "Active Skill : " + ship.getActiveSkillName(), 15);
+        playerHealthText = new TextRenderer(this, "Health : " + Long.toString(ships.get(myPlayerID).getHealth()), 15);
+        activeSkillText = new TextRenderer(this, "Active Skill : " + ships.get(myPlayerID).getActiveSkillName(), 15);
         passiveSkillHeaderText = new TextRenderer(this, "(Passive Skills)", 15);
 
         addGameObject(scoreText);
@@ -191,11 +210,11 @@ public class GameLoop extends Loop {
     private void updateText() {
         scoreText.setText("Score : " + score);
         coinCountText.setText("Coin : " + Long.toString(coinCount));
-        playerHealthText.setText("Health : " + Long.toString(ship.getHealth()) + 
-        (ship.getCurrentShield() == 0 ? "" : " ( " + Integer.toString(ship.getCurrentShield())  + " ) "));
+        playerHealthText.setText("Health : " + Long.toString(ships.get(myPlayerID).getHealth()) +
+        (ships.get(myPlayerID).getCurrentShield() == 0 ? "" : " ( " + Integer.toString(ships.get(myPlayerID).getCurrentShield())  + " ) "));
 
-        String activeSkillTextContent = "Active Skill : " + ship.getActiveSkillName();
-        activeSkillTextContent += ship.isActiveSkillActable() ? "" : "( " + Long.toString(ship.getRemainCoolTime() >> 16) + " )";
+        String activeSkillTextContent = "Active Skill : " + ships.get(myPlayerID).getActiveSkillName();
+        activeSkillTextContent += ships.get(myPlayerID).isActiveSkillActable() ? "" : "( " + Long.toString(ships.get(myPlayerID).getRemainCoolTime() >> 16) + " )";
         activeSkillText.setText(activeSkillTextContent);
         updatePassiveSkillText();
     }
@@ -212,7 +231,9 @@ public class GameLoop extends Loop {
         clearGameObjects();
         initEntities();
         initText();
-        ship.onWaveStart();
+        for(PlayerShip ship:ships){
+            ship.onWaveStart();
+        }
     }
 
     /**
@@ -221,11 +242,24 @@ public class GameLoop extends Loop {
      */
     private void initEntities() {
         // create the player ship and place it roughly in the center of the screen
-        ship = new PlayerShip(this);
-        ship.setPos(400 << 16, 550 << 16);
-        addGameObject(ship);
+        ships.clear();
 
-        enemyFactory = new EnemyFactory(this, ship);
+        //region 플레이어십 생성
+        long shipSpawnDistance = 100L << 16;//플레이어십 간의 거리
+        long shipSpawnAreaWidth = (getPlayerCount()-1) * shipSpawnDistance;
+        long shipSpawnAreaPosX = (400L << 16) - shipSpawnAreaWidth/2;
+
+        for (int playerID = 0; getPlayerCount() > playerID; playerID++) {
+            PlayerShip ship = new PlayerShip(this, playerID);
+            ships.add(ship);
+            aliveShips.add(ship);
+            addGameObject(ship);
+
+            ship.setPos(shipSpawnAreaPosX + shipSpawnDistance * playerID, 550 << 16);
+        }
+        //endregion
+
+        enemyFactory = new EnemyFactory(this);
 
         // create a block of aliens (5 rows, by 12 aliens, spaced evenly)
         enemyCount = 0;
@@ -239,7 +273,7 @@ public class GameLoop extends Loop {
                 else if (row == 3L){
                     enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.ARTILLERY, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                 }
-                else if (row == 10L){
+                else if (row == 2L){
                     enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.RAIDER, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
                     enemy.setRotation(180 << 16);
                 }
@@ -252,11 +286,11 @@ public class GameLoop extends Loop {
         }
 
         //* 상점 아이템 생성 슬롯
-        BombSkill bombSkill = new BombSkill(ship, this);
+        BombSkill bombSkill = new BombSkill(this);
         StoreSlot storeSlot = new StoreSlot(this, 0, bombSkill, 600 << 16, 300 << 16);
         addGameObject(storeSlot);
 
-        LaserSkill laserSkill = new LaserSkill(ship, this);
+        LaserSkill laserSkill = new LaserSkill(this);
         storeSlot = new StoreSlot(this, 0, laserSkill, 700 << 16, 300 << 16);
         addGameObject(storeSlot);
 
@@ -274,7 +308,7 @@ public class GameLoop extends Loop {
             int x = (int) data[1];
             int y = (int) data[2];
 
-            PassiveSkill passiveSkill = new PassiveSkill(type, ship, this);
+            PassiveSkill passiveSkill = new PassiveSkill(type, this);
             storeSlot = new StoreSlot(this, 0, passiveSkill, x, y);
             addGameObject(storeSlot);
         }
@@ -298,7 +332,17 @@ public class GameLoop extends Loop {
     /**
      * Notification that the player has died.
      */
-    public void notifyDeath() {
+    public void notifyPlayerShipDeath() {
+        aliveShips.clear();
+
+        for(PlayerShip ship : ships){
+            if(!ship.isDead()){aliveShips.add(ship);}
+        }
+
+        // 다 죽었으면 패배
+        if(aliveShips.size()==0){setGameResult(GameLoopResultType.Lose);}
+    }
+    public void notifyLose(){
         setGameResult(GameLoopResultType.Lose);
     }
 
@@ -356,8 +400,6 @@ public class GameLoop extends Loop {
     }
 
     //* LootItem을 먹었을때, 나타나는 효과를 호출하는 메소드
-    public void addShieldOnPlayerShip() { ship.increaseHealth(); }
-    public void requestToSpeedUpOnPlayerShip() { ship.requestToSpeedUp(); }
     public void requestToSlowDownEnemies(){
         for (Enemy enemy : enemies){
             enemy.requestSlowDown();

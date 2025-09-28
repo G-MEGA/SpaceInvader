@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 public class LoopInputLog {
     public long inputFrame;
+    // 현재는 게임 플레이 중 입력을 받는 모든 객체들이 isKeyInputPressed()등으로 입력에 접근하므로
+    // inputs 내에서의 순서는 로직에 영향을 끼치지 않음.
     public ArrayList<LoopInput> inputs;
 
     private StringBuilder stringBuilder = new StringBuilder();

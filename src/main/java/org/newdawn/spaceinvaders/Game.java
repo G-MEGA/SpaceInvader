@@ -258,7 +258,7 @@ public class Game extends Canvas
             String inputName = playerSetting.KeyToInputName(e.getKeyCode());
             if(inputName == null) return;
 
-            queuedInputs.add(new LoopInputKey(inputName, true));
+            queuedInputs.add(new LoopInputKey(0, inputName, true));
 		} 
 		
 		/**
@@ -272,7 +272,7 @@ public class Game extends Canvas
             String inputName = playerSetting.KeyToInputName(e.getKeyCode());
             if(inputName == null) return;
 
-            queuedInputs.add(new LoopInputKey(inputName, false));
+            queuedInputs.add(new LoopInputKey(0, inputName, false));
 		}
 
 		/**
@@ -306,7 +306,7 @@ public class Game extends Canvas
             String inputName = playerSetting.KeyToInputName(buttonCode);
             if(inputName == null) return;
 
-            queuedInputs.add(new LoopInputKey(inputName, true));
+            queuedInputs.add(new LoopInputKey(0, inputName, true));
         }
         @Override
         public void mouseReleased(MouseEvent e) {
@@ -328,21 +328,21 @@ public class Game extends Canvas
             String inputName = playerSetting.KeyToInputName(buttonCode);
             if(inputName == null) return;
 
-            queuedInputs.add(new LoopInputKey(inputName, false));
+            queuedInputs.add(new LoopInputKey(0, inputName, false));
         }
 
         @Override
         public void mouseMoved(MouseEvent e) {
             super.mouseMoved(e);
 
-            queuedInputs.add(new LoopInputMouseMove(e.getX(), e.getY()));
+            queuedInputs.add(new LoopInputMouseMove(0, e.getX(), e.getY()));
         }
 
         @Override
         public void mouseDragged(MouseEvent e) {
             super.mouseDragged(e);
 
-            queuedInputs.add(new LoopInputMouseMove(e.getX(), e.getY()));
+            queuedInputs.add(new LoopInputMouseMove(0, e.getX(), e.getY()));
         }
     }
 

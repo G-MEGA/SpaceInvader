@@ -16,6 +16,8 @@ import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class PlayerShip extends GameCharacter{
+    private int playerID;
+
     private int bulletDamage = 1;
 
     /** The speed at which the player's ship should move (pixels/sec) */
@@ -171,9 +173,11 @@ public class PlayerShip extends GameCharacter{
     public PlayerShip(){
         super();
     }
-    public PlayerShip(GameLoop gameLoop) {
+    public PlayerShip(GameLoop gameLoop, int playerID) {
         super(gameLoop, 3);
-        
+
+        this.playerID = playerID;
+
         for (PlayerPassiveSkillType type : PlayerPassiveSkillType.values()) {
             passiveSkills.put(type, 0);
         }
@@ -200,16 +204,16 @@ public class PlayerShip extends GameCharacter{
 
         //region 이동
         velocityX = 0;
-        if ((gameLoop.isKeyInputPressed("left")) && (!gameLoop.isKeyInputPressed("right"))) {
+        if ((gameLoop.isKeyInputPressed(playerID, "left")) && (!gameLoop.isKeyInputPressed(playerID, "right"))) {
             velocityX = -moveSpeed;
-        } else if ((gameLoop.isKeyInputPressed("right")) && (!gameLoop.isKeyInputPressed("left"))) {
+        } else if ((gameLoop.isKeyInputPressed(playerID,"right")) && (!gameLoop.isKeyInputPressed(playerID,"left"))) {
             velocityX = moveSpeed;
         }
 
         velocityY = 0;
-        if ((gameLoop.isKeyInputPressed("up")) && (!gameLoop.isKeyInputPressed("down"))) {
+        if ((gameLoop.isKeyInputPressed(playerID,"up")) && (!gameLoop.isKeyInputPressed(playerID,"down"))) {
             velocityY = -moveSpeed;
-        } else if ((gameLoop.isKeyInputPressed("down")) && (!gameLoop.isKeyInputPressed("up"))) {
+        } else if ((gameLoop.isKeyInputPressed(playerID,"down")) && (!gameLoop.isKeyInputPressed(playerID,"up"))) {
             velocityY = moveSpeed;
         }
 
@@ -229,8 +233,8 @@ public class PlayerShip extends GameCharacter{
         //endregion
 
         //region 마우스를 향해 회전
-        long mousePosX = FixedPointUtil.fromLong(gameLoop.getMousePosX());
-        long mousePosY = FixedPointUtil.fromLong(gameLoop.getMousePosY());
+        long mousePosX = FixedPointUtil.fromLong(gameLoop.getMousePosX(playerID));
+        long mousePosY = FixedPointUtil.fromLong(gameLoop.getMousePosY(playerID));
 
         long fromMeToMouseX = mousePosX - getPosX();
         long fromMeToMouseY = mousePosY - getPosY();
@@ -239,10 +243,10 @@ public class PlayerShip extends GameCharacter{
         //endregion
 
         // 탄 발사
-        if (gameLoop.isKeyInputPressed("mouse_button_left")) {
+        if (gameLoop.isKeyInputPressed(playerID,"mouse_button_left")) {
             tryToFire();
         }
-        if (gameLoop.isKeyInputJustPressed("mouse_button_right")) {
+        if (gameLoop.isKeyInputJustPressed(playerID,"mouse_button_right")) {
             tryToDoActiveSkill(deltaTime);
         }
 
@@ -331,7 +335,7 @@ public class PlayerShip extends GameCharacter{
             return;
         }
         if (--_health == 0){
-            ((GameLoop)getLoop()).notifyDeath();
+            ((GameLoop)getLoop()).notifyPlayerShipDeath();
             destroy();
         }
     }

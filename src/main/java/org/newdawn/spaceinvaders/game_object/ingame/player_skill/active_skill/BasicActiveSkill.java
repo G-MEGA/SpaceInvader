@@ -12,8 +12,8 @@ public class BasicActiveSkill extends ActiveSkill{
     public BasicActiveSkill(){
         super();
     }
-    public BasicActiveSkill(PlayerShip playerShip, GameLoop gameLoop) {
-        super(skillName, skillSpriteRef, coolTime, playerShip, gameLoop);
+    public BasicActiveSkill(GameLoop gameLoop) {
+        super(skillName, skillSpriteRef, coolTime, gameLoop);
     }
     
     @Override

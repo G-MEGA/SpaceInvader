@@ -8,23 +8,26 @@ public class LoopInputKey extends LoopInput {
     public LoopInputKey(){
         super();
     }
-    public LoopInputKey(String name, boolean pressed){
+    public LoopInputKey(int playerID, String name, boolean pressed){
+        super(playerID);
         this.name = name;
         this.pressed = pressed;
     }
     public LoopInputKey(String data){
         String[] splited = data.trim().split(" ");
 
-        if(!splited[0].equals("K")){
+        playerID = Integer.parseInt(splited[0]);
+
+        if(!splited[1].equals("K")){
             throw new IllegalArgumentException();
         }
-        name = splited[1];
-        pressed = !splited[2].equals("0");
+        name = splited[2];
+        pressed = !splited[3].equals("0");
     }
 
     @Override
     public String toSaveData() {
-        return "K "+ name + (pressed ?" 1":" 0");
+        return super.toSaveData() + "K "+ name + (pressed ?" 1":" 0");
     }
 
 }

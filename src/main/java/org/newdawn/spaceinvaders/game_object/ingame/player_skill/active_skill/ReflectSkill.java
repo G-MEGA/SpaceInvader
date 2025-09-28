@@ -12,8 +12,8 @@ public class ReflectSkill extends ActiveSkill{
     public ReflectSkill(){
         super();
     }
-    public ReflectSkill(PlayerShip playerShip, GameLoop gameLoop) {
-        super(skillName, skillSpriteRef, coolTime, playerShip, gameLoop);
+    public ReflectSkill(GameLoop gameLoop) {
+        super(skillName, skillSpriteRef, coolTime, gameLoop);
     }
 
     @Override

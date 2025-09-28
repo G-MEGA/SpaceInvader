@@ -1,5 +1,6 @@
 package org.newdawn.spaceinvaders.game_object.ingame.loot_item;
 
+import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 import org.newdawn.spaceinvaders.loop.Loop;
 
@@ -12,10 +13,7 @@ public class BatteryItem extends LootItem {
         super(loop, "sprites/testBatteryItem.png");
     }
 
-    protected void onCollideWithPlayerShip(){
-        if (getLoop() instanceof GameLoop){
-            GameLoop gameLoop = (GameLoop)getLoop();
-            gameLoop.requestToSpeedUpOnPlayerShip();
-        }
+    protected void onCollideWithPlayerShip(PlayerShip ship){
+        ship.requestToSpeedUp();
     }
 }

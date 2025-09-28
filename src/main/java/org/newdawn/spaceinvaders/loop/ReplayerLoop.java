@@ -29,8 +29,8 @@ public class ReplayerLoop extends Loop{
 
         this.replaySaveData = replaySaveData;
 
-        //TODO 시드 반영
-        gameLoop = new GameLoop(game, 37, 1, "");
+        //TODO 리플레이 정보에 따라서 시드, 플레이어 카운트, 마이 플레이어 아이디, 맵데이터 넣어줘야함
+        gameLoop = new GameLoop(game, 37, 4, 0, "");
 
         String[] splited = replaySaveData.trim().split("\n");
 
@@ -45,30 +45,30 @@ public class ReplayerLoop extends Loop{
     public void process(ArrayList<LoopInput> inputs) {
         super.process(inputs);
 
-        if(isKeyInputJustPressed("escape")) {
+        if(isKeyInputJustPressed(0, "escape")) {
             getGame().changeLoop(new MainMenuLoop(getGame()));
         }
 
-        if(isKeyInputJustPressed("right")) {
+        if(isKeyInputJustPressed(0, "right")) {
             playSpeed++;
         }
-        if(isKeyInputJustPressed("left")) {
+        if(isKeyInputJustPressed(0, "left")) {
             playSpeed--;
             if(playSpeed<0){
                 playSpeed = 0;
             }
         }
-        if(isKeyInputJustPressed("accept")) {
+        if(isKeyInputJustPressed(0, "accept")) {
             paused = !paused;
         }
         // Replay 다시 재생
-        if(isKeyInputJustPressed("record")) {
+        if(isKeyInputJustPressed(0, "record")) {
             getGame().changeLoop(new ReplayerLoop(getGame(), replaySaveData));
             return;
         }
 
         //TODO Rollback Test
-        if (isKeyInputPressed("mouse_button_left")) {
+        if (isKeyInputPressed(0, "mouse_button_left")) {
             long startTime = System.nanoTime();
 
             rollbackFrame = currentFrame;
@@ -85,7 +85,7 @@ public class ReplayerLoop extends Loop{
             System.out.println("직렬화에 걸린 시간: " + durationNs + " ns");
             System.out.println("직렬화에 걸린 시간: " + String.format("%.6f", durationMs) + " ms");
         }
-        else if(isKeyInputJustPressed("mouse_button_right") && rollbackFrame >= 0 && rollbackSnapshot != null) {
+        else if(isKeyInputJustPressed(0, "mouse_button_right") && rollbackFrame >= 0 && rollbackSnapshot != null) {
             long startTime = System.nanoTime();
 
             currentFrame = rollbackFrame;

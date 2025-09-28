@@ -44,29 +44,31 @@ public class Button extends GameObject2D {
     protected void process(long deltaTime) {
         super.process(deltaTime);
 
-        //region 마우스 호버링 판정
-        FixedPointAffineTransform gt = getGlobalTransform();
+        for(int playerID = 0; playerID < getLoop().getPlayerCount(); playerID++) {
+            //region 마우스 호버링 판정
+            FixedPointAffineTransform gt = getGlobalTransform();
 
-        long x = gt.getPosX();
-        long y = gt.getPosY();
+            long x = gt.getPosX();
+            long y = gt.getPosY();
 
-        if(alignment==1){
-            x += FixedPointUtil.fromLong(- width/2);
-        }
-        else if(alignment==2){
-            x += FixedPointUtil.fromLong(- width);
-        }
+            if(alignment==1){
+                x += FixedPointUtil.fromLong(- width/2);
+            }
+            else if(alignment==2){
+                x += FixedPointUtil.fromLong(- width);
+            }
 
-        long xEnd = x + FixedPointUtil.fromLong(width);
-        long yEnd = y + FixedPointUtil.fromLong(height);
-        long mousePosX = FixedPointUtil.fromLong(getLoop().getMousePosX());
-        long mousePosY = FixedPointUtil.fromLong(getLoop().getMousePosY());
+            long xEnd = x + FixedPointUtil.fromLong(width);
+            long yEnd = y + FixedPointUtil.fromLong(height);
+            long mousePosX = FixedPointUtil.fromLong(getLoop().getMousePosX(playerID));
+            long mousePosY = FixedPointUtil.fromLong(getLoop().getMousePosY(playerID));
 
-        hovered = mousePosX >= x && mousePosX <= xEnd && mousePosY >= y && mousePosY <= yEnd;
-        //endregion
+            hovered = mousePosX >= x && mousePosX <= xEnd && mousePosY >= y && mousePosY <= yEnd;
+            //endregion
 
-        if(getLoop().isKeyInputJustPressed("mouse_button_left") && hovered){
-            buttonListener.buttonPressed();
+            if(getLoop().isKeyInputJustPressed(playerID, "mouse_button_left") && hovered){
+                buttonListener.buttonPressed();
+            }
         }
     }
 

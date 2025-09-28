@@ -1,5 +1,6 @@
 package org.newdawn.spaceinvaders.game_object.ingame.loot_item;
 
+import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 import org.newdawn.spaceinvaders.loop.Loop;
 
@@ -12,7 +13,7 @@ public class FrozenItem extends LootItem {
         super(loop,"sprites/testFrozenItem.png");
     }
 
-    protected void onCollideWithPlayerShip(){
+    protected void onCollideWithPlayerShip(PlayerShip ship){
         if (getLoop() instanceof GameLoop){
             GameLoop gameLoop = (GameLoop)getLoop();
             gameLoop.requestToSlowDownEnemies();

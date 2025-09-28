@@ -16,8 +16,8 @@ public class BombSkill extends ActiveSkill {
     public BombSkill(){
         super();
     }
-    public BombSkill(PlayerShip playerShip, GameLoop gameLoop) {
-        super(skillName, skillSpriteRef, coolTime, playerShip, gameLoop);
+    public BombSkill(GameLoop gameLoop) {
+        super(skillName, skillSpriteRef, coolTime, gameLoop);
     }
 
     @Override

@@ -12,15 +12,15 @@ public abstract class ActiveSkill extends PlayerSkill{
     public ActiveSkill(){
         super();
     }
-    public ActiveSkill(String skillName, String skillSpriteRef, long coolTime, PlayerShip playerShip, GameLoop gameLoop) {
-        super(skillName, skillSpriteRef, playerShip, gameLoop);
+    public ActiveSkill(String skillName, String skillSpriteRef, long coolTime, GameLoop gameLoop) {
+        super(skillName, skillSpriteRef, gameLoop);
         this.coolTime = coolTime;
     }
 
     @Override
-    public boolean onAcquire(GameLoop gameLoop) {
+    public boolean onAcquire(GameLoop gameLoop, PlayerShip playerShip) {
         playerShip.setActiveSkill(this);
-
+        this.playerShip = playerShip;
         return true;
     }
     

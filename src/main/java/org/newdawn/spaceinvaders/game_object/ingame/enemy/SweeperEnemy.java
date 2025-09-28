@@ -17,7 +17,7 @@ public abstract class SweeperEnemy extends Enemy {
     }
 
     public void onBroadcast(){
-        goForwardAndCheckDeath();
+        goForwardAndCheckBoundary();
     }
 
     @Override
@@ -38,19 +38,23 @@ public abstract class SweeperEnemy extends Enemy {
 
     private void onCollideWall(){
         if(hiveMind == null) {
-            goForwardAndCheckDeath();
+            goForwardAndCheckBoundary();
         }
         else{
             hiveMind.requestBroadcast();
         }
     }
 
-    private void goForwardAndCheckDeath(){
+    private void goForwardAndCheckBoundary(){
         velocityX = -velocityX;
         
         setPosY(getPosY() + (10 << 16));
         if (getPosY() > (570 << 16)) {
-            ((GameLoop)getLoop()).notifyDeath();
+            onTouchBoundary();
         }
+    }
+
+    protected void onTouchBoundary(){
+        ((GameLoop)getLoop()).notifyLose();
     }
 }

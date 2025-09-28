@@ -14,8 +14,8 @@ public class LaserSkill extends ActiveSkill{
     public LaserSkill(){
         super();
     }
-    public LaserSkill(PlayerShip playerShip, GameLoop gameLoop) {
-        super(skillName, skillSpriteRef, coolTime, playerShip, gameLoop);
+    public LaserSkill(GameLoop gameLoop) {
+        super(skillName, skillSpriteRef, coolTime, gameLoop);
     }
 
     @Override

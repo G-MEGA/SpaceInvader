@@ -14,8 +14,8 @@ public class BarrierSkill extends ActiveSkill{
     public BarrierSkill(){
         super();
     }
-    public BarrierSkill(PlayerShip playerShip, GameLoop gameLoop) {
-        super(skillName, skillSpriteRef, coolTime, playerShip, gameLoop);
+    public BarrierSkill(GameLoop gameLoop) {
+        super(skillName, skillSpriteRef, coolTime, gameLoop);
     }
 
     @Override

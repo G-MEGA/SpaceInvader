@@ -8,7 +8,6 @@ import org.newdawn.spaceinvaders.loop.Loop;
 
 //TODO 싱글톤으로 바꾸기
 public class EnemyFactory extends GameObject{
-    PlayerShip playerShip;
     GameLoop gameLoop;
 
     static public final int AILEN = 0;
@@ -20,11 +19,10 @@ public class EnemyFactory extends GameObject{
     public EnemyFactory(){
         super();
     }
-    public EnemyFactory(GameLoop gameLoop, PlayerShip playerShip) {
+    public EnemyFactory(GameLoop gameLoop) {
         super(gameLoop);
 
         this.gameLoop = gameLoop;
-        this.playerShip = playerShip;
     }
 
     public Enemy spawnEnemy(HiveMind hiveMind, int enemyType, long spawnPosX, long spawnPosY) {
@@ -45,13 +43,13 @@ public class EnemyFactory extends GameObject{
                 enemy = new Alien(gameLoop, hiveMind);
                 break;
             case ARTILLERY:
-                enemy = new Artillery(gameLoop, hiveMind, playerShip);
+                enemy = new Artillery(gameLoop, hiveMind);
                 break;
             case GUARDIAN:
                 enemy = new Guardian(gameLoop, hiveMind);
                 break;
             case RAIDER:
-                enemy = new Raider(gameLoop, hiveMind, playerShip);
+                enemy = new Raider(gameLoop, hiveMind);
                 break;
         }
         if (enemy == null){

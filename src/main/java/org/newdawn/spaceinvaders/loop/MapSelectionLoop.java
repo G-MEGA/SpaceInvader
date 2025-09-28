@@ -1,13 +1,12 @@
 package org.newdawn.spaceinvaders.loop;
 
 import org.newdawn.spaceinvaders.Game;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
+import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.game_object.gui.Button;
 import org.newdawn.spaceinvaders.game_object.gui.IButtonListener;
 import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
 import org.newdawn.spaceinvaders.map_load.MapInfo;
-import org.newdawn.spaceinvaders.map_load.MapList;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -63,7 +62,7 @@ public class MapSelectionLoop extends Loop{
     }
 
     @Override
-    public void process(ArrayList<GameLoopInput> inputs) {
+    public void process(ArrayList<LoopInput> inputs) {
         super.process(inputs);
 
         processGameObjects();

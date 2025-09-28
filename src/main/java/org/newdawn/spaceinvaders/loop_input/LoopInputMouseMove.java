@@ -1,18 +1,18 @@
-package org.newdawn.spaceinvaders.game_loop_input;
+package org.newdawn.spaceinvaders.loop_input;
 
-public class GameLoopInputMouseMove extends GameLoopInput {
+public class LoopInputMouseMove extends LoopInput {
     public int posX;
     public int posY;
 
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
-    public GameLoopInputMouseMove(){
+    public LoopInputMouseMove(){
         super();
     }
-    public GameLoopInputMouseMove(int posX, int posY){
+    public LoopInputMouseMove(int posX, int posY){
         this.posX = posX;
         this.posY = posY;
     }
-    public GameLoopInputMouseMove(String data){
+    public LoopInputMouseMove(String data){
         String[] splited = data.trim().split(" ");
 
         if(!splited[0].equals("M")){

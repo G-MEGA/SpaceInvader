@@ -2,7 +2,7 @@ package org.newdawn.spaceinvaders.loop;
 
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.enums.GameLoopResultType;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
+import org.newdawn.spaceinvaders.loop_input.LoopInput;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,12 +22,12 @@ public class GameLoopPlayerLoop extends Loop{
     }
 
     @Override
-    public void process(ArrayList<GameLoopInput> inputs) {
+    public void process(ArrayList<LoopInput> inputs) {
         super.process(inputs);
 
 //          재시작
 //        if (result != GameLoopResultType.InGame && isKeyInputJustPressed("accept")) {
-//            GameLoopInputLog lastestLog = inputLogs.get(inputLogs.size()-1);
+//            LoopInputLog lastestLog = inputLogs.get(inputLogs.size()-1);
 //            inputLogs.clear();
 //
 //            currentFrame = 0;

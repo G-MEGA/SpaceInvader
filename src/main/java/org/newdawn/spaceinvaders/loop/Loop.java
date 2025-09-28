@@ -1,9 +1,9 @@
 package org.newdawn.spaceinvaders.loop;
 
 import org.newdawn.spaceinvaders.Game;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputKey;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputMouseMove;
+import org.newdawn.spaceinvaders.loop_input.LoopInput;
+import org.newdawn.spaceinvaders.loop_input.LoopInputKey;
+import org.newdawn.spaceinvaders.loop_input.LoopInputMouseMove;
 import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
@@ -59,7 +59,7 @@ public abstract class Loop  {
             }
         }
     }
-    public void process(ArrayList<GameLoopInput> inputs){
+    public void process(ArrayList<LoopInput> inputs){
         for(String keyInputName:isKeyInputJustPressed.keySet()){
             isKeyInputJustPressed.put(keyInputName, false);
         }
@@ -69,7 +69,7 @@ public abstract class Loop  {
 
 
         if(inputs != null && !inputs.isEmpty()) {
-            for (GameLoopInput input : inputs) {
+            for (LoopInput input : inputs) {
                 input(input);
             }
         }
@@ -78,16 +78,16 @@ public abstract class Loop  {
         process(null);
     }
 
-    private void input(GameLoopInput input){
-        if(input instanceof GameLoopInputKey){
-            inputKey((GameLoopInputKey)input);
+    private void input(LoopInput input){
+        if(input instanceof LoopInputKey){
+            inputKey((LoopInputKey)input);
         }
-        else if(input instanceof GameLoopInputMouseMove){
-            inputMouseMove((GameLoopInputMouseMove)input);
+        else if(input instanceof LoopInputMouseMove){
+            inputMouseMove((LoopInputMouseMove)input);
         }
     }
 
-    private void inputKey(GameLoopInputKey input){
+    private void inputKey(LoopInputKey input){
         if(input.pressed){
             if(isKeyInputPressed.get(input.name) == null || !isKeyInputPressed.get(input.name)){
                 isKeyInputJustPressed.put(input.name, true);
@@ -102,7 +102,7 @@ public abstract class Loop  {
         isKeyInputPressed.put(input.name, input.pressed);
     }
 
-    private void inputMouseMove(GameLoopInputMouseMove input) {
+    private void inputMouseMove(LoopInputMouseMove input) {
         mousePosX = input.posX;
         mousePosY = input.posY;
     }

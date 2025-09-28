@@ -1,12 +1,11 @@
 package org.newdawn.spaceinvaders.loop;
 
 import org.newdawn.spaceinvaders.Game;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputLog;
+import org.newdawn.spaceinvaders.loop_input.LoopInput;
+import org.newdawn.spaceinvaders.loop_input.LoopInputLog;
 import serializer.GameLoopSerializer;
 
 import java.awt.*;
-import java.io.*;
 import java.util.ArrayList;
 
 public class ReplayerLoop extends Loop{
@@ -15,7 +14,7 @@ public class ReplayerLoop extends Loop{
     long currentFrame;
     int currentLogIndex = 0;
 
-    ArrayList<GameLoopInputLog> inputLogs = new ArrayList<>();
+    ArrayList<LoopInputLog> inputLogs = new ArrayList<>();
     GameLoop gameLoop;
     int playSpeed = 1;
     boolean paused = false;
@@ -36,14 +35,14 @@ public class ReplayerLoop extends Loop{
         String[] splited = replaySaveData.trim().split("\n");
 
         for(String s: splited){
-            inputLogs.add(new GameLoopInputLog(s));
+            inputLogs.add(new LoopInputLog(s));
         }
 
         currentFrame = gameLoop.currentFrame;
     }
 
     @Override
-    public void process(ArrayList<GameLoopInput> inputs) {
+    public void process(ArrayList<LoopInput> inputs) {
         super.process(inputs);
 
         if(isKeyInputJustPressed("escape")) {
@@ -114,7 +113,7 @@ public class ReplayerLoop extends Loop{
                 return;
             }
 
-            GameLoopInputLog currentLog = inputLogs.get(currentLogIndex);
+            LoopInputLog currentLog = inputLogs.get(currentLogIndex);
 
             if(currentLog.inputFrame < gameLoop.currentFrame){
                 throw new IllegalStateException("currentLog.inputFrame < gameLoop.currentFrame");

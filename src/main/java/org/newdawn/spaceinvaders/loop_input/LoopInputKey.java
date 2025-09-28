@@ -1,18 +1,18 @@
-package org.newdawn.spaceinvaders.game_loop_input;
+package org.newdawn.spaceinvaders.loop_input;
 
-public class GameLoopInputKey extends GameLoopInput{
+public class LoopInputKey extends LoopInput {
     public String name;
     public boolean pressed;
 
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
-    public GameLoopInputKey(){
+    public LoopInputKey(){
         super();
     }
-    public GameLoopInputKey(String name, boolean pressed){
+    public LoopInputKey(String name, boolean pressed){
         this.name = name;
         this.pressed = pressed;
     }
-    public GameLoopInputKey(String data){
+    public LoopInputKey(String data){
         String[] splited = data.trim().split(" ");
 
         if(!splited[0].equals("K")){

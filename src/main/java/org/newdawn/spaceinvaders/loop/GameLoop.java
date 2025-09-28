@@ -5,23 +5,16 @@ import org.newdawn.spaceinvaders.enums.GameLoopResultType;
 import org.newdawn.spaceinvaders.enums.IndicatorTextType;
 import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputLog;
+import org.newdawn.spaceinvaders.loop_input.LoopInput;
+import org.newdawn.spaceinvaders.loop_input.LoopInputLog;
 import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import javax.swing.JFileChooser;
 
 import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
@@ -34,7 +27,7 @@ import random.SerializableRandom;
 
 public class GameLoop extends Loop {
     long currentFrame;
-    ArrayList<GameLoopInputLog> inputLogs = new ArrayList<>();
+    ArrayList<LoopInputLog> inputLogs = new ArrayList<>();
 
     private EnemyFactory enemyFactory;
 
@@ -343,15 +336,18 @@ public class GameLoop extends Loop {
 //            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외
 //            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외
 
+        // 현재 시간에 대한 인풋 하나 더 넣어서 마지막 입력으로부터 리플레이 저장 시점까지도 기록하게 함
+        inputLogs.add(new LoopInputLog(currentFrame, new ArrayList<LoopInput>()));
+
         StringBuilder sb = new StringBuilder();
-        for(GameLoopInputLog gameLoopInputLog : inputLogs){
-            String gameLoopInputLogData = gameLoopInputLog.toSaveData();
+        for(LoopInputLog loopInputLog : inputLogs){
+            String loopInputLogData = loopInputLog.toSaveData();
 
 //            리플레이 저장 입력 및 처리를 이 클래스에서 안하니 리플레이 녹화 버튼 입력이 리플레이 데이터에 들어가도 괜찮음
-//                if(gameLoopInputLogData.contains("record"))
+//                if(loopInputLogData.contains("record"))
 //                    continue;
 
-            sb.append(gameLoopInputLogData).append("\n");
+            sb.append(loopInputLogData).append("\n");
         }
 
         String data = sb.toString();
@@ -368,12 +364,12 @@ public class GameLoop extends Loop {
         }
     }
 
-    public void process(ArrayList<GameLoopInput> inputs){
+    public void process(ArrayList<LoopInput> inputs){
         super.process(inputs);
 
         // 프레임별 입력 기록
         if(inputs != null && !inputs.isEmpty()){
-            inputLogs.add(new GameLoopInputLog(currentFrame, inputs));
+            inputLogs.add(new LoopInputLog(currentFrame, inputs));
         }
 
         enemyHiveMind.broadcastIfRequested();

@@ -1,34 +1,34 @@
-package org.newdawn.spaceinvaders.game_loop_input;
+package org.newdawn.spaceinvaders.loop_input;
 
 
 import java.util.ArrayList;
 
-public class GameLoopInputLog  {
+public class LoopInputLog {
     public long inputFrame;
-    public ArrayList<GameLoopInput> inputs;
+    public ArrayList<LoopInput> inputs;
 
     private StringBuilder stringBuilder = new StringBuilder();
 
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
-    public GameLoopInputLog(){
+    public LoopInputLog(){
         super();
     }
-    public GameLoopInputLog(long inputFrame, ArrayList<GameLoopInput> inputs){
+    public LoopInputLog(long inputFrame, ArrayList<LoopInput> inputs){
         this.inputFrame = inputFrame;
         this.inputs = inputs;
     }
-    public GameLoopInputLog(String data){
+    public LoopInputLog(String data){
         String[] splited = data.trim().split("\t");
         inputFrame = Long.parseLong(splited[0]);
 
         inputs = new ArrayList<>();
         for(int i = 1; i < splited.length; i++){
             if(splited[i].startsWith("K")){
-                inputs.add(new GameLoopInputKey(splited[i]));
+                inputs.add(new LoopInputKey(splited[i]));
                 continue;
             }
             else if(splited[i].startsWith("M")){
-                inputs.add(new GameLoopInputMouseMove(splited[i]));
+                inputs.add(new LoopInputMouseMove(splited[i]));
                 continue;
             }
 
@@ -42,7 +42,7 @@ public class GameLoopInputLog  {
         stringBuilder.append(String.valueOf(inputFrame));
         stringBuilder.append("\t");
 
-        for(GameLoopInput input : inputs){
+        for(LoopInput input : inputs){
             stringBuilder.append(input.toSaveData());
             stringBuilder.append("\t");
         }

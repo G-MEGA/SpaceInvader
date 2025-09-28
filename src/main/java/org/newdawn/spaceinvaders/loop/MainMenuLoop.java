@@ -2,12 +2,11 @@ package org.newdawn.spaceinvaders.loop;
 
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
+import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.game_object.gui.Button;
 import org.newdawn.spaceinvaders.game_object.gui.IButtonListener;
 import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
-import org.newdawn.spaceinvaders.sprite.SpriteStore;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -116,7 +115,7 @@ public class MainMenuLoop extends Loop {
     }
 
     @Override
-    public void process(ArrayList<GameLoopInput> inputs) {
+    public void process(ArrayList<LoopInput> inputs) {
         super.process(inputs);
 
         t += getGame().fixedDeltaTime;

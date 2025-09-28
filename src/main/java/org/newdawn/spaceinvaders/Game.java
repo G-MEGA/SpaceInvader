@@ -9,9 +9,9 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputKey;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputMouseMove;
+import org.newdawn.spaceinvaders.loop_input.LoopInput;
+import org.newdawn.spaceinvaders.loop_input.LoopInputKey;
+import org.newdawn.spaceinvaders.loop_input.LoopInputMouseMove;
 import org.newdawn.spaceinvaders.loop.Loop;
 import org.newdawn.spaceinvaders.loop.MainMenuLoop;
 import org.newdawn.spaceinvaders.map_load.MapList;
@@ -57,7 +57,7 @@ public class Game extends Canvas
 	/** The game window that we'll update with the frame count */
 	private JFrame container;
 
-    private ArrayList<GameLoopInput> queuedInputs = new ArrayList<>();
+    private ArrayList<LoopInput> queuedInputs = new ArrayList<>();
 
 	/**
 	 * Construct our game and set it running.
@@ -204,8 +204,8 @@ public class Game extends Canvas
             else{
                 // process() 작동 중 들어오는 입력을 놓치지 않기 위하여
                 // process() 이전에 미리 교체
-                ArrayList<GameLoopInput> inputsForThisFrame = queuedInputs;
-                queuedInputs = new ArrayList<GameLoopInput>();
+                ArrayList<LoopInput> inputsForThisFrame = queuedInputs;
+                queuedInputs = new ArrayList<LoopInput>();
 
                 loop.process(inputsForThisFrame);
             }
@@ -258,7 +258,7 @@ public class Game extends Canvas
             String inputName = playerSetting.KeyToInputName(e.getKeyCode());
             if(inputName == null) return;
 
-            queuedInputs.add(new GameLoopInputKey(inputName, true));
+            queuedInputs.add(new LoopInputKey(inputName, true));
 		} 
 		
 		/**
@@ -272,7 +272,7 @@ public class Game extends Canvas
             String inputName = playerSetting.KeyToInputName(e.getKeyCode());
             if(inputName == null) return;
 
-            queuedInputs.add(new GameLoopInputKey(inputName, false));
+            queuedInputs.add(new LoopInputKey(inputName, false));
 		}
 
 		/**
@@ -306,7 +306,7 @@ public class Game extends Canvas
             String inputName = playerSetting.KeyToInputName(buttonCode);
             if(inputName == null) return;
 
-            queuedInputs.add(new GameLoopInputKey(inputName, true));
+            queuedInputs.add(new LoopInputKey(inputName, true));
         }
         @Override
         public void mouseReleased(MouseEvent e) {
@@ -328,21 +328,21 @@ public class Game extends Canvas
             String inputName = playerSetting.KeyToInputName(buttonCode);
             if(inputName == null) return;
 
-            queuedInputs.add(new GameLoopInputKey(inputName, false));
+            queuedInputs.add(new LoopInputKey(inputName, false));
         }
 
         @Override
         public void mouseMoved(MouseEvent e) {
             super.mouseMoved(e);
 
-            queuedInputs.add(new GameLoopInputMouseMove(e.getX(), e.getY()));
+            queuedInputs.add(new LoopInputMouseMove(e.getX(), e.getY()));
         }
 
         @Override
         public void mouseDragged(MouseEvent e) {
             super.mouseDragged(e);
 
-            queuedInputs.add(new GameLoopInputMouseMove(e.getX(), e.getY()));
+            queuedInputs.add(new LoopInputMouseMove(e.getX(), e.getY()));
         }
     }
 

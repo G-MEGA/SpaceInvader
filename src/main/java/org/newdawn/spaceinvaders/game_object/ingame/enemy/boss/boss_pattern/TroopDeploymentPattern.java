@@ -16,28 +16,30 @@ public class TroopDeploymentPattern extends BossPattern {
 
     public TroopDeploymentPattern(Loop loop, Boss boss) {
         super(loop, boss);
+        
     }
 
     @Override
     public void executePattern() {
         System.out.println("TroopDeploymentPattern executed");
-
-        int spawnCount = 7; //* 갯수가 홀수임을 가정함
-        long spawnPosXInterval = 200l << 16;
-        long startSpawnPosX = FixedPointUtil.sub(boss.getPosX(), FixedPointUtil.mul(spawnPosXInterval, (spawnCount / 2) << 16));
-        long raiderSpawnPosY = boss.getPosY() + (100 << 16);
-        long guardianSpawnPosY = boss.getPosY() + (300 << 16);
-
-        for (int i = 0;i < spawnCount; i++){
-            Enemy enemy;
-            if (i % 2 == 0){ //TODO GameLoop 좀 어캐 해보기
-                // enemy = ;
-            }
-            else{
-                // enemy = ;
-            }
-        }
-
         notifyPatternEnd();
+
+        // int spawnCount = 7; //* 갯수가 홀수임을 가정함
+        // long spawnPosXInterval = 200l << 16;
+        // long startSpawnPosX = FixedPointUtil.sub(boss.getPosX(), FixedPointUtil.mul(spawnPosXInterval, (spawnCount / 2) << 16));
+        // long raiderSpawnPosY = boss.getPosY() + (100 << 16);
+        // long guardianSpawnPosY = boss.getPosY() + (300 << 16);
+
+        // for (int i = 0;i < spawnCount; i++){
+        //     Enemy enemy;
+        //     if (i % 2 == 0){ //TODO GameLoop 좀 어캐 해보기
+        //         // enemy = ;
+        //     }
+        //     else{
+        //         // enemy = ;
+        //     }
+        // }
+
+        // notifyPatternEnd();
     }
 }

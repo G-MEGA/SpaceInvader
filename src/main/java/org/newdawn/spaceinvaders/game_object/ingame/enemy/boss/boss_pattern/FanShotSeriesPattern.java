@@ -31,6 +31,7 @@ public class FanShotSeriesPattern extends BossPattern {
         if (remainShootCount == 0){
             notifyPatternEnd();
             destroy();
+            return;
         }
         else{
             if (shootElapsed < shootInterval){

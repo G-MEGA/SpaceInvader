@@ -1,4 +1,4 @@
-package org.newdawn.spaceinvaders.game_object.ingame.enemy;
+package org.newdawn.spaceinvaders.game_object.ingame.enemy.common;
 
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;

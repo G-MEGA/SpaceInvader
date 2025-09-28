@@ -1,4 +1,4 @@
-package org.newdawn.spaceinvaders.game_object.ingame.enemy;
+package org.newdawn.spaceinvaders.game_object.ingame.enemy.common;
 
 import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
 import org.newdawn.spaceinvaders.loop.GameLoop;

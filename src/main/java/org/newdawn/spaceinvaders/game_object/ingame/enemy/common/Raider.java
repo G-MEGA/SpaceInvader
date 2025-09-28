@@ -1,9 +1,8 @@
-package org.newdawn.spaceinvaders.game_object.ingame.enemy;
+package org.newdawn.spaceinvaders.game_object.ingame.enemy.common;
 
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
-import org.newdawn.spaceinvaders.game_object.logic.IHiveMindListener;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class Raider extends SweeperEnemy{

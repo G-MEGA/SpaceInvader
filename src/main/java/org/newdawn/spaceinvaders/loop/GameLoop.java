@@ -285,6 +285,35 @@ public class GameLoop extends Loop {
             }
         }
 
+        Enemy boss = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.BOSS, 400 << 16, 300 << 16);
+        enemyCount++;
+        enemies.add(boss);
+
+        // for (long row=0L;row<5L;row++) {
+        //     Enemy enemy = null;
+        //     for (long x=0L;x<12L;x++) {
+        //         if (row == 4L){
+        //             enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.GUARDIAN, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+        //             enemy.setRotation(180 << 16);
+        //         }
+        //         else if (row == 3L){
+        //             enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.ARTILLERY, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+        //         }
+        //         else if (row == 3L){
+        //             enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.ARTILLERY, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+        //         }
+        //         else if (row == 10L){
+        //             enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.RAIDER, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+        //             enemy.setRotation(180 << 16);
+        //         }
+        //         else{
+        //             enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.AILEN, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+        //         }
+        //         enemyCount++;
+        //         enemies.add(enemy);
+        //     }
+        // }
+
         //* 상점 아이템 생성 슬롯
         BombSkill bombSkill = new BombSkill(this);
         StoreSlot storeSlot = new StoreSlot(this, 0, bombSkill, 600 << 16, 300 << 16);

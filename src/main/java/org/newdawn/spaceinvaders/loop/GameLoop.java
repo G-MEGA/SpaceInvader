@@ -25,7 +25,6 @@ import javax.swing.JFileChooser;
 
 import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
-import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BasicActiveSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BombSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.LaserSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.store.StoreSlot;
@@ -59,12 +58,20 @@ public class GameLoop extends Loop {
     private HiveMind enemyHiveMind = new HiveMind();
     private ArrayList<Enemy> enemies = new ArrayList<>();
 
-    /** The message to display which waiting for a key press */
-    private String message = "";
-    /** True if we're holding up game play until a key has been pressed */
-    private boolean waitingForKeyPress = false;
+    private GameLoopResultType gameResult = GameLoopResultType.InGame;
+    public GameLoopResultType getGameResult() {
+        return gameResult;
+    }
+    private void setGameResult(GameLoopResultType gameResult) {
+        if(this.gameResult !=  gameResult) {
+            this.gameResult = gameResult;
 
-    boolean forReplay = false;
+            onGameResultChanged();
+        }
+    }
+    private void onGameResultChanged() {
+        // 이를 GameLoopPlayerLoop에서 옵저버패턴으로 받아서 하이스코어 등록
+    }
 
     //* 게임 화면에 존재하는 Text UI들
     private TextRenderer scoreText;
@@ -139,17 +146,17 @@ public class GameLoop extends Loop {
     public GameLoop(){
         super();
     }
-    public GameLoop(Game game, int randomSeed){
-        this(game, randomSeed, false);
-    }
-    public GameLoop(Game game, int randomSeed, boolean forReplay){
+    public GameLoop(Game game, int randomSeed, int playerCount, String rawMapData){
         super(game);
 
-        startGame();
-
         random = new SerializableRandom(17L * randomSeed); // 소수 17을 곱해서 더 랜덤하게
+        parseMapData(rawMapData);
 
-        this.forReplay = forReplay;
+        startGame();
+    }
+    //TODO 오예준씨 맵 데이터 파싱 여기서 하면 됨
+    private void parseMapData(String rawMapData){
+
     }
 
     private void initText() {
@@ -286,9 +293,6 @@ public class GameLoop extends Loop {
     public long getCurrentTime(){
         return getGame().fixedDeltaTime * currentFrame;
     }
-    public boolean isWaitingForKeyPress(){
-        return waitingForKeyPress;
-    }
 
     //TODO notify류 메소드는 이벤트 버스 패턴으로 리펙토링하자...
     public void notifyBomb(){
@@ -302,8 +306,7 @@ public class GameLoop extends Loop {
      * Notification that the player has died.
      */
     public void notifyDeath() {
-        message = "Oh no! They got you, try again?";
-        waitingForKeyPress = true;
+        setGameResult(GameLoopResultType.Lose);
     }
 
     /**
@@ -311,8 +314,7 @@ public class GameLoop extends Loop {
      * are dead.
      */
     public void notifyWin() {
-        message = "Well done! You Win!";
-        waitingForKeyPress = true;
+        setGameResult(GameLoopResultType.Win);
     }
 
     /**
@@ -337,7 +339,7 @@ public class GameLoop extends Loop {
     }
 
     public String getReplayData(){
-//            forReplay 변수가 있으니 리플레이 녹화 버튼 입력이 리플레이 데이터에 들어가도 괜찮음
+//            리플레이 저장 입력 및 처리를 이 클래스에서 안하니 리플레이 녹화 버튼 입력이 리플레이 데이터에 들어가도 괜찮음
 //            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외
 //            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외
 
@@ -345,7 +347,7 @@ public class GameLoop extends Loop {
         for(GameLoopInputLog gameLoopInputLog : inputLogs){
             String gameLoopInputLogData = gameLoopInputLog.toSaveData();
 
-//            forReplay 변수가 있으니 리플레이 녹화 버튼 입력이 리플레이 데이터에 들어가도 괜찮음
+//            리플레이 저장 입력 및 처리를 이 클래스에서 안하니 리플레이 녹화 버튼 입력이 리플레이 데이터에 들어가도 괜찮음
 //                if(gameLoopInputLogData.contains("record"))
 //                    continue;
 
@@ -374,73 +376,9 @@ public class GameLoop extends Loop {
             inputLogs.add(new GameLoopInputLog(currentFrame, inputs));
         }
 
-        //region 로직
-        if (waitingForKeyPress && isKeyInputJustPressed("accept")) {
-            GameLoopInputLog lastestLog = inputLogs.get(inputLogs.size()-1);
-            inputLogs.clear();
+        enemyHiveMind.broadcastIfRequested();
 
-            currentFrame = 0;
-
-            lastestLog.inputFrame = currentFrame;
-
-            inputLogs.add(lastestLog);
-
-            startGame();
-            waitingForKeyPress = false;
-        }
-        if(isKeyInputJustPressed("escape")) {
-            getGame().changeLoop(new MainMenuLoop(getGame()));
-        }
-
-        //TODO 리플레이 저장 (임시)
-        if(!forReplay && isKeyInputJustPressed("record")) {
-            String data = getReplayData();
-
-            // JFileChooser 객체 생성
-            JFileChooser chooser = new JFileChooser();
-
-            // 파일 저장 다이얼로그를 현재 프레임(this) 중앙에 띄움
-            int result = chooser.showSaveDialog(getGame());
-
-            // 사용자가 '저장' 버튼을 눌렀는지 확인
-            if (result == JFileChooser.APPROVE_OPTION) {
-                // 저장할 파일 경로를 File 객체로 받아옴
-                File fileToSave = chooser.getSelectedFile();
-
-                String filePath = fileToSave.getAbsolutePath(); // 저장할 파일 경로
-
-                if (!filePath.endsWith(".txt")) {
-                    fileToSave = new File(fileToSave.getAbsolutePath() + ".txt");
-                    filePath = fileToSave.getAbsolutePath();
-                }
-
-                try {
-                    // Path 객체 생성
-                    Path path = Paths.get(filePath);
-
-                    // 파일에 문자열 쓰기 (기본 인코딩은 UTF-8)
-                    Files.writeString(path, data);
-
-                    System.out.println("파일 저장 성공");
-
-                } catch (IOException e) {
-                    System.err.println("파일 저장 중 오류가 발생");
-                    e.printStackTrace();
-                }
-            }
-
-            inputLogs.clear();
-
-            // 쓸데없는 예외가 생길 가능성을 봉쇄하기 위하여
-            // 리플레이 저장 즉시 메인메뉴로 사출
-            getGame().changeLoop(new MainMenuLoop(getGame()));
-        }
-
-        if(!waitingForKeyPress){
-            enemyHiveMind.broadcastIfRequested();
-
-            processGameObjects();
-        }
+        processGameObjects();
 
         //* TextUI 관련 로직
         updateText();
@@ -454,7 +392,7 @@ public class GameLoop extends Loop {
         }
 
         //endreigon
-        if (!waitingForKeyPress){
+        if (gameResult ==  GameLoopResultType.InGame){
             if (scoredTimeElapsed >= scoringTimeInterval){
                 increaseScore(scoringScore);
                 scoredTimeElapsed = 0;
@@ -469,13 +407,5 @@ public class GameLoop extends Loop {
 
     public void draw(Graphics2D g) {
         super.draw(g);
-        // if we're waiting for an "any key" press then draw the
-        // current message
-        if (waitingForKeyPress) {
-            g.setColor(Color.white);
-            g.drawString(message,(800-g.getFontMetrics().stringWidth(message))/2,250);
-            g.drawString("Press 'Accept' key",(800-g.getFontMetrics().stringWidth("Press 'Accept' key"))/2,300);
-        }
-        
     }
 }

@@ -38,8 +38,10 @@ public class GameLoop extends Loop {
 
     private int score = 0;
     public int getScore() { return score; }
-    public void increaseScore() { increaseScore(100); }
-    public void increaseScore(int amount) { score += amount; }
+    public void increaseScore() {increaseScore(100); }
+    public void increaseScore(int amount) {
+        if(gameResult != GameLoopResultType.InGame)return;
+        score += amount;}
     private final long scoringTimeInterval = FixedPointUtil.ZERO_01;
     private final int scoringScore = 1;
     private long scoredTimeElapsed = 0;

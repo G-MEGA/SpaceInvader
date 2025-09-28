@@ -217,7 +217,7 @@ public abstract class Loop  {
 //        System.out.println((System.nanoTime() - nanos)/1000_000.0 + "밀리초");
     }
 
-    protected final void processGameObjects(){
+    protected void processGameObjects(){
         gameObjectsInProcessing.clear();
         gameObjectsInProcessing.addAll(gameObjects);
 

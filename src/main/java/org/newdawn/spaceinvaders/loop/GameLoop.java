@@ -327,6 +327,8 @@ public class GameLoop extends Loop {
         for (Enemy enemy : enemies) {
             enemy.decreaseHealth(bombDamage);
         }
+        
+        cleanUpEnemies();
     }
 
     /**
@@ -445,5 +447,14 @@ public class GameLoop extends Loop {
 
     public void draw(Graphics2D g) {
         super.draw(g);
+    }
+
+    private void cleanUpEnemies() {
+        //* 파괴된 enemy를 enemies 리스트에서 제거
+        for(int i=enemies.size() - 1 ; i > -1;i--){
+            if(enemies.get(i).isDestroyed()){
+                enemies.remove(i);
+            }
+        }
     }
 }

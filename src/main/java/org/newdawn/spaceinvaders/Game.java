@@ -97,8 +97,8 @@ public class Game extends Canvas
         SpriteStore.get().getSprite("sprites/enemy/enemyOnHit3.png", 32 << 16, 32 << 16);
 		SpriteStore.get().getSprite("sprites/enemy/enemyBullet.png", 6L << 16, (11 << 16) + FixedPointUtil.ZERO_5);
 
-		SpriteStore.get().getSprite("sprites/enemy/boss.png", 400 << 16, 300 << 16);
-		SpriteStore.get().getSprite("sprites/enemy/bossOnHit.png", 400 << 16, 300 << 16);
+		SpriteStore.get().getSprite("sprites/enemy/boss.png", 287 << 16, (63 << 16) + FixedPointUtil.ZERO_5);
+		SpriteStore.get().getSprite("sprites/enemy/bossOnHit.png", 287 << 16, (63 << 16) + FixedPointUtil.ZERO_5);
 
         //* Loading Skill Icon Sprites
         SpriteStore.get().getSprite("sprites/testPassiveSkill.png", 32 << 16, 32 << 16);

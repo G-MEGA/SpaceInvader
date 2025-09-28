@@ -285,7 +285,7 @@ public class GameLoop extends Loop {
             }
         }
 
-        Enemy boss = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.BOSS, 400 << 16, 300 << 16);
+        Enemy boss = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.BOSS, 400 << 16, 63 << 16);
         enemyCount++;
         enemies.add(boss);
 

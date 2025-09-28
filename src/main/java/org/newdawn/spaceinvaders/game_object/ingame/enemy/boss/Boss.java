@@ -75,17 +75,6 @@ public class Boss extends Enemy{
 
     @Override
     public void onBroadcast() {}
-
-    @Override
-    protected void setCollider(Loop loop) {
-        Collider2D collider2D = new Collider2D(loop, this);
-        collider2D.boundsPosX = FixedPointUtil.add(-spriteRenderer.getSpritePivotX(), 106 << 16);
-        collider2D.boundsPosY = -spriteRenderer.getSpritePivotY();
-        collider2D.boundsWidth = 574 << 16;
-        collider2D.boundsHeight = 150 << 16;
-        collider2D.setDrawBounds(true);
-        addChild(collider2D);
-    }
     
     @Override
     protected void draw(Graphics2D g){

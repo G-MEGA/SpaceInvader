@@ -54,8 +54,15 @@ public class FanShotSeriesPattern extends BossPattern {
     }
 
     private void shootBullets() {
-        //TODO boss 이미지을 파츠별로 나누게하기
-        EnemyBullet bullet = new EnemyBullet((GameLoop)getLoop(), boss.getRotation(), 400l << 16, 300l << 16, 20l, FixedPointUtil.fromLong(200L));
-        getLoop().addGameObject(bullet);
+        EnemyBullet bullet;
+
+        for (int i = 0; i < 9; i++){
+            long shootPosOffsetX = FixedPointUtil.fromLong(-40 + 10 * i);
+            long shootAngleOffset = FixedPointUtil.fromLong(-60 + 15 * i);
+
+            bullet = new EnemyBullet((GameLoop)getLoop(), boss.getRotation() + shootAngleOffset, boss.getPosX() + shootPosOffsetX, boss.getPosY() + (63 << 16), 20l, FixedPointUtil.fromLong(350L));
+            getLoop().addGameObject(bullet);
+        }
+
     }
 }

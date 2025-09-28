@@ -7,7 +7,7 @@ import org.newdawn.spaceinvaders.loop.Loop;
 
 
 public abstract class BossPattern extends GameObject {
-    private Boss boss;
+    protected Boss boss;
 
     // 패턴 1: 오른쪽, 왼쪽에서 플레이어를 향해 10개의 탄환을 각각 0.7초의 간격으로 발사
     public static final int SIDE_BULLET_STREAM = 1;

@@ -4,7 +4,6 @@ import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.Mover2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
-import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
@@ -36,6 +35,8 @@ public abstract class Bullet extends Mover2D implements ICollider2DOwner {
         
         //* 현재 Bullet Sprite가 -90도 회전 되어있어서 이를 맞추기위한 연산
         spawnAngle += 90 << 16;
+
+        //TODO spawnOffset을 고정 소수점으로 받게 만들기
         long spawnX = spawnCentralX + FixedPointUtil.mul(FixedPointUtil.cos(spawnAngle), FixedPointUtil.fromLong(spawnOffset));
         long spawnY = spawnCentralY + FixedPointUtil.mul(FixedPointUtil.sin(spawnAngle), FixedPointUtil.fromLong(spawnOffset));
         setPosX(spawnX);

@@ -111,7 +111,7 @@ public class Game extends Canvas
 		SpriteStore.get().getSprite("sprites/scoringItem.png", 12 << 16, 12 << 16);
 		SpriteStore.get().getSprite("sprites/whiteBackground.png", 400 << 16, 300 << 16, 100 << 16);
 
-        loop = new MainMenuLoop(this);  // 게임 시작 후 가장 처음 진입할 Loop
+        changeLoop(new MainMenuLoop(this));  // 게임 시작 후 가장 처음 진입할 Loop);
 
         mapList = new MapList();
 
@@ -353,7 +353,16 @@ public class Game extends Canvas
 
 
 
+    //TODO 루프 바꿀 때마다 RUDPPeer에 옵저버로 연결해주는거 처리해줘야함
     public void changeLoop(Loop loop) {
+        if(this.loop != null){
+            //TODO RUDPPeer에서 제거
+        }
+
         this.loop = loop;
+
+        if(this.loop != null){
+            //TODO RUDPPeer에 추가
+        }
     }
 }

@@ -18,6 +18,7 @@ public class Guardian extends SweeperEnemy{
     }
     public Guardian(GameLoop gameLoop, HiveMind hiveMind){
         super(gameLoop, hiveMind,1);
+
     }
     
     @Override
@@ -54,10 +55,10 @@ public class Guardian extends SweeperEnemy{
             hitAnimationElapsed = 0;
     
             spriteRenderer.setSpriteRef(onHitFrames.get(frameNumber));
-            
             return;
         }
         
         super.onHit(damage);
     }
+    
 }

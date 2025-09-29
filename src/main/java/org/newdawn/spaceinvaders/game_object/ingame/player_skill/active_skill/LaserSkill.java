@@ -1,9 +1,7 @@
 package org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill;
 
-import org.newdawn.spaceinvaders.game_object.ingame.Laser;
-import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
+import org.newdawn.spaceinvaders.game_object.ingame.PlayerLaser;
 import org.newdawn.spaceinvaders.loop.GameLoop;
-import org.newdawn.spaceinvaders.loop.Loop;
 
 public class LaserSkill extends ActiveSkill{
     private static final String skillSpriteRef = "sprites/testActiveSkill.png";
@@ -23,7 +21,7 @@ public class LaserSkill extends ActiveSkill{
         long spawnPosX = playerShip.getPosX();
         long spawnPosY = playerShip.getPosY();
         long spawnAngle = playerShip.getRotation();
-        Laser laser = new Laser(gameLoop, spawnPosX, spawnPosY, 20L, spawnAngle);
+        PlayerLaser laser = new PlayerLaser(gameLoop, spawnPosX, spawnPosY, 20L, spawnAngle);
         gameLoop.addGameObject(laser);
     }
 }

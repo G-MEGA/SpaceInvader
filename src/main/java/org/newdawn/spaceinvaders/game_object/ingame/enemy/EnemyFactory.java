@@ -2,9 +2,13 @@ package org.newdawn.spaceinvaders.game_object.ingame.enemy;
 
 import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.boss.Boss;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.common.Alien;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.common.Artillery;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.common.Guardian;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.common.Raider;
 import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
 import org.newdawn.spaceinvaders.loop.GameLoop;
-import org.newdawn.spaceinvaders.loop.Loop;
 
 //TODO 싱글톤으로 바꾸기
 public class EnemyFactory extends GameObject{
@@ -14,6 +18,7 @@ public class EnemyFactory extends GameObject{
     static public final int ARTILLERY = 1;
     static public final int GUARDIAN = 2;
     static public final int RAIDER = 3;
+    static public final int BOSS = 4;
 
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public EnemyFactory(){
@@ -51,6 +56,9 @@ public class EnemyFactory extends GameObject{
             case RAIDER:
                 enemy = new Raider(gameLoop, hiveMind);
                 break;
+            case BOSS:
+                enemy = new Boss(gameLoop);
+                break;
         }
         if (enemy == null){
             System.err.println(enemyType + "은 존재하지 않은 enemyType 입니다.");
@@ -65,7 +73,7 @@ public class EnemyFactory extends GameObject{
             gameLoop.addGameObject(enemyWarner);
             return enemy;
         }
-
+        
         gameLoop.addGameObject(enemy);
         return enemy;
     }

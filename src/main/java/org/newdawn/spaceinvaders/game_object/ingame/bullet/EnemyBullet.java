@@ -10,6 +10,7 @@ public class EnemyBullet extends Bullet{
     public EnemyBullet(){
         super();
     }
+
     public EnemyBullet(GameLoop gameLoop, long spawnAngle, long spawnCentralX, long spawnCentralY, long spawnOffset, long spawnSpeed) {
         super(gameLoop, spawnAngle, spawnCentralX, spawnCentralY, spawnOffset, spawnSpeed, spriteRef);
     }

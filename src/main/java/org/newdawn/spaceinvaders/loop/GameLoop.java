@@ -30,6 +30,7 @@ public class GameLoop extends Loop {
     ArrayList<LoopInputLog> inputLogs = new ArrayList<>();
 
     private EnemyFactory enemyFactory;
+    public EnemyFactory getEnemyFactory() { return enemyFactory; }
 
     SerializableRandom random;
     public SerializableRandom getRandom() {
@@ -68,6 +69,8 @@ public class GameLoop extends Loop {
     /** The number of enemies left on the screen */
     private int enemyCount;
     private HiveMind enemyHiveMind = new HiveMind();
+    public HiveMind getEnemyHiveMind() { return enemyHiveMind; }
+
     private ArrayList<Enemy> enemies = new ArrayList<>();
 
     private GameLoopResultType gameResult = GameLoopResultType.InGame;
@@ -262,30 +265,35 @@ public class GameLoop extends Loop {
         //endregion
 
         enemyFactory = new EnemyFactory(this);
+        enemyCount++; //TODO enemyCount를 배열 크기로바꾸기
 
         // create a block of aliens (5 rows, by 12 aliens, spaced evenly)
         enemyCount = 0;
-        for (long row=0L;row<5L;row++) {
-            Enemy enemy = null;
-            for (long x=0L;x<12L;x++) {
-                if (row == 4L){
-                    enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.GUARDIAN, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
-                    enemy.setRotation(180 << 16);
-                }
-                else if (row == 3L){
-                    enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.ARTILLERY, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
-                }
-                else if (row == 2L){
-                    enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.RAIDER, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
-                    enemy.setRotation(180 << 16);
-                }
-                else{
-                    enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.AILEN, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
-                }
-                enemyCount++;
-                enemies.add(enemy);
-            }
-        }
+        // for (long row=0L;row<5L;row++) {
+        //     Enemy enemy = null;
+        //     for (long x=0L;x<12L;x++) {
+        //         if (row == 4L){
+        //             enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.GUARDIAN, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+        //             enemy.setRotation(180 << 16);
+        //         }
+        //         else if (row == 3L){
+        //             enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.ARTILLERY, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+        //         }
+        //         else if (row == 2L){
+        //             enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.RAIDER, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+        //             enemy.setRotation(180 << 16);
+        //         }
+        //         else{
+        //             enemy = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.AILEN, (100 << 16)+(x*(50 << 16)), (50 << 16) + (row << 16) * 30);
+        //         }
+        //         enemyCount++;
+        //         enemies.add(enemy);
+        //     }
+        // }
+
+        Enemy boss = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.BOSS, 400 << 16, 63 << 16);
+        enemyCount++;
+        enemies.add(boss);
 
         //* 상점 아이템 생성 슬롯
         BombSkill bombSkill = new BombSkill(this);
@@ -329,6 +337,8 @@ public class GameLoop extends Loop {
         for (Enemy enemy : enemies) {
             enemy.decreaseHealth(bombDamage);
         }
+        
+        cleanUpEnemies();
     }
 
     /**
@@ -374,6 +384,12 @@ public class GameLoop extends Loop {
                         ((Enemy) gameObject).velocityX,
                         FixedPointUtil.ONE + FixedPointUtil.ZERO_02);
             }
+        }
+    }
+
+    public void notifyPlayerShipsSlowDown(long slowDownRatio, long slowDownTime){
+        for (PlayerShip ship : ships) {
+            ship.notifySlowDown(slowDownRatio, slowDownTime);
         }
     }
 
@@ -447,5 +463,14 @@ public class GameLoop extends Loop {
 
     public void draw(Graphics2D g) {
         super.draw(g);
+    }
+
+    private void cleanUpEnemies() {
+        //* 파괴된 enemy를 enemies 리스트에서 제거
+        for(int i=enemies.size() - 1 ; i > -1;i--){
+            if(enemies.get(i).isDestroyed()){
+                enemies.remove(i);
+            }
+        }
     }
 }

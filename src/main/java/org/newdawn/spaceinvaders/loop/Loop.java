@@ -1,5 +1,11 @@
 package org.newdawn.spaceinvaders.loop;
 
+import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.loop_input.LoopInputKey;
@@ -7,13 +13,6 @@ import org.newdawn.spaceinvaders.loop_input.LoopInputMouseMove;
 import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
-
-import java.awt.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 public abstract class Loop  {
     private transient Game game;

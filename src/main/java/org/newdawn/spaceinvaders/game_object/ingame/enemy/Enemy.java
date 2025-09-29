@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.GameCharacter;
-import org.newdawn.spaceinvaders.game_object.Mover2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
@@ -13,8 +12,8 @@ import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
 import org.newdawn.spaceinvaders.game_object.logic.IHiveMindListener;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
+import org.newdawn.spaceinvaders.loop.Loop;
 import org.newdawn.spaceinvaders.singleton.LootItemFactory;
-import org.newdawn.spaceinvaders.sprite.Sprite;
 
 public abstract class Enemy extends GameCharacter implements IHiveMindListener {
     protected HiveMind hiveMind;
@@ -58,12 +57,7 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
             System.out.println("addSprites() 구현시 하나 이상의 sprite를 삽입하지 않았습니다.");
         }
         
-        Collider2D collider2D = new Collider2D(gameLoop, this);
-        collider2D.boundsPosX = -spriteRenderer.getSpritePivotX();
-        collider2D.boundsPosY = -spriteRenderer.getSpritePivotY();
-        collider2D.boundsWidth = ((long)spriteRenderer.getSpriteWidth()) << 16;
-        collider2D.boundsHeight = ((long)spriteRenderer.getSpriteHeight()) << 16;
-        addChild(collider2D);
+        setCollider(gameLoop);
     }
 
     public Enemy(GameLoop gameLoop, HiveMind hiveMind, long initialHealth){
@@ -71,6 +65,15 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
 
         this.hiveMind = hiveMind;
         this.hiveMind.addListener(this);
+    }
+
+    protected void setCollider(Loop loop){
+        Collider2D collider2D = new Collider2D(loop, this);
+        collider2D.boundsPosX = -spriteRenderer.getSpritePivotX();
+        collider2D.boundsPosY = -spriteRenderer.getSpritePivotY();
+        collider2D.boundsWidth = ((long)spriteRenderer.getSpriteWidth()) << 16;
+        collider2D.boundsHeight = ((long)spriteRenderer.getSpriteHeight()) << 16;
+        addChild(collider2D);
     }
 
     @Override

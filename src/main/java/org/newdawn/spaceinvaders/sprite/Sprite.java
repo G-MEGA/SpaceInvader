@@ -1,9 +1,10 @@
 package org.newdawn.spaceinvaders.sprite;
 
-import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
-
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.geom.AffineTransform;
+
+import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 
 /**
  * A sprite to be displayed on the screen. Note that a sprite
@@ -17,9 +18,9 @@ import java.awt.geom.AffineTransform;
 public class Sprite {
 	/** The image to be drawn for this sprite */
 	private Image image;
-    private long pivotX, pivotY;
-    private long scale;
-    private AffineTransform transform = new AffineTransform();
+        private long pivotX, pivotY;
+        private long scale;
+        private AffineTransform transform = new AffineTransform();
 	private int width;
 	private int height;
 	/**

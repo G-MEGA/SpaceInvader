@@ -14,6 +14,6 @@ public class BatteryItem extends LootItem {
     }
 
     protected void onCollideWithPlayerShip(PlayerShip ship){
-        ship.requestToSpeedUp();
+        ship.notifySpeedUp();
     }
 }

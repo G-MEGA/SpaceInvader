@@ -10,7 +10,6 @@ import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 import org.newdawn.spaceinvaders.game_object.ingame.bullet.EnemyBullet;
 import org.newdawn.spaceinvaders.game_object.ingame.bullet.PlayerBullet;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
-
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.ActiveSkill;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
@@ -157,6 +156,22 @@ public class PlayerShip extends GameCharacter{
     private long speedUpRatio = 2 << 16 + FixedPointUtil.ZERO_5;
     private long speedUpTime = 4 << 16;
     private long speedUpElapsed = 0;
+    public void notifySpeedUp(){
+        isSpeedUp = true;
+        speedUpElapsed = 0;
+    }
+
+    private Boolean isSlowDown = false;
+    private long slowDownElapsed = 0;
+    private long slowDownRatio;
+    private long slowDownTime;
+    public void notifySlowDown(long slowDownRatio, long slowDownTime){
+        isSlowDown = true;
+        slowDownElapsed = 0;
+
+        this.slowDownRatio = slowDownRatio;
+        this.slowDownTime = slowDownTime;
+    }
 
     private long reflexibleElapsed = 0;
     private final long reflexibleTime = 2L << 16;
@@ -164,10 +179,6 @@ public class PlayerShip extends GameCharacter{
 
     SpriteRenderer spriteRenderer;
     public SpriteRenderer getSpriteRenderer() { return spriteRenderer; }
-    public void requestToSpeedUp(){
-        isSpeedUp = true;
-        speedUpElapsed = 0;
-    }
 
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public PlayerShip(){
@@ -227,6 +238,19 @@ public class PlayerShip extends GameCharacter{
                 speedUpElapsed += deltaTime;
                 velocityX = FixedPointUtil.mul(velocityX, speedUpRatio);
                 velocityY = FixedPointUtil.mul(velocityY, speedUpRatio);
+            }
+        }
+
+        //* 만약 SlowUp된 상태면 PlayerShip의 이동 속도를 감소 시킴
+        if (isSlowDown){
+            if (slowDownElapsed >= slowDownTime){
+                isSlowDown = false;
+                slowDownElapsed = 0;
+            }
+            else{
+                slowDownElapsed += deltaTime;
+                velocityX = FixedPointUtil.mul(velocityX, slowDownRatio);
+                velocityY = FixedPointUtil.mul(velocityY, slowDownRatio);
             }
         }
 
@@ -309,9 +333,19 @@ public class PlayerShip extends GameCharacter{
             enemyBullet.onHitByPlayerShip();
             // enemyBullet.destroy();
         }
+        else if (collider instanceof EnemyLaser){
+            onHurt(collider);
+        }
     }
 
     private void onHurt(ICollider2DOwner collider){
+        //TODO 흠.. 이게 맞나?
+        if (collider instanceof EnemyLaser){
+            decreaseHealth(_health);
+            ((GameLoop)getLoop()).notifyPlayerShipDeath();
+            destroy();
+        }
+
         if (isReflexible && collider instanceof EnemyBullet){
             GameLoop gameLoop = (GameLoop)getLoop();
             EnemyBullet enemyBullet = (EnemyBullet)collider;

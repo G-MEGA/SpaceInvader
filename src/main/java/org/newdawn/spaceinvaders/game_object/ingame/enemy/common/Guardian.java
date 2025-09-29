@@ -1,13 +1,7 @@
-package org.newdawn.spaceinvaders.game_object.ingame.enemy;
+package org.newdawn.spaceinvaders.game_object.ingame.enemy.common;
 
-import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
-import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
-import org.newdawn.spaceinvaders.game_object.ingame.loot_item.LootItem;
 import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
 import org.newdawn.spaceinvaders.loop.GameLoop;
-import org.newdawn.spaceinvaders.singleton.LootItemFactory;
-import org.newdawn.spaceinvaders.sprite.Sprite;
-import org.newdawn.spaceinvaders.sprite.SpriteStore;
 
 public class Guardian extends SweeperEnemy{
     private Boolean hasShield = true;

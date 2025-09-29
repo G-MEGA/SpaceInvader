@@ -1,12 +1,18 @@
 package org.newdawn.spaceinvaders.game_object.gui;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.loop.Loop;
 
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-
 public class TextRenderer extends GameObject2D {
+    public static int DEFAULT = 0;
+    public static int BOLD = 1;
+    public static int ITALIC = 2;
+
     String text;
     public void setText(String text)
     {

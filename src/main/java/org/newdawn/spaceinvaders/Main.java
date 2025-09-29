@@ -7,17 +7,23 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import firebase.FirebaseClientAuth;
 import networking.Network;
+import networking.rudp.IRUDPPeerListener;
+import networking.rudp.PacketData.PacketData;
+import networking.rudp.PacketData.PacketDataC2SAuth;
+import networking.rudp.PacketData.PacketDataS2CAuthOK;
+import networking.rudp.RUDPPeer;
 import serializer.GameLoopSerializer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 
 public class Main {
     final String SERVER_IP = "34.67.77.26";
 //    final String SERVER_IP = "127.0.0.1";
 
-    Client client;
+    RUDPPeer rudpPeer;
 
     JFrame authFrame;
     Container authContainer;
@@ -25,47 +31,41 @@ public class Main {
     Container loginContainer;
     Container registerContainer;
 
-    public Main(){
+    public Main() throws Exception {
         GameLoopSerializer.getInstance();// GameLoopSerializer 초기화
 
-        client =  new Client();
-        Network.register(client);
-        client.addListener(new Listener(){
-            @Override
-            public void connected(Connection connection) {
-                System.out.println("connected");
-            }
+        rudpPeer = new RUDPPeer(Network.PEER_UDP_PORT);
+        rudpPeer.addListener(
+                new IRUDPPeerListener() {
+                    @Override
+                    public void onConnected(RUDPPeer peer, networking.rudp.Connection connection) {
+                        System.out.println(connection.getAddress().getAddress().getHostAddress() + " connected");
+                        if (connection.getAddress().getAddress().getHostAddress().equals(SERVER_IP)) {
+                            connection.tag = "server";
+                        }
+                    }
 
-            @Override
-            public void received(Connection connection, Object object) {
-                if(object instanceof Network.S2CAuthOK) {
-                    if (((Network.S2CAuthOK)object).ok)
-                        authFrame.dispose();
-                    startGame();
+                    @Override
+                    public void onDisconnected(RUDPPeer peer, networking.rudp.Connection connection) {
+                        if (connection.getAddress().getAddress().getHostAddress().equals(SERVER_IP)) {
+                        System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
+                        System.exit(0);
+                        }
+                    }
+
+                    @Override
+                    public void onReceived(RUDPPeer peer, networking.rudp.Connection connection, PacketData data) {
+                        if(data instanceof PacketDataS2CAuthOK) {
+                            System.out.println("서버 측 인증 결과 " + ((PacketDataS2CAuthOK)data).ok);
+                            if (((PacketDataS2CAuthOK)data).ok) authFrame.dispose();
+                            startGame();
+                        }
+                    }
                 }
-                else if(object instanceof Network.Hello) {
-                    System.out.print(connection.getID());
-                    System.out.print(" Hello ");
-                    System.out.println(((Network.Hello) object).content);
-                }
-            }
+        );
 
-            @Override
-            public void disconnected(Connection connection) {
-                System.out.println("disconnected");
-                System.exit(0);
-            }
-        });
-
-        client.start();
-        try {
-            client.connect(5000, SERVER_IP, Network.PORT_TCP, Network.PORT_UDP);
-        } catch (IOException e) {
-            System.out.println("서버에 연결할 수 없습니다.");
-            System.out.println(e.getMessage());
-            System.exit(0);
-            throw new RuntimeException(e);
-        }
+        rudpPeer.start();
+        rudpPeer.connect(new InetSocketAddress(SERVER_IP, Network.SERVER_UDP_PORT));
 
         authFrame = new JFrame("로그인/회원가입");
         authFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -241,16 +241,21 @@ public class Main {
         authFrame.setResizable(false);
         authFrame.setLocationRelativeTo(null);//창을 디스플레이 가운데 배치
         authFrame.setVisible(true);
+
+        while(authFrame.isDisplayable()){
+            Thread.sleep(100);
+            rudpPeer.processReceivedData();
+        }
     }
     public void startGame(){
         Game g = new Game(60L << 16);
         g.loop();
     }
-    public void tryAuth(String authToken){
-        client.sendTCP(new Network.C2SAuth(authToken));
+    public void tryAuth(String authToken) throws Exception {
+        rudpPeer.broadcastAboutTag("server", new PacketDataC2SAuth(authToken));
     }
 
-    public static void main(String[] argv) {
+    public static void main(String[] argv) throws Exception {
         new Main();
     }
 }

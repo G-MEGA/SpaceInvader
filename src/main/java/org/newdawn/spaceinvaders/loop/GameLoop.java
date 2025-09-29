@@ -30,6 +30,7 @@ public class GameLoop extends Loop {
     ArrayList<LoopInputLog> inputLogs = new ArrayList<>();
 
     private EnemyFactory enemyFactory;
+    public EnemyFactory getEnemyFactory() { return enemyFactory; }
 
     SerializableRandom random;
     public SerializableRandom getRandom() {
@@ -66,6 +67,8 @@ public class GameLoop extends Loop {
     /** The number of enemies left on the screen */
     private int enemyCount;
     private HiveMind enemyHiveMind = new HiveMind();
+    public HiveMind getEnemyHiveMind() { return enemyHiveMind; }
+
     private ArrayList<Enemy> enemies = new ArrayList<>();
 
     private GameLoopResultType gameResult = GameLoopResultType.InGame;
@@ -260,6 +263,7 @@ public class GameLoop extends Loop {
         //endregion
 
         enemyFactory = new EnemyFactory(this);
+        enemyCount++; //TODO enemyCount를 배열 크기로바꾸기
 
         // create a block of aliens (5 rows, by 12 aliens, spaced evenly)
         enemyCount = 0;

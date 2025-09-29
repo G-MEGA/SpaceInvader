@@ -1,10 +1,9 @@
 package org.newdawn.spaceinvaders.game_object.ingame.enemy.boss.boss_pattern;
 
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
-import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.EnemyFactory;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.boss.Boss;
-import org.newdawn.spaceinvaders.game_object.ingame.enemy.common.Guardian;
-import org.newdawn.spaceinvaders.game_object.ingame.enemy.common.Raider;
+import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 import org.newdawn.spaceinvaders.loop.Loop;
 
@@ -16,27 +15,29 @@ public class TroopDeploymentPattern extends BossPattern {
 
     public TroopDeploymentPattern(Loop loop, Boss boss) {
         super(loop, boss);
-        
     }
 
     @Override
     public void executePattern() {
         System.out.println("TroopDeploymentPattern executed");
-        // notifyPatternEnd();
+        GameLoop gameLoop = (GameLoop)getLoop();
+
+        EnemyFactory enemyFactory = gameLoop.getEnemyFactory();
+        HiveMind enemyHiveMind = gameLoop.getEnemyHiveMind();
 
         int spawnCount = 7; //* 갯수가 홀수임을 가정함
-        long spawnPosXInterval = 200l << 16;
+        long spawnPosXInterval = 100l << 16;
         long startSpawnPosX = FixedPointUtil.sub(boss.getPosX(), FixedPointUtil.mul(spawnPosXInterval, (spawnCount / 2) << 16));
-        long raiderSpawnPosY = boss.getPosY() + (100 << 16);
-        long guardianSpawnPosY = boss.getPosY() + (300 << 16);
+        long raiderSpawnPosY = boss.getPosY() + (50l << 16);
+        long guardianSpawnPosY = boss.getPosY() + (100l << 16);
 
         for (int i = 0;i < spawnCount; i++){
-            Enemy enemy;
-            if (i % 2 == 0){ //TODO EnemyFactory를 싱글톤으로 바꾸기
-                // enemy = ;
+            long spawnPosX = startSpawnPosX + FixedPointUtil.mul(spawnPosXInterval, i << 16);
+            if (i % 2 == 0){ 
+                enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.RAIDER, spawnPosX, raiderSpawnPosY);
             }
             else{
-                // enemy = ;
+                enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.GUARDIAN, spawnPosX, guardianSpawnPosY);
             }
         }
 

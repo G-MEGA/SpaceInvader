@@ -23,6 +23,8 @@ public class RUDPPeer implements AutoCloseable{
     // - 발신 스레드(메인 스레드일 확률이 높음)
     // - 재전송 스레드(여기서 하트비트도 날림)
     // - 수신 스레드(여기서 ACK 발신함)
+    //
+     // - 다만 셧다운 시에는 셧다운 훅 스레드가 동작해야하므로 이를 위해서 serializerForShutdown까지 추가
 
     public static final int BUFFER_SIZE = 1400;
     private static final long RETRANSMISSION_TIMEOUT = 250;  // 서버랑 통신할 때는 핑이 기본 0.2초니까 조금 더 긴 0.25초로
@@ -35,6 +37,8 @@ public class RUDPPeer implements AutoCloseable{
     private final PacketSerializer serializerForSend = new PacketSerializer();
     private final PacketSerializer serializerForReceive = new PacketSerializer();
     private final PacketSerializer serializerForRetransmit = new PacketSerializer();
+
+    private final PacketSerializer serializerForShutdown = new PacketSerializer();
 
     private final DatagramChannel channel;
     private final Selector selector;
@@ -55,6 +59,18 @@ public class RUDPPeer implements AutoCloseable{
 
         this.localPort = localPort;
         System.out.printf("피어 시작. 로컬 포트: %d\n", this.localPort);
+
+        //셧다운 대비
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("셧다운으로 인한 모든 피어와의 disconnect 작동");
+            for(Connection c : connections.values()){
+                try {
+                    disconnect(c, serializerForShutdown);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }));
     }
 
     public void start() {
@@ -111,17 +127,21 @@ public class RUDPPeer implements AutoCloseable{
         sendPacket(address, new Packet(Packet.PacketType.CONNECT), serializerForSend);
     }
     public void disconnect(Connection connection) throws Exception {
-        connection.disconnect();
-        connection.getReceivedData().offer(new PacketDataDisconnect());  // 내 스스로에게 디스커넥 알림
-        sendPacket(connection, new Packet(Packet.PacketType.DISCONNECT), serializerForSend);  // 상대에게 디스커넥 알림
+        disconnect(connection, serializerForSend);
     }
     public void disconnectAll(String exceptionTag) throws Exception {
         for (Connection connection : connections.values()){
-            if(connection.isDisconnecting()) continue;
             if(exceptionTag != null && connection.tag.contains(exceptionTag)) continue;
 
             disconnect(connection);
         }
+    }
+    private void disconnect(Connection connection, PacketSerializer packetSerializer) throws Exception {
+        if(connection.isDisconnecting()) return;
+
+        connection.disconnect();
+        connection.getReceivedData().offer(new PacketDataDisconnect());  // 내 스스로에게 디스커넥 알림
+        sendPacket(connection, new Packet(Packet.PacketType.DISCONNECT), packetSerializer);  // 상대에게 디스커넥 알림
     }
 
     public void send(Connection connection, PacketData data) throws Exception {

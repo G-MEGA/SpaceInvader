@@ -1,13 +1,13 @@
 package org.newdawn.spaceinvaders.map_load.map_load_commands;
 
-import org.newdawn.spaceinvaders.enums.SectionCommandType;
+import org.newdawn.spaceinvaders.enums.SectionType;
 
 public class SectionCommand extends MapLoadCommand{
-    private SectionCommandType _sectionCommandType;
+    private SectionType _sectionCommandType;
 
-    public SectionCommandType getSectionCommandType() { return _sectionCommandType; }
+    public SectionType getSectionCommandType() { return _sectionCommandType; }
 
-    public SectionCommand(SectionCommandType sectionCommandType){
+    public SectionCommand(SectionType sectionCommandType){
         super();
 
         _sectionCommandType = sectionCommandType;

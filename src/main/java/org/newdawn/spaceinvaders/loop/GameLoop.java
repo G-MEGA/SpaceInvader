@@ -2,11 +2,17 @@ package org.newdawn.spaceinvaders.loop;
 
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.enums.GameLoopResultType;
+import org.newdawn.spaceinvaders.enums.GameObjectType;
 import org.newdawn.spaceinvaders.enums.IndicatorTextType;
 import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.loop_input.LoopInputLog;
+import org.newdawn.spaceinvaders.map_load.SectionData;
+import org.newdawn.spaceinvaders.map_load.map_load_commands.InstantiateCommand;
+import org.newdawn.spaceinvaders.map_load.map_load_commands.MapLoadCommand;
+import org.newdawn.spaceinvaders.map_load.map_load_commands.SectionCommand;
+import org.newdawn.spaceinvaders.singleton.MapDataParser;
 import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
@@ -15,12 +21,15 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BombSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.LaserSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.store.StoreSlot;
+import org.newdawn.spaceinvaders.game_object.ingame.store.StoreSlotFactory;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.EnemyFactory;
 import random.SerializableRandom;
@@ -31,6 +40,8 @@ public class GameLoop extends Loop {
 
     private EnemyFactory enemyFactory;
     public EnemyFactory getEnemyFactory() { return enemyFactory; }
+    private StoreSlotFactory storeSlotFactory;
+    public StoreSlotFactory getStoreSlotFactory() { return storeSlotFactory; }
 
     SerializableRandom random;
     public SerializableRandom getRandom() {
@@ -157,6 +168,13 @@ public class GameLoop extends Loop {
         return false;    
     }
 
+    //TODO NULL CHECKING 확인하기
+    private Queue<SectionData> sections;
+    private void parseMapData(String rawMapData){ sections = MapDataParser.getInstance().parseMapData(rawMapData); }
+    private boolean hasSectionEnd = false;
+    private SectionData currentSection;
+    private long sectionElapsed = 0;
+
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public GameLoop(){
         super();
@@ -170,10 +188,6 @@ public class GameLoop extends Loop {
         parseMapData(rawMapData);
 
         startGame();
-    }
-    //TODO 오예준씨 맵 데이터 파싱 여기서 하면 됨
-    private void parseMapData(String rawMapData){
-
     }
 
     private void initText() {
@@ -265,6 +279,8 @@ public class GameLoop extends Loop {
         //endregion
 
         enemyFactory = new EnemyFactory(this);
+        storeSlotFactory = new StoreSlotFactory(this);
+
         enemyCount++; //TODO enemyCount를 배열 크기로바꾸기
 
         // create a block of aliens (5 rows, by 12 aliens, spaced evenly)
@@ -427,6 +443,28 @@ public class GameLoop extends Loop {
     public void process(ArrayList<LoopInput> inputs){
         super.process(inputs);
 
+        //section 실행 관련 로직
+        if (currentSection == null || !currentSection.hasMoreInstantiateCommands()){
+            if (hasSectionEnd){
+                currentSection = sections.poll();
+
+                // 다음 section이 존재하지 않는다면 stage 클리어로 처리
+                //TODO 근데 이러면 :game-end을 두는 의미가 없어지네
+                //TODO new-wave 끝 인식하게 만들기
+                //TODO SpeicalCommand에 시간 연장 command 추가하기
+                if (currentSection == null) {
+                    notifyWin();
+                }
+            }
+        }
+        else{
+            while (currentSection.hasMoreInstantiateCommands() && currentSection.getNextInstantiateCommandInstantiateTime() <= sectionElapsed){
+                InstantiateCommand instantiateCommand = currentSection.pollNextInstantiateCommand();
+
+                ExecuteInstantiateCommand(instantiateCommand);
+            }
+        }
+
         // 프레임별 입력 기록
         if(inputs != null && !inputs.isEmpty()){
             inputLogs.add(new LoopInputLog(currentFrame, inputs));
@@ -459,6 +497,21 @@ public class GameLoop extends Loop {
         }
 
         currentFrame++;
+        sectionElapsed += getGame().fixedDeltaTime;
+    }
+
+    private void ExecuteInstantiateCommand(InstantiateCommand command) {
+        switch (command.getGameObjectType()) {
+            case Enemy:
+                enemyFactory.spawnEnemy(enemyHiveMind, command.getGameObjectId(), command.getInstantiateX(), command.getInstantiateY());
+                break;
+            case PassiveSkill:
+                storeSlotFactory.createPassiveSkillItemSlot(command.getGameObjectId(), command.getInstantiateX(), command.getInstantiateY());
+                break;
+            case ActiveSkill:
+                storeSlotFactory.createActiveSkillItemSlot(command.getGameObjectId(), command.getInstantiateX(), command.getInstantiateY());
+                break;
+        }
     }
 
     public void draw(Graphics2D g) {

@@ -48,8 +48,8 @@ public class MapList {
 
                 String[] lines = content.split("\n");
                 for(String l: lines){
-                    if(l.contains("title")){
-                        title = l.split("=")[1].trim();
+                    if(l.contains("/title")){
+                        title = l.split(" ")[1].trim();
                         break;
                     }
                 }

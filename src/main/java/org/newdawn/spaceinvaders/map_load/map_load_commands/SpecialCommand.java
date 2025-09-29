@@ -5,7 +5,7 @@ import org.newdawn.spaceinvaders.enums.SpecialCommandType;
 public class SpecialCommand extends MapLoadCommand{
     private SpecialCommandType _specialCommandType;
 
-    public SpecialCommandType get_specialCommandType() { return _specialCommandType; }
+    public SpecialCommandType getSpecialCommandType() { return _specialCommandType; }
 
     public SpecialCommand(SpecialCommandType specialCommandType){
         super();

@@ -24,14 +24,13 @@ public class RUDPPeer implements AutoCloseable{
     // - 재전송 스레드(여기서 하트비트도 날림)
     // - 수신 스레드(여기서 ACK 발신함)
 
-    public static final int BUFFER_SIZE = 1376;
+    public static final int BUFFER_SIZE = 1400;
     private static final long RETRANSMISSION_TIMEOUT = 250;  // 서버랑 통신할 때는 핑이 기본 0.2초니까 조금 더 긴 0.25초로
     private static final long HEARTBEAT_INTERVAL = 3_000;
     private static final long HEARTBEAT_TIMEOUT = 10_000;
     private static final long DISCONNECTING_DURATION = 3_000;  // 더 늘려야 하나 싶은데 일단은 이렇게 하자
 
-    // 복수의 리스너를 등록할 수 있게 할 지 말 지는 나중에 상황봐서...
-    public IRUDPPeerListener listener;
+    private Set<IRUDPPeerListener> listeners = new HashSet<>();
 
     private final PacketSerializer serializerForSend = new PacketSerializer();
     private final PacketSerializer serializerForReceive = new PacketSerializer();
@@ -88,16 +87,18 @@ public class RUDPPeer implements AutoCloseable{
             while(!connection.getReceivedData().isEmpty()){
                 PacketData packetData = connection.getReceivedData().poll();
 
-                if(listener == null) continue;
+                for(IRUDPPeerListener listener : listeners){
+                    if(listener == null) continue;
 
-                if(packetData instanceof PacketDataDisconnect){
-                    listener.onDisconnected(this, connection);
-                }
-                else if(packetData instanceof PacketDataConnect){
-                    listener.onConnected(this, connection);
-                }
-                else{
-                    listener.onReceived(this, connection, packetData);
+                    if(packetData instanceof PacketDataDisconnect){
+                        listener.onDisconnected(this, connection);
+                    }
+                    else if(packetData instanceof PacketDataConnect){
+                        listener.onConnected(this, connection);
+                    }
+                    else{
+                        listener.onReceived(this, connection, packetData);
+                    }
                 }
             }
         }
@@ -145,6 +146,13 @@ public class RUDPPeer implements AutoCloseable{
 
             send(connection, data);
         }
+    }
+
+    public void addListener(IRUDPPeerListener listener) {
+        listeners.add(listener);
+    }
+    public void removeListener(IRUDPPeerListener listener) {
+        listeners.remove(listener);
     }
     //endregion
 

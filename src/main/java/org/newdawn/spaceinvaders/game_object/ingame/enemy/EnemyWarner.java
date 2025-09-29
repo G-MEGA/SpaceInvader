@@ -39,12 +39,30 @@ public class EnemyWarner extends GameObject2D{
         setRotation(enemy.getRotation());
     }
 
+    //TODO 이게 맞나..??
+    public EnemyWarner(GameLoop gameLoop, long posX, long posY, long rotation, long warningTime) {
+        super(gameLoop);
+
+        this.warningTime = warningTime;
+
+        spriteRenderer = new SpriteRenderer(gameLoop);
+        spriteRenderer.setSpriteRef(spriteRef);
+        addChild(spriteRenderer);
+
+        warnElapsed = 0l;
+
+        setPos(posX, posY);
+        setRotation(rotation);
+    }
+
     @Override
     protected void process(long deltaTime) {
         super.process(deltaTime);
 
         if (warnElapsed >= warningTime){
-            gameLoop.addGameObject(enemy);
+            if (gameLoop != null){
+                gameLoop.addGameObject(enemy);
+            }
             destroy();
         }
         else{

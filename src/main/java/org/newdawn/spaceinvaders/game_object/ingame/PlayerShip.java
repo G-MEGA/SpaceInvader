@@ -10,7 +10,6 @@ import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 import org.newdawn.spaceinvaders.game_object.ingame.bullet.EnemyBullet;
 import org.newdawn.spaceinvaders.game_object.ingame.bullet.PlayerBullet;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
-
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.ActiveSkill;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
@@ -334,9 +333,19 @@ public class PlayerShip extends GameCharacter{
             enemyBullet.onHitByPlayerShip();
             // enemyBullet.destroy();
         }
+        else if (collider instanceof EnemyLaser){
+            onHurt(collider);
+        }
     }
 
     private void onHurt(ICollider2DOwner collider){
+        //TODO 흠.. 이게 맞나?
+        if (collider instanceof EnemyLaser){
+            decreaseHealth(_health);
+            ((GameLoop)getLoop()).notifyPlayerShipDeath();
+            destroy();
+        }
+
         if (isReflexible && collider instanceof EnemyBullet){
             GameLoop gameLoop = (GameLoop)getLoop();
             EnemyBullet enemyBullet = (EnemyBullet)collider;

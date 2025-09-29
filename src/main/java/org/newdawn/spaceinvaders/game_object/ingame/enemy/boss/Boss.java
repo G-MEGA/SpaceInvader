@@ -3,8 +3,6 @@ package org.newdawn.spaceinvaders.game_object.ingame.enemy.boss;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
-import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.boss.boss_pattern.BossPattern;
@@ -14,7 +12,6 @@ import org.newdawn.spaceinvaders.game_object.ingame.enemy.boss.boss_pattern.Play
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.boss.boss_pattern.SideBulletStreamPattern;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.boss.boss_pattern.TroopDeploymentPattern;
 import org.newdawn.spaceinvaders.loop.GameLoop;
-import org.newdawn.spaceinvaders.loop.Loop;
 
 public class Boss extends Enemy{
     private TextRenderer bossHealthText;

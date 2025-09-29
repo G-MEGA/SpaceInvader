@@ -4,14 +4,13 @@ import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
-import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.Loop;
 
-public class Laser extends GameObject2D implements ICollider2DOwner{
-    private final String spriteRef = "sprites/testLaser.png";
-    private final int damage = 10;
-    private final long lifeDuration = FixedPointUtil.ZERO_5;
+public abstract class Laser extends GameObject2D implements ICollider2DOwner{
+    private String spriteRef;
+    private int damage;
+    private long lifeDuration;
     private long spawnElapsed = 0;
     private SpriteRenderer spriteRenderer;
 
@@ -19,8 +18,12 @@ public class Laser extends GameObject2D implements ICollider2DOwner{
     public Laser(){
         super();
     }
-    public Laser(Loop loop, long spawnPosX, long spawnPosY, long spawnOffset, long spawnAngle){
+    public Laser(Loop loop, long spawnPosX, long spawnPosY, long spawnOffset, long spawnAngle, String spriteRef, int damage, long lifeDuration) {
         super(loop);
+
+        this.spriteRef = spriteRef;
+        this.damage = damage;
+        this.lifeDuration = lifeDuration;
 
         spriteRenderer = new SpriteRenderer(loop);
         spriteRenderer.setSpriteRef(spriteRef);
@@ -57,11 +60,5 @@ public class Laser extends GameObject2D implements ICollider2DOwner{
         }
     }
 
-    @Override
-    public void collidedWith(ICollider2DOwner collider) {
-        if (collider instanceof Enemy){
-            Enemy enemy = (Enemy)collider;
-            enemy.onHit(damage);
-        }
-    }
+    
 }   

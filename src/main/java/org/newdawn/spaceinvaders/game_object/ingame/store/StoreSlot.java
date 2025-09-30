@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 
 import org.newdawn.spaceinvaders.enums.IndicatorTextType;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
+import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
@@ -63,6 +64,12 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner {
 
         setPosX(spawnX);
         setPosY(spawnY);
+
+        setSortingLayer(-100);
+        spriteRenderer.setSortingLayer(-100);
+        itemNameText.setSortingLayer(-100);
+        priceText.setSortingLayer(-100);
+        collider2D.setSortingLayer(-100);
     }
 
     @Override

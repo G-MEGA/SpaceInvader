@@ -19,7 +19,7 @@
 1000 250 150 passiveSkill 0
 1000 550 150 passiveSkill 0
 1000 250 450 passiveSkill 0
-1000 550 450 passiveSkill 0
+1000 550 450 activeSkill 2
 
 >new-wave
 1000 60 60 Enemy 0

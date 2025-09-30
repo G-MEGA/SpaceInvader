@@ -5,6 +5,7 @@ import org.newdawn.spaceinvaders.enums.GameLoopResultType;
 import org.newdawn.spaceinvaders.enums.GameObjectType;
 import org.newdawn.spaceinvaders.enums.IndicatorTextType;
 import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
+import org.newdawn.spaceinvaders.enums.SectionType;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.loop_input.LoopInputLog;
@@ -77,12 +78,13 @@ public class GameLoop extends Loop {
             return aliveShips.get(getRandom().nextInt(aliveShips.size()));
         }
     }
-    /** The number of enemies left on the screen */
-    private int enemyCount;
     private HiveMind enemyHiveMind = new HiveMind();
     public HiveMind getEnemyHiveMind() { return enemyHiveMind; }
-
     private ArrayList<Enemy> enemies = new ArrayList<>();
+    public void addEnemy(Enemy enemy) {
+        enemies.add(enemy);
+        addGameObject(enemy);
+    }
 
     private GameLoopResultType gameResult = GameLoopResultType.InGame;
     public GameLoopResultType getGameResult() {
@@ -171,7 +173,7 @@ public class GameLoop extends Loop {
     //TODO NULL CHECKING 확인하기
     private Queue<SectionData> sections;
     private void parseMapData(String rawMapData){ sections = MapDataParser.getInstance().parseMapData(rawMapData); }
-    private boolean hasSectionEnd = false;
+    private boolean hasSectionEnd = true;
     private SectionData currentSection;
     private long sectionElapsed = 0;
 
@@ -281,10 +283,10 @@ public class GameLoop extends Loop {
         enemyFactory = new EnemyFactory(this);
         storeSlotFactory = new StoreSlotFactory(this);
 
-        enemyCount++; //TODO enemyCount를 배열 크기로바꾸기
+        // enemyCount++; //TODO enemyCount를 배열 크기로바꾸기
 
         // create a block of aliens (5 rows, by 12 aliens, spaced evenly)
-        enemyCount = 0;
+        // enemyCount = 0;
         // for (long row=0L;row<5L;row++) {
         //     Enemy enemy = null;
         //     for (long x=0L;x<12L;x++) {
@@ -307,9 +309,9 @@ public class GameLoop extends Loop {
         //     }
         // }
 
-        Enemy boss = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.BOSS, 400 << 16, 63 << 16);
-        enemyCount++;
-        enemies.add(boss);
+        // Enemy boss = enemyFactory.spawnEnemy(enemyHiveMind, EnemyFactory.BOSS, 400 << 16, 63 << 16);
+        // enemyCount++;
+        // enemies.add(boss);
 
         //* 상점 아이템 생성 슬롯
         BombSkill bombSkill = new BombSkill(this);
@@ -386,14 +388,14 @@ public class GameLoop extends Loop {
      * Notification that an alien has been killed
      */
     public void notifyAlienKilled() {
-        // reduce the alient count, if there are none left, the player has won!
-        enemyCount--;
+        cleanUpEnemies();
         increaseScore();
 
-        if (enemyCount == 0) {
+        if (enemies.isEmpty()) {
             notifyWin();
         }
 
+        //TODO Enemies 배열로 바꾸기
         for(GameObject gameObject : getGameObjects()){
             if(gameObject instanceof Enemy){
                 ((Enemy) gameObject).velocityX = FixedPointUtil.mul(
@@ -447,23 +449,39 @@ public class GameLoop extends Loop {
         if (currentSection == null || !currentSection.hasMoreInstantiateCommands()){
             if (hasSectionEnd){
                 currentSection = sections.poll();
-
-                // 다음 section이 존재하지 않는다면 stage 클리어로 처리
+                //* 다음 section이 존재하지 않는다면 stage 클리어로 처리
                 //TODO 근데 이러면 :game-end을 두는 의미가 없어지네
-                //TODO new-wave 끝 인식하게 만들기
-                //TODO SpeicalCommand에 시간 연장 command 추가하기
                 if (currentSection == null) {
                     notifyWin();
                 }
             }
+            else{
+                //* 현재 Section이 New Wave 타입이라면, 적이 모두 파괴되었을 때 다음 Section으로 넘어감
+                if (currentSection.getSectionType() == SectionType.NewWave){
+                    if (enemies.isEmpty()){
+                        hasSectionEnd = true;
+                        sectionElapsed = 0;
+                    }
+                }
+                //* 현재 Section이 Store 타입이라면, Scection 시작 15초 후에 Section 종료
+                if (currentSection.getSectionType() == SectionType.Store){  
+                    if (sectionElapsed >= (15 << 16)){
+                        hasSectionEnd = true;
+                        sectionElapsed = 0;
+                    }
+                }
+            }
         }
         else{
+            System.out.println(currentSection.hasMoreInstantiateCommands());
+            System.out.println(currentSection.getNextInstantiateCommandInstantiateTime() <= sectionElapsed);
             while (currentSection.hasMoreInstantiateCommands() && currentSection.getNextInstantiateCommandInstantiateTime() <= sectionElapsed){
                 InstantiateCommand instantiateCommand = currentSection.pollNextInstantiateCommand();
 
                 ExecuteInstantiateCommand(instantiateCommand);
             }
         }
+
 
         // 프레임별 입력 기록
         if(inputs != null && !inputs.isEmpty()){

@@ -61,7 +61,7 @@ public class EnemyWarner extends GameObject2D{
 
         if (warnElapsed >= warningTime){
             if (gameLoop != null){
-                gameLoop.addGameObject(enemy);
+                gameLoop.addEnemy(enemy);
             }
             destroy();
         }

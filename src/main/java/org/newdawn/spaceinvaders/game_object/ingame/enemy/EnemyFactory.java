@@ -64,6 +64,8 @@ public class EnemyFactory extends GameObject{
             return null;
         }
         
+        gameLoop.notifyEnemyInstantiated();
+
         enemy.setPosRotation(spawnPosX, spawnPosY, spawnAngle);
         hiveMind.addListener(enemy);
         

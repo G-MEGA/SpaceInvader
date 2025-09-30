@@ -331,7 +331,6 @@ public class PlayerShip extends GameCharacter{
             
             EnemyBullet enemyBullet = (EnemyBullet)collider;
             enemyBullet.onHitByPlayerShip();
-            // enemyBullet.destroy();
         }
         else if (collider instanceof EnemyLaser){
             onHurt(collider);

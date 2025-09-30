@@ -80,6 +80,8 @@ public class GameLoop extends Loop {
     }
     private HiveMind enemyHiveMind = new HiveMind();
     public HiveMind getEnemyHiveMind() { return enemyHiveMind; }
+    private boolean hasEnemy = false;
+    public void notifyEnemyInstantiated() { this.hasEnemy = true; }
     private ArrayList<Enemy> enemies = new ArrayList<>();
     public void addEnemy(Enemy enemy) {
         enemies.add(enemy);
@@ -391,10 +393,6 @@ public class GameLoop extends Loop {
         cleanUpEnemies();
         increaseScore();
 
-        if (enemies.isEmpty()) {
-            notifyWin();
-        }
-
         //TODO Enemies 배열로 바꾸기
         for(GameObject gameObject : getGameObjects()){
             if(gameObject instanceof Enemy){
@@ -403,6 +401,8 @@ public class GameLoop extends Loop {
                         FixedPointUtil.ONE + FixedPointUtil.ZERO_02);
             }
         }
+    
+        if (enemies.isEmpty()) { hasEnemy = false; }
     }
 
     public void notifyPlayerShipsSlowDown(long slowDownRatio, long slowDownTime){
@@ -446,42 +446,42 @@ public class GameLoop extends Loop {
         super.process(inputs);
 
         //section 실행 관련 로직
-        if (currentSection == null || !currentSection.hasMoreInstantiateCommands()){
-            if (hasSectionEnd){
-                currentSection = sections.poll();
-                //* 다음 section이 존재하지 않는다면 stage 클리어로 처리
-                //TODO 근데 이러면 :game-end을 두는 의미가 없어지네
-                if (currentSection == null) {
-                    notifyWin();
+        if (gameResult == GameLoopResultType.InGame){
+            if (currentSection == null || !currentSection.hasMoreInstantiateCommands()){
+                if (hasSectionEnd){
+                    currentSection = sections.poll();
+                    hasSectionEnd = false;
+                    //* 다음 section이 존재하지 않는다면 stage 클리어로 처리
+                    //TODO 근데 이러면 :game-end을 두는 의미가 없어지네
+                    if (currentSection == null) {
+                        notifyWin();
+                    }
+                }
+                else{
+                    //* 현재 Section이 New Wave 타입이라면, 적이 모두 파괴되었을 때 다음 Section으로 넘어감
+                    if (currentSection.getSectionType() == SectionType.NewWave){
+                        if (!hasEnemy){
+                            hasSectionEnd = true;
+                            sectionElapsed = 0;
+                        }
+                    }
+                    //* 현재 Section이 Store 타입이라면, Scection 시작 15초 후에 Section 종료
+                    if (currentSection.getSectionType() == SectionType.Store){  
+                        if (sectionElapsed >= (15 << 16)){
+                            hasSectionEnd = true;
+                            sectionElapsed = 0;
+                        }
+                    }
                 }
             }
             else{
-                //* 현재 Section이 New Wave 타입이라면, 적이 모두 파괴되었을 때 다음 Section으로 넘어감
-                if (currentSection.getSectionType() == SectionType.NewWave){
-                    if (enemies.isEmpty()){
-                        hasSectionEnd = true;
-                        sectionElapsed = 0;
-                    }
-                }
-                //* 현재 Section이 Store 타입이라면, Scection 시작 15초 후에 Section 종료
-                if (currentSection.getSectionType() == SectionType.Store){  
-                    if (sectionElapsed >= (15 << 16)){
-                        hasSectionEnd = true;
-                        sectionElapsed = 0;
-                    }
+                while (currentSection.hasMoreInstantiateCommands() && currentSection.getNextInstantiateCommandInstantiateTime() >= sectionElapsed){
+                    InstantiateCommand instantiateCommand = currentSection.pollNextInstantiateCommand();
+    
+                    ExecuteInstantiateCommand(instantiateCommand);
                 }
             }
         }
-        else{
-            System.out.println(currentSection.hasMoreInstantiateCommands());
-            System.out.println(currentSection.getNextInstantiateCommandInstantiateTime() <= sectionElapsed);
-            while (currentSection.hasMoreInstantiateCommands() && currentSection.getNextInstantiateCommandInstantiateTime() <= sectionElapsed){
-                InstantiateCommand instantiateCommand = currentSection.pollNextInstantiateCommand();
-
-                ExecuteInstantiateCommand(instantiateCommand);
-            }
-        }
-
 
         // 프레임별 입력 기록
         if(inputs != null && !inputs.isEmpty()){

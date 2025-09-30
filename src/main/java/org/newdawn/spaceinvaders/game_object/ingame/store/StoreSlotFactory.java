@@ -1,6 +1,7 @@
 package org.newdawn.spaceinvaders.game_object.ingame.store;
 
 import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
+import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.ActiveSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BarrierSkill;
@@ -28,36 +29,40 @@ public class StoreSlotFactory {
         this.gameLoop = gameLoop;
     }
 
-    public void createPassiveSkillItemSlot(int id, long spawnPosX, long spawnPosY){
+    public void createPassiveSkillItemSlot(int skillId, long spawnPosX, long spawnPosY, PlayerShip playerShip){
         PassiveSkill passiveSkill = null;
-        Integer skillLevel;
+        Integer skillLevel = 0;
         //TODO 스킬 레벨에 따른 가격 변동 추가
-        switch (id) {
+        switch (skillId) {
             case PS_FIRE_SPEED:
                 passiveSkill = new PassiveSkill(PlayerPassiveSkillType.FireSpeed, gameLoop);
+                skillLevel = playerShip.getPassiveSkillLevel(PlayerPassiveSkillType.FireSpeed);
                 break;
             case PS_DAMAGE_UP:
                 passiveSkill = new PassiveSkill(PlayerPassiveSkillType.DamageUp, gameLoop);
+                skillLevel = playerShip.getPassiveSkillLevel(PlayerPassiveSkillType.DamageUp);
                 break;
             case PS_ADDITIONAL_ENGINE:
                 passiveSkill = new PassiveSkill(PlayerPassiveSkillType.AdditionalEngine, gameLoop);
+                skillLevel = playerShip.getPassiveSkillLevel(PlayerPassiveSkillType.AdditionalEngine);
                 break;
             case PS_REPAIR_KIT:
                 passiveSkill = new PassiveSkill(PlayerPassiveSkillType.RepairKit, gameLoop);
+                skillLevel = playerShip.getPassiveSkillLevel(PlayerPassiveSkillType.RepairKit);
                 break;
         }
         if (passiveSkill == null){
-            System.err.println(id + "은 존재하지 않은 passiveSkill ID 입니다.");
+            System.err.println(skillId + "은 존재하지 않은 passiveSkill ID 입니다.");
             return;
         }
 
-        StoreSlot storeSlot = new StoreSlot(gameLoop, 0, passiveSkill, spawnPosX, spawnPosY);
+        StoreSlot storeSlot = new StoreSlot(gameLoop, skillLevel.intValue() + 1, passiveSkill, spawnPosX, spawnPosY);
         gameLoop.addGameObject(storeSlot);
     }
 
-    public void createActiveSkillItemSlot(int id, long spawnPosX, long spawnPosY){
+    public void createActiveSkillItemSlot(int skillId, long spawnPosX, long spawnPosY){
         ActiveSkill activeSkill = null;
-        switch (id) {
+        switch (skillId) {
             case AS_BARRIER:
                 activeSkill = new BarrierSkill(gameLoop);
                 break;
@@ -72,11 +77,11 @@ public class StoreSlotFactory {
                 break;
         }
         if (activeSkill == null){
-            System.err.println(id + "은 존재하지 않은 activeSkill ID 입니다.");
+            System.err.println(skillId + "은 존재하지 않은 activeSkill ID 입니다.");
             return;
         }
 
-        StoreSlot storeSlot = new StoreSlot(gameLoop, 20, activeSkill, spawnPosX, spawnPosY);
+        StoreSlot storeSlot = new StoreSlot(gameLoop, 3, activeSkill, spawnPosX, spawnPosY);
         gameLoop.addGameObject(storeSlot);
     }
 }

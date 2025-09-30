@@ -1,15 +1,11 @@
 /title 맵1
 /description 설명
 
->new-wave
-1000 60 60 Enemy 0
-
-
 >store
 1000 250 150 passiveSkill 0
-1000 550 150 passiveSkill 1
-1000 250 450 passiveSkill 2
-1000 550 450 passiveSkill 3
+1000 550 150 passiveSkill 0
+1000 250 450 passiveSkill 0
+1000 550 450 passiveSkill 0
 
 >new-wave
 1000 60 60 Enemy 0

@@ -115,6 +115,7 @@ public class GameLoop extends Loop {
             TextRenderer text = passiveSkillsTexts.get(type);
             if (text == null){
                 text = new TextRenderer(this, "", 10);
+                text.setSortingLayer(101);
                 passiveSkillsTexts.put(type, text);
 
                 addGameObject(text);
@@ -140,7 +141,7 @@ public class GameLoop extends Loop {
 
     private final int bombDamage = 100;
 
-    private long coinCount = 0;
+    private long coinCount = 30;
     public long getCoinCount() { return coinCount; }
     public void increaseCoin(){ increaseCoin(1); }
     public void increaseCoin(long count){ coinCount += count; }
@@ -205,6 +206,12 @@ public class GameLoop extends Loop {
         activeSkillText = new TextRenderer(this, "Active Skill : " + ships.get(myPlayerID).getActiveSkillName(), 15);
         passiveSkillHeaderText = new TextRenderer(this, "(Passive Skills)", 15);
 
+        scoreText.setSortingLayer(100);
+        coinCountText.setSortingLayer(100);
+        playerHealthText.setSortingLayer(100);
+        activeSkillText.setSortingLayer(100);
+        passiveSkillHeaderText.setSortingLayer(100);        
+
         addGameObject(scoreText);
         addGameObject(coinCountText);
         addGameObject(playerHealthText);
@@ -227,6 +234,7 @@ public class GameLoop extends Loop {
         indicatorText = new TextRenderer(this, "", 20);
         indicatorText.alignment = 1;
         indicatorText.setPos(400 << 16, 50 << 16);
+        indicatorText.setSortingLayer(101);
         addGameObject(indicatorText);
     }
 
@@ -285,8 +293,6 @@ public class GameLoop extends Loop {
         enemyFactory = new EnemyFactory(this);
         storeSlotFactory = new StoreSlotFactory(this);
 
-        // enemyCount++; //TODO enemyCount를 배열 크기로바꾸기
-
         // create a block of aliens (5 rows, by 12 aliens, spaced evenly)
         // enemyCount = 0;
         // for (long row=0L;row<5L;row++) {
@@ -316,32 +322,32 @@ public class GameLoop extends Loop {
         // enemies.add(boss);
 
         //* 상점 아이템 생성 슬롯
-        BombSkill bombSkill = new BombSkill(this);
-        StoreSlot storeSlot = new StoreSlot(this, 0, bombSkill, 600 << 16, 300 << 16);
-        addGameObject(storeSlot);
+        // BombSkill bombSkill = new BombSkill(this);
+        // StoreSlot storeSlot = new StoreSlot(this, 0, bombSkill, 600 << 16, 300 << 16);
+        // addGameObject(storeSlot);
 
-        LaserSkill laserSkill = new LaserSkill(this);
-        storeSlot = new StoreSlot(this, 0, laserSkill, 700 << 16, 300 << 16);
-        addGameObject(storeSlot);
+        // LaserSkill laserSkill = new LaserSkill(this);
+        // storeSlot = new StoreSlot(this, 0, laserSkill, 700 << 16, 300 << 16);
+        // addGameObject(storeSlot);
 
-        // (타입, x, y) 정보를 담은 배열
-        Object[][] skillData = {
-            { PlayerPassiveSkillType.DamageUp, 100 << 16, 500 << 16 },
-            { PlayerPassiveSkillType.DamageUp, 200 << 16, 500 << 16 },
-            { PlayerPassiveSkillType.DamageUp, 300 << 16, 500 << 16 },
-            { PlayerPassiveSkillType.DamageUp, 400 << 16, 500 << 16 },
-        };
+        // // (타입, x, y) 정보를 담은 배열
+        // Object[][] skillData = {
+        //     { PlayerPassiveSkillType.DamageUp, 100 << 16, 500 << 16 },
+        //     { PlayerPassiveSkillType.DamageUp, 200 << 16, 500 << 16 },
+        //     { PlayerPassiveSkillType.DamageUp, 300 << 16, 500 << 16 },
+        //     { PlayerPassiveSkillType.DamageUp, 400 << 16, 500 << 16 },
+        // };
 
-        // 반복문으로 생성
-        for (Object[] data : skillData) {
-            PlayerPassiveSkillType type = (PlayerPassiveSkillType) data[0];
-            int x = (int) data[1];
-            int y = (int) data[2];
+        // // 반복문으로 생성
+        // for (Object[] data : skillData) {
+        //     PlayerPassiveSkillType type = (PlayerPassiveSkillType) data[0];
+        //     int x = (int) data[1];
+        //     int y = (int) data[2];
 
-            PassiveSkill passiveSkill = new PassiveSkill(type, this);
-            storeSlot = new StoreSlot(this, 0, passiveSkill, x, y);
-            addGameObject(storeSlot);
-        }
+        //     PassiveSkill passiveSkill = new PassiveSkill(type, this);
+        //     storeSlot = new StoreSlot(this, 0, passiveSkill, x, y);
+        //     addGameObject(storeSlot);
+        // }
 
         enemyHiveMind.cancelBroadcast();
         System.gc();
@@ -435,7 +441,6 @@ public class GameLoop extends Loop {
         return data;
     }
 
-    //* LootItem을 먹었을때, 나타나는 효과를 호출하는 메소드
     public void requestToSlowDownEnemies(){
         for (Enemy enemy : enemies){
             enemy.requestSlowDown();
@@ -447,40 +452,7 @@ public class GameLoop extends Loop {
 
         //section 실행 관련 로직
         if (gameResult == GameLoopResultType.InGame){
-            if (currentSection == null || !currentSection.hasMoreInstantiateCommands()){
-                if (hasSectionEnd){
-                    currentSection = sections.poll();
-                    hasSectionEnd = false;
-                    //* 다음 section이 존재하지 않는다면 stage 클리어로 처리
-                    //TODO 근데 이러면 :game-end을 두는 의미가 없어지네
-                    if (currentSection == null) {
-                        notifyWin();
-                    }
-                }
-                else{
-                    //* 현재 Section이 New Wave 타입이라면, 적이 모두 파괴되었을 때 다음 Section으로 넘어감
-                    if (currentSection.getSectionType() == SectionType.NewWave){
-                        if (!hasEnemy){
-                            hasSectionEnd = true;
-                            sectionElapsed = 0;
-                        }
-                    }
-                    //* 현재 Section이 Store 타입이라면, Scection 시작 15초 후에 Section 종료
-                    if (currentSection.getSectionType() == SectionType.Store){  
-                        if (sectionElapsed >= (15 << 16)){
-                            hasSectionEnd = true;
-                            sectionElapsed = 0;
-                        }
-                    }
-                }
-            }
-            else{
-                while (currentSection.hasMoreInstantiateCommands() && currentSection.getNextInstantiateCommandInstantiateTime() >= sectionElapsed){
-                    InstantiateCommand instantiateCommand = currentSection.pollNextInstantiateCommand();
-    
-                    ExecuteInstantiateCommand(instantiateCommand);
-                }
-            }
+            deserializeMapdata();
         }
 
         // 프레임별 입력 기록
@@ -518,13 +490,49 @@ public class GameLoop extends Loop {
         sectionElapsed += getGame().fixedDeltaTime;
     }
 
+    private void deserializeMapdata() {
+        if (currentSection == null || !currentSection.hasMoreInstantiateCommands()){
+            if (hasSectionEnd){
+                currentSection = sections.poll();
+                hasSectionEnd = false;
+                //* 다음 section이 존재하지 않는다면 stage 클리어로 처리
+                //TODO 근데 이러면 :game-end을 두는 의미가 없어지네
+                if (currentSection == null) {
+                    notifyWin();
+                }
+            }
+            else{
+                //* 현재 Section이 New Wave 타입이라면, 적이 모두 파괴되었을 때 다음 Section으로 넘어감
+                if (currentSection.getSectionType() == SectionType.NewWave){
+                    if (!hasEnemy){
+                        hasSectionEnd = true;
+                        sectionElapsed = 0;
+                    }
+                }
+                //* 현재 Section이 Store 타입이라면, Scection 시작 15초 후에 Section 종료
+                if (currentSection.getSectionType() == SectionType.Store){  
+                    if (sectionElapsed >= (15 << 16)){
+                        hasSectionEnd = true;
+                        sectionElapsed = 0;
+                    }
+                }
+            }
+        }
+        else{
+            while (currentSection.hasMoreInstantiateCommands() && currentSection.getNextInstantiateCommandInstantiateTime() >= sectionElapsed){
+                InstantiateCommand instantiateCommand = currentSection.pollNextInstantiateCommand();
+                ExecuteInstantiateCommand(instantiateCommand);
+            }
+        }
+    }
+
     private void ExecuteInstantiateCommand(InstantiateCommand command) {
         switch (command.getGameObjectType()) {
             case Enemy:
                 enemyFactory.spawnEnemy(enemyHiveMind, command.getGameObjectId(), command.getInstantiateX(), command.getInstantiateY());
                 break;
             case PassiveSkill:
-                storeSlotFactory.createPassiveSkillItemSlot(command.getGameObjectId(), command.getInstantiateX(), command.getInstantiateY());
+                storeSlotFactory.createPassiveSkillItemSlot(command.getGameObjectId(), command.getInstantiateX(), command.getInstantiateY(), aliveShips.get(myPlayerID));
                 break;
             case ActiveSkill:
                 storeSlotFactory.createActiveSkillItemSlot(command.getGameObjectId(), command.getInstantiateX(), command.getInstantiateY());

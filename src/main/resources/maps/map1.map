@@ -1,6 +1,20 @@
 /title 맵1
 /description 설명
 
+>new-wave
+1000 60 60 Enemy 1
+1000 100 60 Enemy 1
+1000 380 60 Enemy 1
+1000 420 60 Enemy 1
+1000 460 60 Enemy 1
+1000 500 60 Enemy 1
+1000 540 60 Enemy 1
+1000 580 60 Enemy 1
+1000 620 60 Enemy 1
+1000 660 60 Enemy 1
+1000 700 60 Enemy 1
+1000 740 60 Enemy 1
+
 >store
 1000 250 150 passiveSkill 0
 1000 550 150 passiveSkill 0

@@ -57,9 +57,18 @@ public class StoreSlotFactory {
         }
 
         StoreSlot storeSlot = new StoreSlot(gameLoop, skillLevel.intValue() + 1, passiveSkill, spawnPosX, spawnPosY);
-        gameLoop.addGameObject(storeSlot);
+        gameLoop.addStoreSlot(storeSlot);
     }
 
+    public void setPassiveSkillItemPrice(StoreSlot storeSlot, PlayerPassiveSkillType type, PlayerShip playerShip) {
+        if (playerShip.isPasiveSkillMaxLevel(type)){
+            storeSlot.setPriceUnkown(true);
+        }
+        else{
+            storeSlot.setPrice(playerShip.getPassiveSkillLevel(type) + 1);
+        }
+    }
+    
     public void createActiveSkillItemSlot(int skillId, long spawnPosX, long spawnPosY){
         ActiveSkill activeSkill = null;
         switch (skillId) {
@@ -82,6 +91,7 @@ public class StoreSlotFactory {
         }
 
         StoreSlot storeSlot = new StoreSlot(gameLoop, 3, activeSkill, spawnPosX, spawnPosY);
-        gameLoop.addGameObject(storeSlot);
+        gameLoop.addStoreSlot(storeSlot);
     }
+
 }

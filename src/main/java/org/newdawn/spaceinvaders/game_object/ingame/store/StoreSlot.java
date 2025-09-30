@@ -16,12 +16,17 @@ import org.newdawn.spaceinvaders.loop.Loop;
 
 public class StoreSlot extends GameObject2D implements ICollider2DOwner {
     private IStoreItem item;
+    private boolean isPriceUnkown = false;
     private long price;
     private GameLoop gameLoop;
     private SpriteRenderer spriteRenderer;
     private TextRenderer itemNameText;
     private TextRenderer priceText;
-
+    
+    public IStoreItem getItem() { return item; }
+    public void setPrice(long price) { this.price = price; }
+    public void setPriceUnkown(boolean isPriceUnkown) { this.isPriceUnkown = isPriceUnkown; }
+    
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public StoreSlot(){
         super();
@@ -62,6 +67,15 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner {
 
     @Override
     protected void draw(Graphics2D g) {
+        String priceTextContent = "";
+        if (isPriceUnkown){
+            priceTextContent = "?";
+        }
+        else{
+            priceTextContent = Long.toString(price);
+        }
+
+        priceText.setText(priceTextContent);
         super.draw(g);
     }
 
@@ -71,6 +85,9 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner {
             if(gameLoop.decreaseCoin(price)){
                 if(item.onAcquire(gameLoop, (PlayerShip)collider)){
                     destroy();
+                }
+                else{
+                    gameLoop.increaseCoin(price); //* IStoreItem의 내부 구매 조건이 충족 되지 않았다면, 환불해줌.
                 }
             }
             else{

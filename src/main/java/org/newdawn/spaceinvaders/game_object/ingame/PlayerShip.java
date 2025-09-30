@@ -55,10 +55,10 @@ public class PlayerShip extends GameCharacter{
 
     private HashMap<PlayerPassiveSkillType, Integer> passiveSkills = new HashMap<>(); // < PlayerPassiveSkillType, level >
     public int getPassiveSkillLevel(PlayerPassiveSkillType type) { return passiveSkills.get(type); }
-    public boolean isSkillMaxLevel(PlayerPassiveSkillType type) { return passiveSkills.get(type) == type.getMaxLevel(); }
+    public boolean isPasiveSkillMaxLevel(PlayerPassiveSkillType type) { return passiveSkills.get(type) == type.getMaxLevel(); }
     public void upgradePassiveSkill(PlayerPassiveSkillType type) { upgradePassiveSkill(type, 1);}
     public void upgradePassiveSkill(PlayerPassiveSkillType type, int amount){
-        if (!isSkillMaxLevel(type)){
+        if (!isPasiveSkillMaxLevel(type)){
             //* 증가된 레벨 값을 0와 type의 최대 레벨 사이로 clamp한다
             int newLevel = Math.max(0, Math.min(type.getMaxLevel(), passiveSkills.get(type) + amount));
             passiveSkills.put(type, newLevel);

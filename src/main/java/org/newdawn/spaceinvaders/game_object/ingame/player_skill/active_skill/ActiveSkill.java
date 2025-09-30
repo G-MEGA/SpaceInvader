@@ -21,6 +21,7 @@ public abstract class ActiveSkill extends PlayerSkill{
     public boolean onAcquire(GameLoop gameLoop, PlayerShip playerShip) {
         playerShip.setActiveSkill(this);
         this.playerShip = playerShip;
+        gameLoop.notifySkillStoreItemAcquired();
         return true;
     }
     

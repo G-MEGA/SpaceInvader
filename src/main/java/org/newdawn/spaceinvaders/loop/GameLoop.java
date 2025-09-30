@@ -141,7 +141,7 @@ public class GameLoop extends Loop {
 
     private final int bombDamage = 100;
 
-    private long coinCount = 30;
+    private long coinCount = 0;
     public long getCoinCount() { return coinCount; }
     public void increaseCoin(){ increaseCoin(1); }
     public void increaseCoin(long count){ coinCount += count; }
@@ -171,6 +171,13 @@ public class GameLoop extends Loop {
             return true;
         }
         return false;    
+    }
+
+    //* 상점 section에서 존재하는 slot들
+    private ArrayList<StoreSlot> storeSlots = new ArrayList<>();
+    public void addStoreSlot(StoreSlot storeSlot){
+        storeSlots.add(storeSlot);
+        addGameObject(storeSlot);
     }
 
     //TODO NULL CHECKING 확인하기
@@ -417,6 +424,21 @@ public class GameLoop extends Loop {
         }
     }
 
+    public void notifySkillStoreItemAcquired() {
+        for (int i = 0; i < storeSlots.size(); i++){
+            if (storeSlots.get(i).isDestroyed()){
+                storeSlots.remove(i);
+            }
+        }
+
+        for (StoreSlot storeSlot : storeSlots) {
+            if (storeSlot.getItem() instanceof PassiveSkill){
+                PlayerPassiveSkillType type = ((PassiveSkill)storeSlot.getItem()).getType();
+                storeSlotFactory.setPassiveSkillItemPrice(storeSlot, type, aliveShips.get(myPlayerID));
+            }
+        }
+    }
+
     public String getReplayData(){
 //            리플레이 저장 입력 및 처리를 이 클래스에서 안하니 리플레이 녹화 버튼 입력이 리플레이 데이터에 들어가도 괜찮음
 //            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외
@@ -514,6 +536,11 @@ public class GameLoop extends Loop {
                     if (sectionElapsed >= (15 << 16)){
                         hasSectionEnd = true;
                         sectionElapsed = 0;
+
+                        for (StoreSlot storeSlot : storeSlots){
+                            storeSlot.destroy();
+                        }
+                        storeSlots.clear();
                     }
                 }
             }
@@ -552,4 +579,5 @@ public class GameLoop extends Loop {
             }
         }
     }
+
 }

@@ -7,6 +7,7 @@ import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class PassiveSkill extends PlayerSkill{
     private PlayerPassiveSkillType type;
+    public PlayerPassiveSkillType getType() { return type; }
 
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public PassiveSkill(){
@@ -20,12 +21,13 @@ public class PassiveSkill extends PlayerSkill{
 
     @Override
     public boolean onAcquire(GameLoop gameLoop, PlayerShip playerShip) {
-        if (playerShip.isSkillMaxLevel(type)) {
+        if (playerShip.isPasiveSkillMaxLevel(type)) {
             gameLoop.showIndicatorText("'" + type.name() + "'" + " 패시브 스킬은 현재 최대 레벨 입니다.", IndicatorTextType.Warning);
             return false;
         }
         playerShip.upgradePassiveSkill(type);
         this.playerShip = playerShip;
+        gameLoop.notifySkillStoreItemAcquired();
         return true;
     }
 }

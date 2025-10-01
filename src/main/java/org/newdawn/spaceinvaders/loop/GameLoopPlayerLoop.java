@@ -9,6 +9,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+//플레이어 루프
+//	- 진입 후 수신이든 발신이든 모든 통신을 시작하기까지 1초정도 대기시간 둬야할 듯.
+//클라: 입력할 때마다 server제외 입력 브로드캐스팅, 게임 끝나면 server에게 결과 전송, 게임 끝나고 나갈 때 server제외 disconnect
+//서버:
+
 import javax.swing.JFileChooser;
 
 import org.newdawn.spaceinvaders.Game;

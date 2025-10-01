@@ -1,31 +1,27 @@
 package org.newdawn.spaceinvaders.loop;
 
 import org.newdawn.spaceinvaders.Game;
+import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.game_object.gui.Button;
 import org.newdawn.spaceinvaders.game_object.gui.IButtonListener;
 import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
-import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.map_load.MapInfo;
 
 import java.awt.*;
 import java.util.ArrayList;
 
-//- 방 내부
-//	- 내가 참가했던 게임 중 가장 하이스코어, 참가 인원
-//	- 리더보드
-//		- 순위, 점수, 참가 인원
-//	- 맵선택(방장만 가능)
-//	- 레디 버튼
-//클라가 하이스코어와 랭킹 파베에서 끌어오기
-//클라 : 방 나가기, 레디, p2p연결 완료(따른 모든 플레이어와 p2p연결 완료)
-//서버 :
-//방 나가기 결과,
-//방 정보 전송(방 진입 및 방 정보(맵, 플레이어 목록, 플레이어 레디) 바뀔 때마다 브로드캐스팅),
-//올레디-(시드및 플레이어목록 배부 및 각 플레이어 아이디 할당)
-//게임 시작(방 내의 모든 클라로부터 p2p연결 완료 수신시... 서버 내부적으로는 레디 전부 풀어버림)(클라가 이거 받으면 게임루프플레이어루프로 넘어감)
-
-public class LobbyLoop extends Loop{
+//- 방목록
+//	- 방 목록 겸 입장 버튼
+//	- 방 만들기 버튼
+//	- 메인메뉴로
+//클라: 방 목록 내놔, 방 만들기(방이름, 최대 인원수), 방 입장(로비 ID),
+//서버: 방 목록임, 방 진입 실패 사유,
+//        - 방 생성창
+//	- 방 제목
+//	- 최대 인원수
+//	- 확인, 취소
+public class LobbyListLoop extends Loop{
     GameObject2D mapSelectionGUI;
 
     GameObject2D mapSelectionButtonContainer;
@@ -33,7 +29,7 @@ public class LobbyLoop extends Loop{
 
     GameObject2D gameRoomGUI;
 
-    public LobbyLoop(Game game) {
+    public LobbyListLoop(Game game) {
         super(game);
 
         mapSelectionGUI = new GameObject2D(this);

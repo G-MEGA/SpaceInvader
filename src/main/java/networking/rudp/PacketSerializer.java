@@ -7,6 +7,8 @@ import networking.rudp.PacketData.PacketData;
 import org.reflections.Reflections;
 import serializer.KryoRecursiveRegistrar;
 
+import java.net.InetSocketAddress;
+
 public class PacketSerializer {
     Kryo kryo;
     KryoRecursiveRegistrar registrar;

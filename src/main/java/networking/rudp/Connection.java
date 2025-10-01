@@ -17,7 +17,6 @@ public class Connection {
 
     // 이거 true면 일정 시간동안 해당 주소에서 들어오는 입력은 처리 안하겠다는 거임.
     //      게임 종료 등의 의도적인 disconnect의 경우 그렇게 함
-    //TODO disconnect 후 몇 초간(lastHeartbeat를 갱신하니 그걸 기준으로) 수신 차단(이건 해놨음)하고 Connection 목록에서 삭제하기 구현해야함
     private boolean disconnecting = false;
     public boolean isDisconnecting(){return disconnecting;}
     public void disconnect(){

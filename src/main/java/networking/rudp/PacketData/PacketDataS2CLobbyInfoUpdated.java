@@ -9,6 +9,10 @@ public class PacketDataS2CLobbyInfoUpdated extends PacketData{
     public ArrayList<String> playersUID;
     public ArrayList<Boolean> playerReadied;
     public int mapID;
+
+    public PacketDataS2CLobbyInfoUpdated(int lobbyID){
+        this.lobbyID = lobbyID;
+    }
     // Kryo 역직렬화를 위한 기본 생성자
     public PacketDataS2CLobbyInfoUpdated(){
     }

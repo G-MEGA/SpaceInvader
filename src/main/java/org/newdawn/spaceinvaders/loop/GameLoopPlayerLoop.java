@@ -1,5 +1,10 @@
 package org.newdawn.spaceinvaders.loop;
 
+import networking.Network;
+import networking.rudp.Connection;
+import networking.rudp.IRUDPPeerListener;
+import networking.rudp.PacketData.PacketData;
+import networking.rudp.RUDPPeer;
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.enums.GameLoopResultType;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
@@ -31,6 +36,9 @@ public class GameLoopPlayerLoop extends Loop{
     public void process(ArrayList<LoopInput> inputs) {
         super.process(inputs);
 
+        //TODO 네트워크 플레이 적용할 때 이 메서드 어디 위치시킬지 잘 따져야한다
+        getGame().getRudpPeer().processReceivedData();
+
 //          재시작
 //        if (result != GameLoopResultType.InGame && isKeyInputJustPressed("accept")) {
 //            LoopInputLog lastestLog = inputLogs.get(inputLogs.size()-1);
@@ -48,11 +56,11 @@ public class GameLoopPlayerLoop extends Loop{
 
         // 게임 종료 시
         if(gameLoop.getGameResult() != GameLoopResultType.InGame){
-            //메인메뉴로 나가기
+            //TODO 로비로 나가도록 변경하기
             if(isKeyInputJustPressed(0, "escape")) {
                 getGame().changeLoop(new MainMenuLoop(getGame()));
             }
-            //리플레이 저장하고 메인메뉴로 나가기
+            //TODO 로비로 나가도록 변경하기
             else if(isKeyInputJustPressed(0, "record")) {
                 String data = gameLoop.getReplayData();
 
@@ -124,5 +132,29 @@ public class GameLoopPlayerLoop extends Loop{
             g.drawString(message,(800-g.getFontMetrics().stringWidth(message))/2,325);
         }
 
+    }
+
+    @Override
+    protected IRUDPPeerListener generateIRUDPPeerListener() {
+        return new  IRUDPPeerListener() {
+            @Override
+            public boolean onConnected(RUDPPeer peer, Connection connection) {
+                return false;
+            }
+
+            @Override
+            public boolean onDisconnected(RUDPPeer peer, Connection connection) {
+                if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
+                    System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
+                    System.exit(0);
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
+                return false;
+            }
+        };
     }
 }

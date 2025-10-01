@@ -1,5 +1,10 @@
 package org.newdawn.spaceinvaders.loop;
 
+import networking.Network;
+import networking.rudp.Connection;
+import networking.rudp.IRUDPPeerListener;
+import networking.rudp.PacketData.PacketData;
+import networking.rudp.RUDPPeer;
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
@@ -75,6 +80,32 @@ public class LobbyListLoop extends Loop{
     public void process(ArrayList<LoopInput> inputs) {
         super.process(inputs);
 
+        getGame().getRudpPeer().processReceivedData();
+
         processGameObjects();
+    }
+
+    @Override
+    protected IRUDPPeerListener generateIRUDPPeerListener() {
+        return new  IRUDPPeerListener() {
+            @Override
+            public boolean onConnected(RUDPPeer peer, Connection connection) {
+                return false;
+            }
+
+            @Override
+            public boolean onDisconnected(RUDPPeer peer, Connection connection) {
+                if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
+                    System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
+                    System.exit(0);
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
+                return false;
+            }
+        };
     }
 }

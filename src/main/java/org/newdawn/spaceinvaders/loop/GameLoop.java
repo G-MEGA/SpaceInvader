@@ -1,5 +1,10 @@
 package org.newdawn.spaceinvaders.loop;
 
+import networking.Network;
+import networking.rudp.Connection;
+import networking.rudp.IRUDPPeerListener;
+import networking.rudp.PacketData.PacketData;
+import networking.rudp.RUDPPeer;
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.enums.GameLoopResultType;
 import org.newdawn.spaceinvaders.enums.IndicatorTextType;
@@ -427,6 +432,9 @@ public class GameLoop extends Loop {
     public void process(ArrayList<LoopInput> inputs){
         super.process(inputs);
 
+        // 이 클래스는 직접적으로 네트워킹 하지 않으니 주석처리
+//        getGame().getRudpPeer().processReceivedData();
+
         // 프레임별 입력 기록
         if(inputs != null && !inputs.isEmpty()){
             inputLogs.add(new LoopInputLog(currentFrame, inputs));
@@ -472,5 +480,29 @@ public class GameLoop extends Loop {
                 enemies.remove(i);
             }
         }
+    }
+
+    @Override
+    protected IRUDPPeerListener generateIRUDPPeerListener() {
+        return new  IRUDPPeerListener() {
+            @Override
+            public boolean onConnected(RUDPPeer peer, Connection connection) {
+                return false;
+            }
+
+            @Override
+            public boolean onDisconnected(RUDPPeer peer, Connection connection) {
+                if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
+                    System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
+                    System.exit(0);
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
+                return false;
+            }
+        };
     }
 }

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import networking.rudp.IRUDPPeerListener;
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.loop_input.LoopInputKey;
@@ -16,6 +17,12 @@ import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 
 public abstract class Loop  {
     private transient Game game;
+
+    private transient IRUDPPeerListener irudpPeerListener;
+    public IRUDPPeerListener getIrudpPeerListener() {
+        return irudpPeerListener;
+    }
+    protected abstract IRUDPPeerListener generateIRUDPPeerListener();
 
     private int playerCount = -1;
     public int getPlayerCount() {
@@ -46,6 +53,8 @@ public abstract class Loop  {
     public Loop(Game game, int playerCount) {
         this.game = game;
         this.playerCount = playerCount;
+
+        irudpPeerListener = generateIRUDPPeerListener();
 
         for (int i = 0; i < playerCount; i++) {
             isKeyInputPressed.add(new HashMap<>());

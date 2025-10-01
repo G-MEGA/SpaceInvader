@@ -127,6 +127,9 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
         
         if (isDead()){
             destroy();
+
+            ((GameLoop)getLoop()).notifyAlienKilled();// GameLoop에 부고소식 전달
+            
             LootItem item = LootItemFactory.getInstance().instantiateRandomItem((GameLoop)getLoop());
             
             if (item != null){
@@ -207,9 +210,9 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
         }
     }
     
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        ((GameLoop)getLoop()).notifyAlienKilled();// GameLoop에 부고소식 전달
-    }
+    // @Override
+    // public void onDestroy() {
+    //     super.onDestroy();
+    //     ((GameLoop)getLoop()).notifyAlienKilled();// GameLoop에 부고소식 전달
+    // }
 }

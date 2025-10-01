@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 
 import org.newdawn.spaceinvaders.enums.IndicatorTextType;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
+import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
@@ -16,12 +17,17 @@ import org.newdawn.spaceinvaders.loop.Loop;
 
 public class StoreSlot extends GameObject2D implements ICollider2DOwner {
     private IStoreItem item;
+    private boolean isPriceUnkown = false;
     private long price;
     private GameLoop gameLoop;
     private SpriteRenderer spriteRenderer;
     private TextRenderer itemNameText;
     private TextRenderer priceText;
-
+    
+    public IStoreItem getItem() { return item; }
+    public void setPrice(long price) { this.price = price; }
+    public void setPriceUnkown(boolean isPriceUnkown) { this.isPriceUnkown = isPriceUnkown; }
+    
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public StoreSlot(){
         super();
@@ -58,10 +64,25 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner {
 
         setPosX(spawnX);
         setPosY(spawnY);
+
+        setSortingLayer(-100);
+        spriteRenderer.setSortingLayer(-100);
+        itemNameText.setSortingLayer(-100);
+        priceText.setSortingLayer(-100);
+        collider2D.setSortingLayer(-100);
     }
 
     @Override
     protected void draw(Graphics2D g) {
+        String priceTextContent = "";
+        if (isPriceUnkown){
+            priceTextContent = "?";
+        }
+        else{
+            priceTextContent = Long.toString(price);
+        }
+
+        priceText.setText(priceTextContent);
         super.draw(g);
     }
 
@@ -71,6 +92,9 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner {
             if(gameLoop.decreaseCoin(price)){
                 if(item.onAcquire(gameLoop, (PlayerShip)collider)){
                     destroy();
+                }
+                else{
+                    gameLoop.increaseCoin(price); //* IStoreItem의 내부 구매 조건이 충족 되지 않았다면, 환불해줌.
                 }
             }
             else{

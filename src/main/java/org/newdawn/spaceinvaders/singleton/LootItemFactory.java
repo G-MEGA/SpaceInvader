@@ -19,10 +19,10 @@ public class LootItemFactory {
     //TODO Object Pulling을 만들기 -> Loop의 GameObject에 넣어놓기
     private final HashMap<String, Long> _itemWeights = new HashMap<>(); //* <아이템 이름, 가중치
     public LootItemFactory() {
-        _itemWeights.put("none", 75L);
+        _itemWeights.put("none", 50L);
         // _itemWeights.put("shield", 10L);
         // _itemWeights.put("battery", 10L);
-        _itemWeights.put("coin", 20L);
+        _itemWeights.put("coin", 45L);
         _itemWeights.put("scoring", 5L);
         // _itemWeights.put("frozen", 10L);
     }

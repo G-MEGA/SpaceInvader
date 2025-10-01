@@ -11,12 +11,20 @@ import org.newdawn.spaceinvaders.loop_input.LoopInput;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+
+import javax.swing.JFileChooser;
+
+import org.newdawn.spaceinvaders.Game;
+import org.newdawn.spaceinvaders.enums.GameLoopResultType;
+import org.newdawn.spaceinvaders.loop_input.LoopInput;
 
 //플레이어 루프
 //	- 진입 후 수신이든 발신이든 모든 통신을 시작하기까지 1초정도 대기시간 둬야할 듯.
@@ -29,7 +37,16 @@ public class GameLoopPlayerLoop extends Loop{
     public GameLoopPlayerLoop(Game game){
         super(game);
         //TODO 멀티플레이 정보에 따라서 시드, 플레이어 카운트, 마이 픓레이어 아이디, 맵데이터 넣어줘야함
-        gameLoop = new GameLoop(game, 37, 4, 0, "");
+
+        //* 테스트로 맵 파일을 불러옴
+        Path filePath = Paths.get("src/main/resources/maps/map1.map"); // 파일 경로
+        String content = "";
+        try {
+            content = Files.readString(filePath); // 파일 전체를 String으로 읽음
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        gameLoop = new GameLoop(game, 37, 4, 0, content);
     }
 
     @Override

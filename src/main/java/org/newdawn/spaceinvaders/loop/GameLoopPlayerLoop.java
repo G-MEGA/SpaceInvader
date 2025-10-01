@@ -36,7 +36,7 @@ public class GameLoopPlayerLoop extends Loop{
 
     public GameLoopPlayerLoop(Game game){
         super(game);
-        //TODO 멀티플레이 정보에 따라서 시드, 플레이어 카운트, 마이 픓레이어 아이디, 맵데이터 넣어줘야함
+        //TODO 멀티플레이 정보에 따라서 시드, 플레이어 카운트, 마이 플레이어 아이디, 맵데이터 넣어줘야함
 
         //* 테스트로 맵 파일을 불러옴
         Path filePath = Paths.get("src/main/resources/maps/map1.map"); // 파일 경로
@@ -79,6 +79,7 @@ public class GameLoopPlayerLoop extends Loop{
             }
             //TODO 로비로 나가도록 변경하기
             else if(isKeyInputJustPressed(0, "record")) {
+                //TODO 시드, 플레이어 카운트, 마이 플레이어 아이디, 맵데이터도 Replay에
                 String data = gameLoop.getReplayData();
 
                 // JFileChooser 객체 생성

@@ -206,10 +206,6 @@ public class GameLoop extends Loop {
 
         startGame();
     }
-    //TODO 오예준씨 맵 데이터 파싱 여기서 하면 됨
-    private void parseMapData(String rawMapData){
-
-    }
 
     private void initText() {
         //* 좌측 상단 Text 관련 초기화

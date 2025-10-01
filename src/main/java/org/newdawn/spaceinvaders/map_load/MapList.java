@@ -68,7 +68,7 @@ public class MapList {
      * @param path resources 폴더를 기준으로 한 내부 디렉터리 경로 (예: "maps")
      * @return 파일 이름 목록
      */
-    public ArrayList<Path> listFiles(String path) throws IOException, URISyntaxException {
+    private ArrayList<Path> listFiles(String path) throws IOException, URISyntaxException {
         // 1. ClassLoader를 통해 리소스의 URL을 가져옵니다.
         URL url = this.getClass().getClassLoader().getResource(path);
         if (url == null) {

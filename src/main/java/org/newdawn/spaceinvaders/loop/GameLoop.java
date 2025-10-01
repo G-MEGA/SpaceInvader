@@ -9,6 +9,7 @@ import org.newdawn.spaceinvaders.enums.SectionType;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.loop_input.LoopInputLog;
+import org.newdawn.spaceinvaders.map_load.MapList;
 import org.newdawn.spaceinvaders.map_load.SectionData;
 import org.newdawn.spaceinvaders.map_load.map_load_commands.InstantiateCommand;
 import org.newdawn.spaceinvaders.map_load.map_load_commands.MapLoadCommand;
@@ -20,6 +21,10 @@ import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -60,6 +65,8 @@ public class GameLoop extends Loop {
     private long scoredTimeElapsed = 0;
 
     int myPlayerID = -1;
+    int randomSeed = -1;
+    int mapID = -1;
 
     /** The entity representing the player */
     private ArrayList<PlayerShip> ships = new ArrayList<>();
@@ -187,16 +194,30 @@ public class GameLoop extends Loop {
     private SectionData currentSection;
     private long sectionElapsed = 0;
 
+
+
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public GameLoop(){
         super();
     }
-    public GameLoop(Game game, int randomSeed, int playerCount, int myPlayerID, String rawMapData){
+    public GameLoop(Game game, int randomSeed, int playerCount, int myPlayerID, int mapID){
         super(game, playerCount);
 
         this.myPlayerID = myPlayerID;
+        this.randomSeed = randomSeed;
+        this.mapID = mapID;
 
         random = new SerializableRandom(17L * randomSeed); // 소수 17을 곱해서 더 랜덤하게
+
+        //mapID에 따른 맵 불러오기
+        Path filePath = game.getMapList().getList().get(mapID).getPath(); // 파일 경로
+        String rawMapData = "";
+        try {
+            rawMapData = Files.readString(filePath); // 파일 전체를 String으로 읽음
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         parseMapData(rawMapData);
 
         startGame();
@@ -444,10 +465,20 @@ public class GameLoop extends Loop {
 //            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외
 //            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외
 
-        // 현재 시간에 대한 인풋 하나 더 넣어서 마지막 입력으로부터 리플레이 저장 시점까지도 기록하게 함
-        inputLogs.add(new LoopInputLog(currentFrame, new ArrayList<LoopInput>()));
 
         StringBuilder sb = new StringBuilder();
+
+        //region GameLoop 구성 데이터 저장
+        sb.append("GameLoop::randomSeed=").append(randomSeed).append("\n");
+        sb.append("GameLoop::playerCount=").append(getPlayerCount()).append("\n");
+        sb.append("GameLoop::myPlayerID=").append(myPlayerID).append("\n");
+        sb.append("GameLoop::mapID=").append(mapID).append("\n");
+        //endregion
+
+        //region 인풋 데이터 저장
+        // 현재 시간에 대한 인풋 하나 더 넣어서 마지막 입력으로부터 리플레이 저장 시점까지도 기록하게 함
+        inputLogs.add(new LoopInputLog(currentFrame, new ArrayList<LoopInput>()));
+        // 모든 인풋 데이터 저장
         for(LoopInputLog loopInputLog : inputLogs){
             String loopInputLogData = loopInputLog.toSaveData();
 
@@ -457,10 +488,9 @@ public class GameLoop extends Loop {
 
             sb.append(loopInputLogData).append("\n");
         }
+        //endregion
 
-        String data = sb.toString();
-
-        return data;
+        return sb.toString();
     }
 
     public void requestToSlowDownEnemies(){

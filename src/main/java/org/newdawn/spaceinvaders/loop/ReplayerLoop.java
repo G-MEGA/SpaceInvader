@@ -29,15 +29,32 @@ public class ReplayerLoop extends Loop{
 
         this.replaySaveData = replaySaveData;
 
-        //TODO 리플레이 정보에 따라서 시드, 플레이어 카운트, 마이 플레이어 아이디, 맵데이터 넣어줘야함
-        gameLoop = new GameLoop(game, 37, 4, 0, "");
-
         String[] splited = replaySaveData.trim().split("\n");
 
+        int randomSeed = -1;
+        int playerCount = -1;
+        int myPlayerID = -1;
+        int mapID = -1;
+
         for(String s: splited){
-            inputLogs.add(new LoopInputLog(s));
+            if(s.startsWith("GameLoop::randomSeed=")){
+                randomSeed = Integer.parseInt(s.split("=")[1]);
+            }
+            else if(s.startsWith("GameLoop::playerCount=")){
+                playerCount = Integer.parseInt(s.split("=")[1]);
+            }
+            else if(s.startsWith("GameLoop::myPlayerID=")){
+                myPlayerID = Integer.parseInt(s.split("=")[1]);
+            }
+            else if(s.startsWith("GameLoop::mapID=")){
+                mapID = Integer.parseInt(s.split("=")[1]);
+            }
+            else{
+                inputLogs.add(new LoopInputLog(s));
+            }
         }
 
+        gameLoop = new GameLoop(game, randomSeed, playerCount , myPlayerID , mapID );
         currentFrame = gameLoop.currentFrame;
     }
 

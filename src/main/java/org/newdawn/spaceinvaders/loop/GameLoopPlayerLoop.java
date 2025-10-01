@@ -3,7 +3,7 @@ package org.newdawn.spaceinvaders.loop;
 import networking.Network;
 import networking.rudp.Connection;
 import networking.rudp.IRUDPPeerListener;
-import networking.rudp.PacketData.PacketData;
+import networking.rudp.PacketData.*;
 import networking.rudp.RUDPPeer;
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.enums.GameLoopResultType;
@@ -163,8 +163,51 @@ public class GameLoopPlayerLoop extends Loop{
 
             @Override
             public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
+                if (data instanceof PacketDataS2CPreprocessForGame) {
+                    return true;
+                }
+                else if (data instanceof PacketDataS2CStartGame) {
+                    return true;
+                }
+                else if (data instanceof PacketDataP2PInput) {
+                    return true;
+                }
                 return false;
             }
         };
+    }
+
+    void preprocessOK(){
+        try {
+            getGame().getRudpPeer().broadcastAboutTag("server", new PacketDataC2SPreprocessOK());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    void p2pInput(long inputFrame, ArrayList<String> inputs) {
+        try {
+            PacketDataP2PInput packetData = new PacketDataP2PInput();
+
+            packetData.inputFrame  = inputFrame;
+            packetData.inputs  = inputs;
+
+            getGame().getRudpPeer().broadcast(packetData, "server");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    void gameResult(){
+        if(gameLoop.getGameResult() == GameLoopResultType.InGame){
+            System.err.println("아직 게임이 끝나지 않은 상태에서는 게임 결과를 서버로 전송할 수 없음");
+            return;
+        }
+
+        try {
+            getGame().getRudpPeer().broadcastAboutTag("server", new PacketDataC2SGameResult(
+                    gameLoop.getScore(), gameLoop.getGameResult() ==  GameLoopResultType.Win
+            ));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

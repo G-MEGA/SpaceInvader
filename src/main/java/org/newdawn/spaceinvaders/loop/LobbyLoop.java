@@ -3,7 +3,7 @@ package org.newdawn.spaceinvaders.loop;
 import networking.Network;
 import networking.rudp.Connection;
 import networking.rudp.IRUDPPeerListener;
-import networking.rudp.PacketData.PacketData;
+import networking.rudp.PacketData.*;
 import networking.rudp.RUDPPeer;
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
@@ -31,12 +31,16 @@ import java.util.ArrayList;
 //게임 시작(방 내의 모든 클라로부터 p2p연결 완료 수신시... 서버 내부적으로는 레디 전부 풀어버림)(클라가 이거 받으면 게임루프플레이어루프로 넘어감)
 
 public class LobbyLoop extends Loop{
+    GameObject2D lobbyGUI;
+
     GameObject2D mapSelectionGUI;
 
     GameObject2D mapSelectionButtonContainer;
     TextRenderer mapInfoTextRenderer;
 
     GameObject2D gameRoomGUI;
+
+    boolean waitingForServer = false;
 
     public LobbyLoop(Game game) {
         super(game);
@@ -76,8 +80,10 @@ public class LobbyLoop extends Loop{
 
         //endregion
 
-        addGameObject(mapSelectionGUI);
-//        addGameObject(gameRoomGUI);
+        lobbyGUI.addChild(mapSelectionGUI);
+//        lobbyGUI.addChild(gameRoomGUI);
+
+        addGameObject(lobbyGUI);
     }
 
     @Override
@@ -108,8 +114,44 @@ public class LobbyLoop extends Loop{
 
             @Override
             public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
+                if (data instanceof PacketDataS2CLobbyInfoUpdated) {
+                    return true;
+                }
+                else if (data instanceof PacketDataS2CPreprocessForGame) {
+                    // GameLoopPlayerLoop로 넘겨
+                    return false;
+                }
+
                 return false;
             }
         };
+    }
+
+    void updateLobbyInfo(int mapID) {
+        try {
+            PacketDataC2SUpdateLobbyInfo d = new PacketDataC2SUpdateLobbyInfo();
+            d.mapID = mapID;
+            getGame().getRudpPeer().broadcastAboutTag("server", d);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    void exitLobby(){
+        waitingForServer = true;
+
+        try {
+            getGame().getRudpPeer().broadcastAboutTag("server", new PacketDataC2SExitLobby());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    void ready(){
+        waitingForServer = true;
+
+        try {
+            getGame().getRudpPeer().broadcastAboutTag("server", new PacketDataC2SReady());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

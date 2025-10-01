@@ -18,6 +18,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Map;
 
 public class Main {
     RUDPPeer rudpPeer;
@@ -28,6 +29,7 @@ public class Main {
     Container loginContainer;
     Container registerContainer;
 
+    Map<String, String> authInfo;
     boolean authenticated = false;
 
     IRUDPPeerListener rudpPeerListener = new IRUDPPeerListener() {
@@ -201,11 +203,11 @@ public class Main {
             String password = String.valueOf(loginPasswordText.getPassword()).trim();
 
             try {
-                String authToken = auth.signIn(email, password);
-                System.out.println("Firebase 로그인 완료 " + authToken);
+                authInfo = auth.signIn(email, password);
+                System.out.println("Firebase 로그인 완료 " + authInfo.get("idToken"));
                 authFrame.setVisible(false);
 
-                tryAuth(authToken);
+                tryAuth(authInfo.get("idToken"));
             } catch (Exception ex) {
                 //인증 실패시 실패사유 출력
                 JsonObject json = JsonParser.parseString(ex.getMessage()).getAsJsonObject();
@@ -243,11 +245,11 @@ public class Main {
             }
 
             try {
-                String authToken = auth.signUp(email, password);
-                System.out.println("Firebase 회원가입 완료 " + authToken);
+                authInfo = auth.signUp(email, password);
+                System.out.println("Firebase 회원가입 완료 " + authInfo.get("idToken"));
                 authFrame.setVisible(false);
 
-                tryAuth(authToken);
+                tryAuth(authInfo.get("idToken"));
             } catch (Exception ex) {
                 //인증 실패시 실패사유 출력
                 JsonObject json = JsonParser.parseString(ex.getMessage()).getAsJsonObject();
@@ -276,7 +278,7 @@ public class Main {
     }
     public void startGame(){
         rudpPeer.removeListener(rudpPeerListener);
-        Game g = new Game(60L << 16, rudpPeer);
+        Game g = new Game(60L << 16, rudpPeer, authInfo.get("localId"));
         g.loop();
     }
     public void tryAuth(String authToken) throws Exception {

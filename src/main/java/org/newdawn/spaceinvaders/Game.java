@@ -46,6 +46,7 @@ public class Game extends Canvas
     {
         return rudpPeer;
     }
+    public final String myUID;
 
     private MapList mapList;
 
@@ -68,7 +69,7 @@ public class Game extends Canvas
 	/**
 	 * Construct our game and set it running.
 	 */
-	public Game(long fixedFPS, RUDPPeer rudpPeer) {
+	public Game(long fixedFPS, RUDPPeer rudpPeer, String myUID) {
         this.fixedFPS = fixedFPS;
         this.fixedDeltaTime = FixedPointUtil.div(FixedPointUtil.ONE, fixedFPS);
 
@@ -118,6 +119,8 @@ public class Game extends Canvas
 		SpriteStore.get().getSprite("sprites/whiteBackground.png", 400 << 16, 300 << 16, 100 << 16);
 
         this.rudpPeer = rudpPeer;
+        this.myUID = myUID;
+        System.out.println("myUID: " + myUID);
 
         changeLoop(new MainMenuLoop(this));  // 게임 시작 후 가장 처음 진입할 Loop);
 

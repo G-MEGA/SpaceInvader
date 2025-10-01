@@ -16,22 +16,22 @@ public class FirebaseClientAuth {
     private static final Gson gson = new Gson();
 
     /**
-     * Firebase에 이메일/비밀번호로 회원가입을 요청하고 ID 토큰을 반환합니다.
+     * Firebase에 이메일/비밀번호로 회원가입을 요청
      */
-    public String signUp(String email, String password) throws Exception {
+    public Map<String, String> signUp(String email, String password) throws Exception {
         String url = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" + WEB_API_KEY;
         return requestAuth(url, email, password);
     }
 
     /**
-     * Firebase에 이메일/비밀번호로 로그인을 요청하고 ID 토큰을 반환합니다.
+     * Firebase에 이메일/비밀번호로 로그인을 요청
      */
-    public String signIn(String email, String password) throws Exception {
+    public Map<String, String> signIn(String email, String password) throws Exception {
         String url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + WEB_API_KEY;
         return requestAuth(url, email, password);
     }
 
-    private String requestAuth(String urlString, String email, String password) throws Exception {
+    private Map<String, String> requestAuth(String urlString, String email, String password) throws Exception {
         URL url = new URL(urlString);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
@@ -53,7 +53,7 @@ public class FirebaseClientAuth {
         if (responseCode == HttpURLConnection.HTTP_OK) {
             try (InputStreamReader reader = new InputStreamReader(conn.getInputStream())) {
                 Map<String, String> result = gson.fromJson(reader, Map.class);
-                return result.get("idToken"); // 성공 시 ID 토큰 반환
+                return result;
             }
         } else {
             // 1. 에러 스트림을 가져옵니다.

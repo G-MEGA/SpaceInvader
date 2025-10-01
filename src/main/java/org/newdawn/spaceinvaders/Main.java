@@ -20,9 +20,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 public class Main {
-    final String SERVER_IP = "34.67.77.26";
-//    final String SERVER_IP = "127.0.0.1";
-
     RUDPPeer rudpPeer;
 
     JFrame authFrame;
@@ -37,7 +34,7 @@ public class Main {
         @Override
         public boolean onConnected(RUDPPeer peer, networking.rudp.Connection connection) {
             System.out.println(connection.getAddress().getAddress().getHostAddress() + " connected");
-            if (connection.getAddress().getAddress().getHostAddress().equals(SERVER_IP)) {
+            if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
                 connection.tag = "server";
             }
             return true;
@@ -45,7 +42,7 @@ public class Main {
 
         @Override
         public boolean onDisconnected(RUDPPeer peer, networking.rudp.Connection connection) {
-            if (connection.getAddress().getAddress().getHostAddress().equals(SERVER_IP)) {
+            if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
                 System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
                 System.exit(0);
             }
@@ -63,11 +60,11 @@ public class Main {
                 if (((PacketDataS2CAuthOK)data).ok) {
                     authenticated = true;
                     authFrame.dispose();
+                    startGame();
                 }
                 else{
                     //TODO 인증 실패
                 }
-                startGame();
             }
             return true;
         }
@@ -82,7 +79,7 @@ public class Main {
 
         rudpPeer.start();
 
-        InetSocketAddress serverAddress = new InetSocketAddress(SERVER_IP, Network.SERVER_UDP_PORT);
+        InetSocketAddress serverAddress = new InetSocketAddress(Network.SERVER_IP, Network.SERVER_UDP_PORT);
         int max = 5;
         for(int i = 0; i < max; i++){
             if(rudpPeer.isConnected(serverAddress)) break;
@@ -279,7 +276,7 @@ public class Main {
     }
     public void startGame(){
         rudpPeer.removeListener(rudpPeerListener);
-        Game g = new Game(60L << 16);
+        Game g = new Game(60L << 16, rudpPeer);
         g.loop();
     }
     public void tryAuth(String authToken) throws Exception {

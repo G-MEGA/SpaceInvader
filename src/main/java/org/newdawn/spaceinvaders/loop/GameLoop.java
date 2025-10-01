@@ -1,5 +1,10 @@
 package org.newdawn.spaceinvaders.loop;
 
+import networking.Network;
+import networking.rudp.Connection;
+import networking.rudp.IRUDPPeerListener;
+import networking.rudp.PacketData.PacketData;
+import networking.rudp.RUDPPeer;
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.enums.GameLoopResultType;
 import org.newdawn.spaceinvaders.enums.GameObjectType;
@@ -239,7 +244,7 @@ public class GameLoop extends Loop {
         coinCountText.setSortingLayer(100);
         playerHealthText.setSortingLayer(100);
         activeSkillText.setSortingLayer(100);
-        passiveSkillHeaderText.setSortingLayer(100);        
+        passiveSkillHeaderText.setSortingLayer(100);
 
         addGameObject(scoreText);
         addGameObject(coinCountText);
@@ -436,7 +441,7 @@ public class GameLoop extends Loop {
                         FixedPointUtil.ONE + FixedPointUtil.ZERO_02);
             }
         }
-    
+
         if (enemies.isEmpty()) { hasEnemy = false; }
     }
 
@@ -508,6 +513,9 @@ public class GameLoop extends Loop {
             deserializeMapdata();
         }
 
+        // 이 클래스는 직접적으로 네트워킹 하지 않으니 주석처리
+//        getGame().getRudpPeer().processReceivedData();
+
         // 프레임별 입력 기록
         if(inputs != null && !inputs.isEmpty()){
             inputLogs.add(new LoopInputLog(currentFrame, inputs));
@@ -563,7 +571,7 @@ public class GameLoop extends Loop {
                     }
                 }
                 //* 현재 Section이 Store 타입이라면, Scection 시작 15초 후에 Section 종료
-                if (currentSection.getSectionType() == SectionType.Store){  
+                if (currentSection.getSectionType() == SectionType.Store){
                     if (sectionElapsed >= (15 << 16)){
                         hasSectionEnd = true;
                         sectionElapsed = 0;
@@ -611,4 +619,27 @@ public class GameLoop extends Loop {
         }
     }
 
+    @Override
+    protected IRUDPPeerListener generateIRUDPPeerListener() {
+        return new  IRUDPPeerListener() {
+            @Override
+            public boolean onConnected(RUDPPeer peer, Connection connection) {
+                return false;
+            }
+
+            @Override
+            public boolean onDisconnected(RUDPPeer peer, Connection connection) {
+                if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
+                    System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
+                    System.exit(0);
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
+                return false;
+            }
+        };
+    }
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class PacketDataS2CPreprocessForGame extends PacketData{
     public long gameLoopSeed;
+    public int mapID;
     public ArrayList<String> playersUID;
     public ArrayList<String> addresses;
     public ArrayList<String> ports;

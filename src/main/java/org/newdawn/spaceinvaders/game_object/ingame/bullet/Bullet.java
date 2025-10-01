@@ -48,6 +48,7 @@ public abstract class Bullet extends Mover2D implements ICollider2DOwner {
         this.spawnSpeed = spawnSpeed;
     }
 
+    @Override
     protected void process(long deltaTime) {
         super.process(deltaTime);
 

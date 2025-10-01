@@ -1,7 +1,6 @@
 package org.newdawn.spaceinvaders.game_object.ingame.enemy;
 
 import org.newdawn.spaceinvaders.game_object.GameObject;
-import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.boss.Boss;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.common.Alien;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.common.Artillery;
@@ -65,6 +64,8 @@ public class EnemyFactory extends GameObject{
             return null;
         }
         
+        gameLoop.notifyEnemyInstantiated();
+
         enemy.setPosRotation(spawnPosX, spawnPosY, spawnAngle);
         hiveMind.addListener(enemy);
         
@@ -74,7 +75,7 @@ public class EnemyFactory extends GameObject{
             return enemy;
         }
         
-        gameLoop.addGameObject(enemy);
+        gameLoop.addEnemy(enemy);
         return enemy;
     }
 }

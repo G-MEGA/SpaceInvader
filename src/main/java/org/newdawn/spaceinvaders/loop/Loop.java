@@ -65,7 +65,7 @@ public abstract class Loop  {
 
             gameObject.propagateGetLayerSet(layerSet);
         }
-
+        
         for (Integer layer : layerSet) {
             // cycle round drawing all the entities we have in the game
             for (int i=0;i<gameObjects.size();i++) {

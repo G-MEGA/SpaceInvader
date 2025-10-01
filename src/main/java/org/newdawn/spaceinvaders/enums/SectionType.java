@@ -1,6 +1,6 @@
 package org.newdawn.spaceinvaders.enums;
 
-public enum SectionCommandType {
+public enum SectionType {
     // Enum constants with their associated string values
     NewWave("new-wave"),
     Store("store");
@@ -9,7 +9,7 @@ public enum SectionCommandType {
     private final String value;
 
     // Constructor to initialize the string value
-    SectionCommandType(String value) {
+    SectionType(String value) {
         this.value = value;
     }
 
@@ -19,8 +19,8 @@ public enum SectionCommandType {
     }
     
     // Convert string to enum (factory method)
-    public static SectionCommandType fromValue(String value) {
-        for (SectionCommandType type : values()) {
+    public static SectionType fromValue(String value) {
+        for (SectionType type : values()) {
             
             if (type.value.equalsIgnoreCase(value)) { // 대소문자 구분 없음
                 return type;

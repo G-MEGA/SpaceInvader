@@ -3,11 +3,8 @@ package org.newdawn.spaceinvaders.enums;
 public enum GameObjectType {
     // Enum constants with their associated string values
     Enemy("enemy"),
-    Coin("coin"),
-    Item("item"),
-    Player("player"),
-    Effect("effect"),
-    Text("text");
+    PassiveSkill("passiveskill"),
+    ActiveSkill("activeskill");
 
     // Field to store the string value
     private final String value;

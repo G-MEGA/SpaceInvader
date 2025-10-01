@@ -96,32 +96,59 @@ public class RUDPPeer implements AutoCloseable{
         }
     }
 
-    //region 발신 스레드
+    public boolean isConnected(InetSocketAddress address) {
+        return connections.containsKey(address);
+    }
 
+    //region 발신 스레드
     public void processReceivedData(){
+        if(listeners.isEmpty()){
+            System.out.println("RUDPPeer : There is no listener");
+            return;
+        }
+
         for (Connection connection : connections.values()){
-            while(!connection.getReceivedData().isEmpty()){
+            for(int i = 0; i < connection.getReceivedData().size(); i++){
                 PacketData packetData = connection.getReceivedData().poll();
+                boolean processed = true;
 
                 for(IRUDPPeerListener listener : listeners){
-                    if(listener == null) continue;
+                    if(listener == null) {
+                        System.err.println("RUDPPeer : listener is null");
+                        continue;
+                    }
+
+                    // 처리 수락, 거부 여부
+                    boolean result;
 
                     if(packetData instanceof PacketDataDisconnect){
-                        listener.onDisconnected(this, connection);
+                        result = listener.onDisconnected(this, connection);
                     }
                     else if(packetData instanceof PacketDataConnect){
-                        listener.onConnected(this, connection);
+                        result = listener.onConnected(this, connection);
                     }
                     else{
-                        listener.onReceived(this, connection, packetData);
+                        result = listener.onReceived(this, connection, packetData);
                     }
+
+                    // 처리 거부시 루프 탈출
+                    if(!result){
+                        processed = false;
+                        break;
+                    }
+                }
+
+                // 모든 Listener에서 처리 수락하면 큐에서 제거된 채로 진행
+                // 하나라도 처리 거부시 큐에 다시 넣음
+                if(!processed){
+                    connection.getReceivedData().offer(packetData);
                 }
             }
         }
     }
 
     public void connect(InetSocketAddress address) throws Exception {
-        if (connections.containsKey(address)) {
+        if (isConnected(address)) {
             return;
         }
         sendPacket(address, new Packet(Packet.PacketType.CONNECT), serializerForSend);

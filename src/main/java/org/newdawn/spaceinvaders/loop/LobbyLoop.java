@@ -11,7 +11,7 @@ import org.newdawn.spaceinvaders.map_load.MapInfo;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class MapSelectionLoop extends Loop{
+public class LobbyLoop extends Loop{
     GameObject2D mapSelectionGUI;
 
     GameObject2D mapSelectionButtonContainer;
@@ -19,7 +19,7 @@ public class MapSelectionLoop extends Loop{
 
     GameObject2D gameRoomGUI;
 
-    public MapSelectionLoop(Game game) {
+    public LobbyLoop(Game game) {
         super(game);
 
         mapSelectionGUI = new GameObject2D(this);

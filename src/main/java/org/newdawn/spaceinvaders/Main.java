@@ -31,41 +31,71 @@ public class Main {
     Container loginContainer;
     Container registerContainer;
 
+    boolean authenticated = false;
+
+    IRUDPPeerListener rudpPeerListener = new IRUDPPeerListener() {
+        @Override
+        public boolean onConnected(RUDPPeer peer, networking.rudp.Connection connection) {
+            System.out.println(connection.getAddress().getAddress().getHostAddress() + " connected");
+            if (connection.getAddress().getAddress().getHostAddress().equals(SERVER_IP)) {
+                connection.tag = "server";
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onDisconnected(RUDPPeer peer, networking.rudp.Connection connection) {
+            if (connection.getAddress().getAddress().getHostAddress().equals(SERVER_IP)) {
+                System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
+                System.exit(0);
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onReceived(RUDPPeer peer, networking.rudp.Connection connection, PacketData data) {
+            if(data instanceof PacketDataS2CAuthOK) {
+                if(authenticated) {
+                    return true;
+                }
+
+                System.out.println("서버 측 인증 결과 " + ((PacketDataS2CAuthOK)data).ok);
+                if (((PacketDataS2CAuthOK)data).ok) {
+                    authenticated = true;
+                    authFrame.dispose();
+                }
+                else{
+                    //TODO 인증 실패
+                }
+                startGame();
+            }
+            return true;
+        }
+    };
+
     public Main() throws Exception {
         GameLoopSerializer.getInstance();// GameLoopSerializer 초기화
 
         rudpPeer = new RUDPPeer(Network.PEER_UDP_PORT);
-        rudpPeer.addListener(
-                new IRUDPPeerListener() {
-                    @Override
-                    public void onConnected(RUDPPeer peer, networking.rudp.Connection connection) {
-                        System.out.println(connection.getAddress().getAddress().getHostAddress() + " connected");
-                        if (connection.getAddress().getAddress().getHostAddress().equals(SERVER_IP)) {
-                            connection.tag = "server";
-                        }
-                    }
 
-                    @Override
-                    public void onDisconnected(RUDPPeer peer, networking.rudp.Connection connection) {
-                        if (connection.getAddress().getAddress().getHostAddress().equals(SERVER_IP)) {
-                        System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
-                        System.exit(0);
-                        }
-                    }
-
-                    @Override
-                    public void onReceived(RUDPPeer peer, networking.rudp.Connection connection, PacketData data) {
-                        if(data instanceof PacketDataS2CAuthOK) {
-                            System.out.println("서버 측 인증 결과 " + ((PacketDataS2CAuthOK)data).ok);
-                            if (((PacketDataS2CAuthOK)data).ok) authFrame.dispose();
-                            startGame();
-                        }
-                    }
-                }
-        );
+        rudpPeer.addListener(rudpPeerListener);
 
         rudpPeer.start();
-        rudpPeer.connect(new InetSocketAddress(SERVER_IP, Network.SERVER_UDP_PORT));
+
+        InetSocketAddress serverAddress = new InetSocketAddress(SERVER_IP, Network.SERVER_UDP_PORT);
+        int max = 5;
+        for(int i = 0; i < max; i++){
+            if(rudpPeer.isConnected(serverAddress)) break;
+
+            System.out.println("서버와 연결 시도..." + (i+1) + "/ " + max);
+            rudpPeer.connect(serverAddress);
+
+            Thread.sleep(1000);
+        }
+
+        if(!rudpPeer.isConnected(serverAddress)){
+            //TODO 서버 연결에 실패 한 경우 처리
+        }
 
         authFrame = new JFrame("로그인/회원가입");
         authFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -242,16 +272,19 @@ public class Main {
         authFrame.setLocationRelativeTo(null);//창을 디스플레이 가운데 배치
         authFrame.setVisible(true);
 
-        while(authFrame.isDisplayable()){
+        while(!authenticated){
             Thread.sleep(100);
             rudpPeer.processReceivedData();
         }
     }
     public void startGame(){
+        rudpPeer.removeListener(rudpPeerListener);
         Game g = new Game(60L << 16);
         g.loop();
     }
     public void tryAuth(String authToken) throws Exception {
+        if(authenticated) return;
+
         rudpPeer.broadcastAboutTag("server", new PacketDataC2SAuth(authToken));
     }
 

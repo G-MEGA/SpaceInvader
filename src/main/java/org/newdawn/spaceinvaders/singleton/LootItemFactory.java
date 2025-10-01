@@ -1,3 +1,4 @@
+
 package org.newdawn.spaceinvaders.singleton;
 
 import java.util.HashMap;

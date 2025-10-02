@@ -56,7 +56,7 @@ public class StoreSlotFactory {
             return;
         }
 
-        StoreSlot storeSlot = new StoreSlot(gameLoop, skillLevel.intValue() + 1, passiveSkill, spawnPosX, spawnPosY);
+        StoreSlot storeSlot = new StoreSlot(gameLoop, skillLevel.intValue()*2 + 1, passiveSkill, spawnPosX, spawnPosY);
         gameLoop.addStoreSlot(storeSlot);
     }
 
@@ -65,7 +65,7 @@ public class StoreSlotFactory {
             storeSlot.setPriceUnkown(true);
         }
         else{
-            storeSlot.setPrice(playerShip.getPassiveSkillLevel(type) + 1);
+            storeSlot.setPrice(playerShip.getPassiveSkillLevel(type)*2 + 1);
         }
     }
     

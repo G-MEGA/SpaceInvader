@@ -9,7 +9,7 @@ public class Alien extends SweeperEnemy{
         super();
     }
     public Alien(GameLoop gameLoop, HiveMind hiveMind){
-        super(gameLoop, hiveMind, 5);
+        super(gameLoop, hiveMind, 3);
     }
 
     @Override

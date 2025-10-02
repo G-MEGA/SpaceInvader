@@ -1,13 +1,11 @@
 package org.newdawn.spaceinvaders.game_object.ingame.loot_item;
 
-import org.newdawn.spaceinvaders.Game;
-import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
+import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
 import org.newdawn.spaceinvaders.loop.GameLoop;
-import org.newdawn.spaceinvaders.loop.Loop;
 
 public class ScoringItem extends LootItem {
     private static final String spriteRef = "sprites/scoringItem.png";
-    private final int scoringScore = 1000;
+    private static final int scoringScore = 1000;
 
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public ScoringItem(){

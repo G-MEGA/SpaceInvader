@@ -16,7 +16,6 @@ import org.newdawn.spaceinvaders.map_load.map_load_commands.MapLoadCommand;
 import org.newdawn.spaceinvaders.map_load.map_load_commands.SectionCommand;
 import org.newdawn.spaceinvaders.singleton.MapDataParser;
 import org.newdawn.spaceinvaders.game_object.GameObject;
-import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
 
 import java.awt.Color;
@@ -38,6 +37,8 @@ import org.newdawn.spaceinvaders.game_object.ingame.store.StoreSlot;
 import org.newdawn.spaceinvaders.game_object.ingame.store.StoreSlotFactory;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.EnemyFactory;
+import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
+
 import random.SerializableRandom;
 
 public class GameLoop extends Loop {

@@ -1,6 +1,6 @@
 package org.newdawn.spaceinvaders.game_object.ingame.store;
 
-import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
+import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 import org.newdawn.spaceinvaders.sprite.Sprite;
 

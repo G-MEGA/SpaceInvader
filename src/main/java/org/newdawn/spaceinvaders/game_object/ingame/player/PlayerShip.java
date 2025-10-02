@@ -1,4 +1,4 @@
-package org.newdawn.spaceinvaders.game_object.ingame;
+package org.newdawn.spaceinvaders.game_object.ingame.player;
 
 import java.util.HashMap;
 
@@ -10,6 +10,7 @@ import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 import org.newdawn.spaceinvaders.game_object.ingame.bullet.EnemyBullet;
 import org.newdawn.spaceinvaders.game_object.ingame.bullet.PlayerBullet;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
+import org.newdawn.spaceinvaders.game_object.ingame.laser.EnemyLaser;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.ActiveSkill;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;

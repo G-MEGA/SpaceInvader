@@ -1,6 +1,6 @@
 package org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill;
 
-import org.newdawn.spaceinvaders.game_object.ingame.bullet.PlayerLaser;
+import org.newdawn.spaceinvaders.game_object.ingame.laser.PlayerLaser;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class LaserSkill extends ActiveSkill{

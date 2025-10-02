@@ -2,7 +2,7 @@ package org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill;
 
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.effect.BlankScreenEffect;
-import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
+import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class BombSkill extends ActiveSkill {

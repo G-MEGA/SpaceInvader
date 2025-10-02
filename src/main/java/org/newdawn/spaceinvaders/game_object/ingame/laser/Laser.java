@@ -1,4 +1,4 @@
-package org.newdawn.spaceinvaders.game_object.ingame.bullet;
+package org.newdawn.spaceinvaders.game_object.ingame.laser;
 
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
@@ -8,7 +8,6 @@ import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.Loop;
 
 public abstract class Laser extends GameObject2D implements ICollider2DOwner{
-    private String spriteRef;
     private int damage;
     private long lifeDuration;
     private long spawnElapsed = 0;
@@ -21,7 +20,6 @@ public abstract class Laser extends GameObject2D implements ICollider2DOwner{
     public Laser(Loop loop, long spawnPosX, long spawnPosY, long spawnOffset, long spawnAngle, String spriteRef, int damage, long lifeDuration) {
         super(loop);
 
-        this.spriteRef = spriteRef;
         this.damage = damage;
         this.lifeDuration = lifeDuration;
 

@@ -10,14 +10,14 @@ import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
-import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
+import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 import org.newdawn.spaceinvaders.loop.Loop;
 
 public class StoreSlot extends GameObject2D implements ICollider2DOwner {
     private IStoreItem item;
-    private boolean isPriceUnkown = false;
+    private boolean isPriceUnknown = false;
     private long price;
     private GameLoop gameLoop;
     private SpriteRenderer spriteRenderer;
@@ -26,7 +26,7 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner {
     
     public IStoreItem getItem() { return item; }
     public void setPrice(long price) { this.price = price; }
-    public void setPriceUnkown(boolean isPriceUnkown) { this.isPriceUnkown = isPriceUnkown; }
+    public void setPriceUnknown(boolean isPriceUnkown) { this.isPriceUnknown = isPriceUnkown; }
     
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public StoreSlot(){
@@ -75,7 +75,7 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner {
     @Override
     protected void draw(Graphics2D g) {
         String priceTextContent = "";
-        if (isPriceUnkown){
+        if (isPriceUnknown){
             priceTextContent = "?";
         }
         else{

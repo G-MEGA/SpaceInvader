@@ -10,7 +10,7 @@ import org.newdawn.spaceinvaders.loop.GameLoop;
 public abstract class Bullet extends Mover2D implements ICollider2DOwner {
      /** True if this shot has been "used", i.e. its hit something */
     protected boolean used = false;
-    protected long spawnSpeed = 0;;
+    protected long spawnSpeed = 0;
     public long getSpawnSpeed() { return spawnSpeed; }
 
     // Kryo 역직렬화를 위한 매개변수 없는 생성자

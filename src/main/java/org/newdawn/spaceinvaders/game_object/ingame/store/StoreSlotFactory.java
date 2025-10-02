@@ -1,7 +1,7 @@
 package org.newdawn.spaceinvaders.game_object.ingame.store;
 
 import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
-import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
+import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.ActiveSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BarrierSkill;
@@ -14,16 +14,16 @@ public class StoreSlotFactory {
     private GameLoop gameLoop;
 
     //* passive skill ID
-    private static final int PS_FIRE_SPEED = 0;
-    private static final int PS_DAMAGE_UP = 1;
-    private static final int PS_ADDITIONAL_ENGINE = 2;
-    private static final int PS_REPAIR_KIT = 3;
+    public static final int PS_FIRE_SPEED = 0;
+    public static final int PS_DAMAGE_UP = 1;
+    public static final int PS_ADDITIONAL_ENGINE = 2;
+    public static final int PS_REPAIR_KIT = 3;
     
     //* active skill ID
-    private static final int AS_BARRIER = 0;
-    private static final int AS_BOMB = 1;
-    private static final int AS_LASER = 2;
-    private static final int AS_REFLECT = 3;
+    public static final int AS_BARRIER = 0;
+    public static final int AS_BOMB = 1;
+    public static final int AS_LASER = 2;
+    public static final int AS_REFLECT = 3;
 
     public StoreSlotFactory(GameLoop gameLoop) {
         this.gameLoop = gameLoop;
@@ -62,7 +62,7 @@ public class StoreSlotFactory {
 
     public void setPassiveSkillItemPrice(StoreSlot storeSlot, PlayerPassiveSkillType type, PlayerShip playerShip) {
         if (playerShip.isPasiveSkillMaxLevel(type)){
-            storeSlot.setPriceUnkown(true);
+            storeSlot.setPriceUnknown(true);
         }
         else{
             storeSlot.setPrice(playerShip.getPassiveSkillLevel(type) + 1);

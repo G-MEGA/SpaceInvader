@@ -2,7 +2,7 @@ package org.newdawn.spaceinvaders.game_object.ingame.player_skill;
 
 import org.newdawn.spaceinvaders.enums.IndicatorTextType;
 import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
-import org.newdawn.spaceinvaders.game_object.ingame.PlayerShip;
+import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class PassiveSkill extends PlayerSkill{

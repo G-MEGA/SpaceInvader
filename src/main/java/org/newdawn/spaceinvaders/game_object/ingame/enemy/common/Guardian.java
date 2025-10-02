@@ -11,7 +11,7 @@ public class Guardian extends SweeperEnemy{
         super();
     }
     public Guardian(GameLoop gameLoop, HiveMind hiveMind){
-        super(gameLoop, hiveMind,1);
+        super(gameLoop, hiveMind,7);
 
     }
     

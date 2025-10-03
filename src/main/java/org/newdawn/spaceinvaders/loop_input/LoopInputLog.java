@@ -20,10 +20,22 @@ public class LoopInputLog {
         this.inputs = inputs;
     }
     public LoopInputLog(String data){
+        setFromSaveData(data);
+    }
+
+    public void setFromSaveData(String data){
+        if (inputs == null) {
+            inputs = new ArrayList<>();
+        }
+        else{
+            inputs.clear();
+        }
+
+
+
         String[] splited = data.trim().split("\t");
         inputFrame = Long.parseLong(splited[0]);
 
-        inputs = new ArrayList<>();
         for(int i = 1; i < splited.length; i++){
             char type = splited[i].charAt(splited[i].indexOf(" ") + 1);
 
@@ -39,7 +51,6 @@ public class LoopInputLog {
             throw new RuntimeException();
         }
     }
-
     public String toSaveData() {
         stringBuilder.setLength(0);
 

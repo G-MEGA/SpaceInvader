@@ -12,6 +12,7 @@ import org.newdawn.spaceinvaders.enums.IndicatorTextType;
 import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
 import org.newdawn.spaceinvaders.enums.SectionType;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
+import org.newdawn.spaceinvaders.loop.game_loop.IGameLoopGameResultListener;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.loop_input.LoopInputLog;
 import org.newdawn.spaceinvaders.map_load.MapList;
@@ -71,7 +72,8 @@ public class GameLoop extends Loop {
     private long scoredTimeElapsed = 0;
 
     int myPlayerID = -1;
-    int randomSeed = -1;
+    public int getMyPlayerID() { return myPlayerID; }
+    long randomSeed = -1;
     int mapID = -1;
 
     /** The entity representing the player */
@@ -113,8 +115,12 @@ public class GameLoop extends Loop {
         }
     }
     private void onGameResultChanged() {
-        // 이를 GameLoopPlayerLoop에서 옵저버패턴으로 받아서 하이스코어 등록
+        if(gameResultListener == null) return;
+
+        gameResultListener.onGameResultChanged(gameResult);
     }
+    public transient IGameLoopGameResultListener gameResultListener;
+
 
     //* 게임 화면에 존재하는 Text UI들
     private TextRenderer scoreText;
@@ -206,7 +212,7 @@ public class GameLoop extends Loop {
     public GameLoop(){
         super();
     }
-    public GameLoop(Game game, int randomSeed, int playerCount, int myPlayerID, int mapID){
+    public GameLoop(Game game, long randomSeed, int playerCount, int myPlayerID, int mapID){
         super(game, playerCount);
 
         this.myPlayerID = myPlayerID;

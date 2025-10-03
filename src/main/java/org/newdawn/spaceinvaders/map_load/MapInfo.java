@@ -6,11 +6,13 @@ public class MapInfo {
     private String hash;
     private Path path;
     private String title;
+    private String description;
 
-    public MapInfo(String hash, Path path, String title) {
+    public MapInfo(String hash, Path path, String title, String description) {
         this.hash = hash;
         this.path = path;
         this.title = title;
+        this.description = description;
     }
 
     @Override
@@ -26,5 +28,8 @@ public class MapInfo {
     }
     public String getTitle() {
         return title;
+    }
+    public String getDescription() {
+        return description;
     }
 }

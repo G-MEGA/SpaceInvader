@@ -11,6 +11,9 @@ public class SectionData {
     private SectionCommand sectionCommand;
     private Queue<InstantiateCommand> remainInstantiateCommands = new LinkedList<>();
 
+
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public SectionData(){}
     public SectionData(SectionCommand sectionCommand, Queue<InstantiateCommand> remainInstantiateCommands) {
         this.sectionCommand = sectionCommand;
         this.remainInstantiateCommands = remainInstantiateCommands;

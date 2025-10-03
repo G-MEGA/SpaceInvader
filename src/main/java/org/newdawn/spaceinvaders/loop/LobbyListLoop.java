@@ -187,6 +187,8 @@ public class LobbyListLoop extends Loop{
                         Integer mapID = d.mapIDs.get(i);
                         Boolean isPlaying = d.isPlaying.get(i);
 
+                        String mapTitle = getGame().getMapList().getList().get(mapID).getTitle();
+
                         int height = 37;
                         Button b = new Button(thisLoop, ()->{
                             if(waitingForServer || creatingLobby){return;}
@@ -194,7 +196,7 @@ public class LobbyListLoop extends Loop{
                             enterLobby(lobbyID);
                         }, 700, height);
                         b.addTextRenderer(
-                                "  [로비 ID:" + lobbyID + "] [인원:" + playersNum + "/"+ maxPlayer + "] [맵:" +  mapID + "] [게임 중:" + isPlaying + "] " + lobbyName
+                                "  [로비 ID:" + lobbyID + "] [인원:" + playersNum + "/"+ maxPlayer + "] [맵:" +  mapTitle + "] [게임 중:" + isPlaying + "] " + lobbyName
                                 , (int)(10*(height/25.0)), Color.WHITE, 0);
                         b.setPos(50L << 16, i*(((long)height) << 16));
 
@@ -216,8 +218,15 @@ public class LobbyListLoop extends Loop{
                     return true;
                 }
                 else if (data instanceof PacketDataS2CLobbyInfoUpdated) {
-                    //LobbyLoop로 넘겨야함
-                    getGame().changeLoop(new LobbyLoop(getGame()));
+                    PacketDataS2CLobbyInfoUpdated d = (PacketDataS2CLobbyInfoUpdated) data;
+                    if(d.lobbyID == -1){
+                        // d.lobbyID가 -1이면 나감 처리 되었다는 뜻
+                        // 로비 리스트에서는 아무 것도 할 필요 없음
+                    }
+                    else{
+                        //LobbyLoop로 넘겨야함
+                        getGame().changeLoop(new LobbyLoop(getGame()));
+                    }
                     return false;
                 }
 

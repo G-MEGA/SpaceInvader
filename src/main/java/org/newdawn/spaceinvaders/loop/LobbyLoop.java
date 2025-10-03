@@ -49,45 +49,74 @@ public class LobbyLoop extends Loop{
 
     public LobbyLoop(Game game) {
         super(game);
-//
-//        mapSelectionGUI = new GameObject2D(this);
-//
-//        //region mapSelectionGUI 구성
-//        mapInfoTextRenderer = new TextRenderer(this,"맵을 선택하세요.", 20);
-//        mapInfoTextRenderer.setPosX(160L << 16);
-//        addGameObject(mapInfoTextRenderer);
-//
-//        mapSelectionButtonContainer =  new GameObject2D(this);
-//        mapSelectionGUI.addChild(mapSelectionButtonContainer);
-//        ArrayList<MapInfo> maps = game.getMapList().getList();
-//        for (int i = 0; i < maps.size(); i++) {
-//            final MapInfo mapInfo = maps.get(i);
-//            Button button = new Button(this, new IButtonListener() {
-//                @Override
-//                public void buttonPressed() {
-//                    String t = mapInfo.getTitle();
-//                    t += "\n" + mapInfo.getPath();
-//                    t += "\n" + mapInfo.getHash();
-//
-//                    mapInfoTextRenderer.setText(t);
-//                }
-//            }, 150, 40);
-//            mapSelectionButtonContainer.addChild(button);
-//
-//            button.setPos(0, i * button.getHeightInFixedPoint());
-//            TextRenderer textRenderer = button.addTextRenderer(mapInfo.getTitle(), 20, Color.WHITE, 0);
-//            textRenderer.setPosX(10L << 16);
-//        }
-//        //endregion
-//
-//        //region gameRoomGUI 구성
-//
-//        //endregion
-//
-//        lobbyGUI.addChild(mapSelectionGUI);
-////        lobbyGUI.addChild(gameRoomGUI);
-//
-//        addGameObject(lobbyGUI);
+
+        lobbyGUI = new GameObject2D(this);
+
+        lobbyInfoText = new TextRenderer(this, "로비 정보 텍스트", 20, Color.WHITE, 1);  // 로비 ID, 로비 이름, 로비 최대 플레이어
+
+        playerListText = new TextRenderer(this, "플레이어 목록", 10);  // 플레이어 목록(레디 여부 포함)
+
+        mapSelectionGUI = new  GameObject2D(this);
+        mapSelectionButtonContainer = new GameObject2D(this);
+        mapSelectionButtons = new ArrayList<>();  // 맵 목록(방장만 터치 가능)
+        mapInfoTextRenderer = new TextRenderer(this, "맵 정보", 15);
+
+        readyButton = new Button(this, () -> {
+            if(waitingForServer){return;}
+
+            ready();
+        }, 100, 50);
+        exitButton = new Button(this, () -> {
+            if(waitingForServer){return;}
+
+            exitLobby();
+        }, 100, 50);
+
+        lobbyInfoText.setPos(400L << 16, 0L << 16);
+        lobbyInfoText.alignment = 1;
+
+        playerListText.setPos(800L << 16, 75L << 16);
+        playerListText.alignment = 2;
+
+        for(int i = 0; i < getGame().getMapList().getList().size(); i++){
+            MapInfo mapInfo = getGame().getMapList().getList().get(i);
+
+            final int mapID = i;
+            Button b = new Button(this, new IButtonListener() {
+                @Override
+                public void buttonPressed() {
+                    if(waitingForServer){return;}
+
+                    updateLobbyInfo(mapID);
+                }
+            }, 100, 50 );
+            b.setPos(0L << 16, i * 50L << 16);
+            b.addTextRenderer(mapInfo.getTitle(), 20, Color.WHITE, 0);
+            mapSelectionButtonContainer.addChild(b);
+        }
+        mapInfoTextRenderer.setPos(100L << 16, 0L << 16);
+        mapSelectionGUI.setPos(0L << 16, 75L << 16);
+
+        readyButton.setPos(800L << 16, 550L << 16);
+        readyButton.alignment = 2;
+        readyButton.addTextRenderer("Ready", 20, Color.RED, 1);
+        exitButton.setPos(0L << 16, 550L << 16);
+        exitButton.addTextRenderer("나가기", 20, Color.white, 0);
+
+
+
+        lobbyGUI.addChild(exitButton);
+        lobbyGUI.addChild(readyButton);
+
+        mapSelectionGUI.addChild(mapSelectionButtonContainer);
+        mapSelectionGUI.addChild(mapInfoTextRenderer);
+        lobbyGUI.addChild(mapSelectionGUI);
+
+        lobbyGUI.addChild(playerListText);
+
+        lobbyGUI.addChild(lobbyInfoText);
+
+        addGameObject(lobbyGUI);
     }
 
     @Override
@@ -119,10 +148,43 @@ public class LobbyLoop extends Loop{
             @Override
             public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
                 if (data instanceof PacketDataS2CLobbyInfoUpdated) {
+                    PacketDataS2CLobbyInfoUpdated d = (PacketDataS2CLobbyInfoUpdated) data;
+                    if(d.lobbyID == -1){
+                        // d.lobbyID가 -1이면 나감 처리 되었다는 뜻
+                        getGame().changeLoop(new LobbyListLoop(getGame()));
+                    }
+                    else{
+                        //받은 정보로 UI 업뎃
+                        lobbyInfoText.setText(
+                                "[로비 ID:" + d.lobbyID + "] [최대 인원:" + d.maxPlayers + "] " + d.lobbyName
+                        );
+
+
+                        MapInfo mapInfo = getGame().getMapList().getList().get(d.mapID);
+                        mapInfoTextRenderer.setText(
+                                "<<<" + mapInfo.getTitle() + ">>>\n" + mapInfo.getDescription()
+                        );
+
+                        String playerlistString = "|플레이어 목록|\n\n";
+                        for(int i = 0; i < d.playersUID.size(); i++){
+                            String playerUID = d.playersUID.get(i);
+                            boolean playerReadied = d.playerReadied.get(i);
+                            if(playerReadied){
+                                playerlistString += playerUID + "\n";
+                            }
+                            else {
+                                playerlistString += playerUID + " *NOT READIED*\n";
+                            }
+                        }
+                        playerListText.setText(playerlistString);
+
+                        waitingForServer = false;
+                    }
                     return true;
                 }
                 else if (data instanceof PacketDataS2CPreprocessForGame) {
                     // GameLoopPlayerLoop로 넘겨
+                    getGame().changeLoop(new GameLoopPlayerLoop(getGame()));
                     return false;
                 }
 
@@ -149,19 +211,17 @@ public class LobbyLoop extends Loop{
         }
     }
     void exitLobby(){
-        waitingForServer = true;
-
         try {
             getGame().getRudpPeer().broadcastAboutTag("server", new PacketDataC2SExitLobby());
+            waitingForServer = true;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
     void ready(){
-        waitingForServer = true;
-
         try {
             getGame().getRudpPeer().broadcastAboutTag("server", new PacketDataC2SReady());
+            waitingForServer = true;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

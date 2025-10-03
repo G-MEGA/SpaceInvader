@@ -36,14 +36,14 @@ public class ReplayerLoop extends Loop{
 
         String[] splited = replaySaveData.trim().split("\n");
 
-        int randomSeed = -1;
+        long randomSeed = -1;
         int playerCount = -1;
         int myPlayerID = -1;
         int mapID = -1;
 
         for(String s: splited){
             if(s.startsWith("GameLoop::randomSeed=")){
-                randomSeed = Integer.parseInt(s.split("=")[1]);
+                randomSeed = Long.parseLong(s.split("=")[1]);
             }
             else if(s.startsWith("GameLoop::playerCount=")){
                 playerCount = Integer.parseInt(s.split("=")[1]);
@@ -195,7 +195,7 @@ public class ReplayerLoop extends Loop{
 
         message = "PlaySpeed : x" + String.valueOf(playSpeed);
         g.setColor(Color.red);
-        g.drawString(message,660,messageY);
+        g.drawString(message,600,messageY);
 
         messageY -= 20;
 

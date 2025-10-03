@@ -2,9 +2,7 @@ package org.newdawn.spaceinvaders.game_object.ingame.player_skill;
 
 import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.ingame.store.IStoreItem;
-import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
-import org.newdawn.spaceinvaders.sprite.Sprite;
 
 
 

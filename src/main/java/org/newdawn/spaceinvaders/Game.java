@@ -119,6 +119,7 @@ public class Game extends Canvas
 		SpriteStore.get().getSprite("sprites/enemyLaser.png", 8 << 16, 512 << 16);
         SpriteStore.get().getSprite("sprites/testLaser.png", 8 << 16, 512 << 16);
 		SpriteStore.get().getSprite("sprites/testWarning.png", 10 << 16, 10 << 16);
+		SpriteStore.get().getSprite("sprites/storeItemSpawnSignal.png", 10 << 16, 10 << 16);
 		SpriteStore.get().getSprite("sprites/scoringItem.png", 12 << 16, 12 << 16);
 		SpriteStore.get().getSprite("sprites/whiteBackground.png", 400 << 16, 300 << 16, 100 << 16);
 

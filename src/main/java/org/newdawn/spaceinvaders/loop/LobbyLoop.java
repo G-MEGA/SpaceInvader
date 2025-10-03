@@ -33,57 +33,61 @@ import java.util.ArrayList;
 public class LobbyLoop extends Loop{
     GameObject2D lobbyGUI;
 
+    TextRenderer lobbyInfoText;  // 로비 ID, 로비 이름, 로비 최대 플레이어
+
+    TextRenderer playerListText;  // 플레이어 목록(레디 여부 포함)
+
     GameObject2D mapSelectionGUI;
-
-    GameObject2D mapSelectionButtonContainer;
     TextRenderer mapInfoTextRenderer;
+    GameObject2D mapSelectionButtonContainer;
+    ArrayList<Button> mapSelectionButtons;  // 맵 목록(방장만 터치 가능)
 
-    GameObject2D gameRoomGUI;
+    Button readyButton;
+    Button exitButton;
 
     boolean waitingForServer = false;
 
     public LobbyLoop(Game game) {
         super(game);
-
-        mapSelectionGUI = new GameObject2D(this);
-        gameRoomGUI = new GameObject2D(this);
-
-        //region mapSelectionGUI 구성
-        mapInfoTextRenderer = new TextRenderer(this,"맵을 선택하세요.", 20);
-        mapInfoTextRenderer.setPosX(160L << 16);
-        addGameObject(mapInfoTextRenderer);
-
-        mapSelectionButtonContainer =  new GameObject2D(this);
-        mapSelectionGUI.addChild(mapSelectionButtonContainer);
-        ArrayList<MapInfo> maps = game.getMapList().getList();
-        for (int i = 0; i < maps.size(); i++) {
-            final MapInfo mapInfo = maps.get(i);
-            Button button = new Button(this, new IButtonListener() {
-                @Override
-                public void buttonPressed() {
-                    String t = mapInfo.getTitle();
-                    t += "\n" + mapInfo.getPath();
-                    t += "\n" + mapInfo.getHash();
-
-                    mapInfoTextRenderer.setText(t);
-                }
-            }, 150, 40);
-            mapSelectionButtonContainer.addChild(button);
-
-            button.setPos(0, i * button.getHeightInFixedPoint());
-            TextRenderer textRenderer = button.addTextRenderer(mapInfo.getTitle(), 20, Color.WHITE, 0);
-            textRenderer.setPosX(10L << 16);
-        }
-        //endregion
-
-        //region gameRoomGUI 구성
-
-        //endregion
-
-        lobbyGUI.addChild(mapSelectionGUI);
-//        lobbyGUI.addChild(gameRoomGUI);
-
-        addGameObject(lobbyGUI);
+//
+//        mapSelectionGUI = new GameObject2D(this);
+//
+//        //region mapSelectionGUI 구성
+//        mapInfoTextRenderer = new TextRenderer(this,"맵을 선택하세요.", 20);
+//        mapInfoTextRenderer.setPosX(160L << 16);
+//        addGameObject(mapInfoTextRenderer);
+//
+//        mapSelectionButtonContainer =  new GameObject2D(this);
+//        mapSelectionGUI.addChild(mapSelectionButtonContainer);
+//        ArrayList<MapInfo> maps = game.getMapList().getList();
+//        for (int i = 0; i < maps.size(); i++) {
+//            final MapInfo mapInfo = maps.get(i);
+//            Button button = new Button(this, new IButtonListener() {
+//                @Override
+//                public void buttonPressed() {
+//                    String t = mapInfo.getTitle();
+//                    t += "\n" + mapInfo.getPath();
+//                    t += "\n" + mapInfo.getHash();
+//
+//                    mapInfoTextRenderer.setText(t);
+//                }
+//            }, 150, 40);
+//            mapSelectionButtonContainer.addChild(button);
+//
+//            button.setPos(0, i * button.getHeightInFixedPoint());
+//            TextRenderer textRenderer = button.addTextRenderer(mapInfo.getTitle(), 20, Color.WHITE, 0);
+//            textRenderer.setPosX(10L << 16);
+//        }
+//        //endregion
+//
+//        //region gameRoomGUI 구성
+//
+//        //endregion
+//
+//        lobbyGUI.addChild(mapSelectionGUI);
+////        lobbyGUI.addChild(gameRoomGUI);
+//
+//        addGameObject(lobbyGUI);
     }
 
     @Override
@@ -120,6 +124,14 @@ public class LobbyLoop extends Loop{
                 else if (data instanceof PacketDataS2CPreprocessForGame) {
                     // GameLoopPlayerLoop로 넘겨
                     return false;
+                }
+
+
+
+                else if (data instanceof PacketDataP2PInput) {
+                    // 만약 게임 결과 나온 후 로비로 돌아왔을 때 P2P 패킷이 여태까지 남아있으면 안되니
+                    // 의미없이 소모
+                    return true;
                 }
 
                 return false;

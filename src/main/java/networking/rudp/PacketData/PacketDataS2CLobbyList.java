@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class PacketDataS2CLobbyList extends PacketData{
     public ArrayList<Integer> lobbyIDs = new ArrayList<>();
     public ArrayList<String> lobbyNames = new ArrayList<>();
+    public ArrayList<Integer> playersNum = new ArrayList<>();
     public ArrayList<Integer> maxPlayers = new ArrayList<>();
     public ArrayList<Integer> mapIDs = new ArrayList<>();
     public ArrayList<Boolean> isPlaying = new ArrayList<>();

@@ -19,6 +19,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Map;
+import java.util.Random;
 
 public class Main {
     RUDPPeer rudpPeer;
@@ -75,7 +76,7 @@ public class Main {
     public Main() throws Exception {
         GameLoopSerializer.getInstance();// GameLoopSerializer 초기화
 
-        rudpPeer = new RUDPPeer(Network.PEER_UDP_PORT);
+        rudpPeer = new RUDPPeer(Network.PEER_UDP_PORT + new Random(System.currentTimeMillis()).nextInt(1000));
 
         rudpPeer.addListener(rudpPeerListener);
 

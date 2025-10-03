@@ -63,6 +63,10 @@ public class Game extends Canvas
 	private String windowTitle = "Space Invaders 102";
 	/** The game window that we'll update with the frame count */
 	private JFrame container;
+    public JFrame  getContainer()
+    {
+        return container;
+    }
 
     private ArrayList<LoopInput> queuedInputs = new ArrayList<>();
 
@@ -365,6 +369,9 @@ public class Game extends Canvas
 
 
     public void changeLoop(Loop loop) {
+        if(this.loop != null){
+            this.loop.onExitLoop();
+        }
         if(this.loop != null && this.loop.getIrudpPeerListener() != null) {
             rudpPeer.removeListener(this.loop.getIrudpPeerListener());
         }

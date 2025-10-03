@@ -45,16 +45,23 @@ public class MapList {
 
                 String hash = md5(content);
                 String title = "";
+                String description = "";
 
                 String[] lines = content.split("\n");
                 for(String l: lines){
                     if(l.contains("/title")){
                         title = l.split(" ")[1].trim();
+                    }
+                    else if(l.contains("/description")){
+                        description = l.split(" ")[1].trim();
+                    }
+
+                    if(!title.isEmpty() && !description.isEmpty()){
                         break;
                     }
                 }
 
-                list.add(new MapInfo(hash, path, title));
+                list.add(new MapInfo(hash, path, title, description));
 //                System.out.println(list.get(list.size()-1).toString());
             } catch (IOException e) {
                 System.err.println("파일을 읽는 중 오류가 발생했습니다: " + e.getMessage());

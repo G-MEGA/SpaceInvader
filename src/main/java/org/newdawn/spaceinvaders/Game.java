@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import networking.rudp.RUDPPeer;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.loop_input.LoopInputKey;
@@ -40,6 +41,12 @@ public class Game extends Canvas
     public final long fixedDeltaTime;
 
     private Loop loop;
+    private RUDPPeer rudpPeer;
+    public RUDPPeer getRudpPeer()
+    {
+        return rudpPeer;
+    }
+    public final String myUID;
 
     private MapList mapList;
 
@@ -56,13 +63,17 @@ public class Game extends Canvas
 	private String windowTitle = "Space Invaders 102";
 	/** The game window that we'll update with the frame count */
 	private JFrame container;
+    public JFrame  getContainer()
+    {
+        return container;
+    }
 
     private ArrayList<LoopInput> queuedInputs = new ArrayList<>();
 
 	/**
 	 * Construct our game and set it running.
 	 */
-	public Game(long fixedFPS) {
+	public Game(long fixedFPS, RUDPPeer rudpPeer, String myUID) {
         this.fixedFPS = fixedFPS;
         this.fixedDeltaTime = FixedPointUtil.div(FixedPointUtil.ONE, fixedFPS);
 
@@ -110,6 +121,10 @@ public class Game extends Canvas
 		SpriteStore.get().getSprite("sprites/testWarning.png", 10 << 16, 10 << 16);
 		SpriteStore.get().getSprite("sprites/scoringItem.png", 12 << 16, 12 << 16);
 		SpriteStore.get().getSprite("sprites/whiteBackground.png", 400 << 16, 300 << 16, 100 << 16);
+
+        this.rudpPeer = rudpPeer;
+        this.myUID = myUID;
+        System.out.println("myUID: " + myUID);
 
         changeLoop(new MainMenuLoop(this));  // 게임 시작 후 가장 처음 진입할 Loop);
 
@@ -353,16 +368,18 @@ public class Game extends Canvas
 
 
 
-    //TODO 루프 바꿀 때마다 RUDPPeer에 옵저버로 연결해주는거 처리해줘야함
     public void changeLoop(Loop loop) {
         if(this.loop != null){
-            //TODO RUDPPeer에서 제거
+            this.loop.onExitLoop();
+        }
+        if(this.loop != null && this.loop.getIrudpPeerListener() != null) {
+            rudpPeer.removeListener(this.loop.getIrudpPeerListener());
         }
 
         this.loop = loop;
 
-        if(this.loop != null){
-            //TODO RUDPPeer에 추가
+        if(this.loop != null && this.loop.getIrudpPeerListener() != null){
+            rudpPeer.addListener(this.loop.getIrudpPeerListener());
         }
     }
 }

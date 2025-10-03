@@ -7,6 +7,9 @@ public class SpecialCommand extends MapLoadCommand{
 
     public SpecialCommandType getSpecialCommandType() { return _specialCommandType; }
 
+
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public SpecialCommand(){}
     public SpecialCommand(SpecialCommandType specialCommandType){
         super();
 

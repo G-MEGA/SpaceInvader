@@ -25,6 +25,8 @@ public class StoreSlotFactory {
     public static final int AS_LASER = 2;
     public static final int AS_REFLECT = 3;
 
+    //kryo 역직렬화를 위한 매개변수 없는 생성자
+    public StoreSlotFactory(){}
     public StoreSlotFactory(GameLoop gameLoop) {
         this.gameLoop = gameLoop;
     }

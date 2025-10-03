@@ -1,5 +1,10 @@
 package org.newdawn.spaceinvaders.loop;
 
+import networking.Network;
+import networking.rudp.Connection;
+import networking.rudp.IRUDPPeerListener;
+import networking.rudp.PacketData.PacketData;
+import networking.rudp.RUDPPeer;
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.enums.GameLoopResultType;
 import org.newdawn.spaceinvaders.enums.GameObjectType;
@@ -7,6 +12,7 @@ import org.newdawn.spaceinvaders.enums.IndicatorTextType;
 import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
 import org.newdawn.spaceinvaders.enums.SectionType;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
+import org.newdawn.spaceinvaders.loop.game_loop.IGameLoopGameResultListener;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.loop_input.LoopInputLog;
 import org.newdawn.spaceinvaders.map_load.MapList;
@@ -66,7 +72,8 @@ public class GameLoop extends Loop {
     private long scoredTimeElapsed = 0;
 
     int myPlayerID = -1;
-    int randomSeed = -1;
+    public int getMyPlayerID() { return myPlayerID; }
+    long randomSeed = -1;
     int mapID = -1;
 
     /** The entity representing the player */
@@ -108,8 +115,12 @@ public class GameLoop extends Loop {
         }
     }
     private void onGameResultChanged() {
-        // 이를 GameLoopPlayerLoop에서 옵저버패턴으로 받아서 하이스코어 등록
+        if(gameResultListener == null) return;
+
+        gameResultListener.onGameResultChanged(gameResult);
     }
+    public transient IGameLoopGameResultListener gameResultListener;
+
 
     //* 게임 화면에 존재하는 Text UI들
     private TextRenderer scoreText;
@@ -201,7 +212,7 @@ public class GameLoop extends Loop {
     public GameLoop(){
         super();
     }
-    public GameLoop(Game game, int randomSeed, int playerCount, int myPlayerID, int mapID){
+    public GameLoop(Game game, long randomSeed, int playerCount, int myPlayerID, int mapID){
         super(game, playerCount);
 
         this.myPlayerID = myPlayerID;
@@ -239,7 +250,7 @@ public class GameLoop extends Loop {
         coinCountText.setSortingLayer(100);
         playerHealthText.setSortingLayer(100);
         activeSkillText.setSortingLayer(100);
-        passiveSkillHeaderText.setSortingLayer(100);        
+        passiveSkillHeaderText.setSortingLayer(100);
 
         addGameObject(scoreText);
         addGameObject(coinCountText);
@@ -436,7 +447,7 @@ public class GameLoop extends Loop {
                         FixedPointUtil.ONE + FixedPointUtil.ZERO_02);
             }
         }
-    
+
         if (enemies.isEmpty()) { hasEnemy = false; }
     }
 
@@ -503,10 +514,16 @@ public class GameLoop extends Loop {
     public void process(ArrayList<LoopInput> inputs){
         super.process(inputs);
 
+        // 이 클래스는 직접적으로 네트워킹 하지 않으니 주석처리
+//        getGame().getRudpPeer().processReceivedData();
+
         //section 실행 관련 로직
         if (gameResult == GameLoopResultType.InGame){
             deserializeMapdata();
         }
+
+        // 이 클래스는 직접적으로 네트워킹 하지 않으니 주석처리
+//        getGame().getRudpPeer().processReceivedData();
 
         // 프레임별 입력 기록
         if(inputs != null && !inputs.isEmpty()){
@@ -563,7 +580,7 @@ public class GameLoop extends Loop {
                     }
                 }
                 //* 현재 Section이 Store 타입이라면, Scection 시작 15초 후에 Section 종료
-                if (currentSection.getSectionType() == SectionType.Store){  
+                if (currentSection.getSectionType() == SectionType.Store){
                     if (sectionElapsed >= (15 << 16)){
                         hasSectionEnd = true;
                         sectionElapsed = 0;
@@ -611,4 +628,27 @@ public class GameLoop extends Loop {
         }
     }
 
+    @Override
+    protected IRUDPPeerListener generateIRUDPPeerListener() {
+        return new  IRUDPPeerListener() {
+            @Override
+            public boolean onConnected(RUDPPeer peer, Connection connection) {
+                return false;
+            }
+
+            @Override
+            public boolean onDisconnected(RUDPPeer peer, Connection connection) {
+                if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
+                    System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
+                    System.exit(0);
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
+                return false;
+            }
+        };
+    }
 }

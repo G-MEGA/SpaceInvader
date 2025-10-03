@@ -19,6 +19,9 @@ public class InstantiateCommand extends MapLoadCommand {
     public int getGameObjectId() { return _gameObjectId; }
     public ArrayList<String> getExtra() { return _extra; }
 
+
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public InstantiateCommand(){}
     public InstantiateCommand(
         long instantiateTime, long instantiateX, long instantiateY, 
         GameObjectType gameObjectType, int gameObjectId,

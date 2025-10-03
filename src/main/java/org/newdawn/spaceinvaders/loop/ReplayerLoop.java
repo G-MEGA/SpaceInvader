@@ -1,5 +1,10 @@
 package org.newdawn.spaceinvaders.loop;
 
+import networking.Network;
+import networking.rudp.Connection;
+import networking.rudp.IRUDPPeerListener;
+import networking.rudp.PacketData.PacketData;
+import networking.rudp.RUDPPeer;
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.loop_input.LoopInputLog;
@@ -31,14 +36,14 @@ public class ReplayerLoop extends Loop{
 
         String[] splited = replaySaveData.trim().split("\n");
 
-        int randomSeed = -1;
+        long randomSeed = -1;
         int playerCount = -1;
         int myPlayerID = -1;
         int mapID = -1;
 
         for(String s: splited){
             if(s.startsWith("GameLoop::randomSeed=")){
-                randomSeed = Integer.parseInt(s.split("=")[1]);
+                randomSeed = Long.parseLong(s.split("=")[1]);
             }
             else if(s.startsWith("GameLoop::playerCount=")){
                 playerCount = Integer.parseInt(s.split("=")[1]);
@@ -61,6 +66,8 @@ public class ReplayerLoop extends Loop{
     @Override
     public void process(ArrayList<LoopInput> inputs) {
         super.process(inputs);
+
+        getGame().getRudpPeer().processReceivedData();
 
         if(isKeyInputJustPressed(0, "escape")) {
             getGame().changeLoop(new MainMenuLoop(getGame()));
@@ -150,6 +157,30 @@ public class ReplayerLoop extends Loop{
     }
 
     @Override
+    protected IRUDPPeerListener generateIRUDPPeerListener() {
+        return new  IRUDPPeerListener() {
+            @Override
+            public boolean onConnected(RUDPPeer peer, Connection connection) {
+                return false;
+            }
+
+            @Override
+            public boolean onDisconnected(RUDPPeer peer, Connection connection) {
+                if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
+                    System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
+                    System.exit(0);
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
+                return false;
+            }
+        };
+    }
+
+    @Override
     public void draw(Graphics2D g) {
         gameLoop.draw(g);
 
@@ -164,7 +195,7 @@ public class ReplayerLoop extends Loop{
 
         message = "PlaySpeed : x" + String.valueOf(playSpeed);
         g.setColor(Color.red);
-        g.drawString(message,660,messageY);
+        g.drawString(message,600,messageY);
 
         messageY -= 20;
 

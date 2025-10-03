@@ -1,56 +1,112 @@
 package org.newdawn.spaceinvaders.loop;
 
+import networking.Network;
+import networking.rudp.Connection;
+import networking.rudp.IRUDPPeerListener;
+import networking.rudp.PacketData.*;
+import networking.rudp.RUDPPeer;
+import org.newdawn.spaceinvaders.Game;
+import org.newdawn.spaceinvaders.enums.GameLoopResultType;
+import org.newdawn.spaceinvaders.loop.game_loop.IGameLoopGameResultListener;
+import org.newdawn.spaceinvaders.loop_input.LoopInput;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+//플레이어 루프
+//	- 진입 후 수신이든 발신이든 모든 통신을 시작하기까지 1초정도 대기시간 둬야할 듯.
+//클라: 입력할 때마다 server제외 입력 브로드캐스팅, 게임 끝나면 server에게 결과 전송, 게임 끝나고 나갈 때 server제외 disconnect
+//서버:
 
 import javax.swing.JFileChooser;
 
-import org.newdawn.spaceinvaders.Game;
-import org.newdawn.spaceinvaders.enums.GameLoopResultType;
-import org.newdawn.spaceinvaders.loop_input.LoopInput;
+import org.newdawn.spaceinvaders.loop_input.LoopInputLog;
+import org.newdawn.spaceinvaders.loop.game_loop.GameLoopSnapshot;
+import serializer.GameLoopSerializer;
 
-public class GameLoopPlayerLoop extends Loop{
+//플레이어 루프
+//	- 진입 후 수신이든 발신이든 모든 통신을 시작하기까지 1초정도 대기시간 둬야할 듯.
+//클라: 입력할 때마다 server제외 입력 브로드캐스팅, 게임 끝나면 server에게 결과 전송, 게임 끝나고 나갈 때 server제외 disconnect
+//서버:
+
+public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListener {
     GameLoop gameLoop;
+    boolean gameStarted = false;
+    public boolean isPlaying(){
+        return gameLoop != null && gameStarted;
+    }
+
+    // -1이면 현재 롤백할 필요가 없다는 의미
+    //  그렇지 않다면 해당 프레임으로 롤백을 해야한다는 의미
+    long rollbackTargetFrame = -1L;
+
+    Map<Long, GameLoopSnapshot> snapshots = new HashMap<>();
+    LoopInputLog loopInputLog = new LoopInputLog();
 
     public GameLoopPlayerLoop(Game game){
         super(game);
-        //TODO 멀티플레이 정보에 따라서 시드, 플레이어 카운트, 마이 픓레이어 아이디, 맵데이터 넣어줘야함
+    }
 
-        gameLoop = new GameLoop(game, 37, 4, 0, 1);
+    @Override
+    public void onExitLoop(){
+        super.onExitLoop();
+
+        //루프 나갈 때 서버 제외 모든 피어와 연결 끊기
+        try {
+            getGame().getRudpPeer().disconnectAll("server");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        System.gc();
+    }
+
+    @Override
+    public void onGameResultChanged(GameLoopResultType gameResult) {
+        gameResult();
     }
 
     @Override
     public void process(ArrayList<LoopInput> inputs) {
         super.process(inputs);
 
-//          재시작
-//        if (result != GameLoopResultType.InGame && isKeyInputJustPressed("accept")) {
-//            LoopInputLog lastestLog = inputLogs.get(inputLogs.size()-1);
-//            inputLogs.clear();
-//
-//            currentFrame = 0;
-//
-//            lastestLog.inputFrame = currentFrame;
-//
-//            inputLogs.add(lastestLog);
-//
-//            startGame();
-//            result = GameLoopResultType.InGame;
-//        }
+        // 통신(processReceivedData())은 게임이 시작되기 전에도 수행되어야 하니 여기 위치 시킴
+        getGame().getRudpPeer().processReceivedData();
+
+
+
+        // 이하는 게임이 시작된 이후에만 실행되는 동작들
+        if(!isPlaying()){return;}
+
+        if(inputs != null){
+            for (LoopInput loopInput : inputs) {
+                // 이번 프레임에 들어온 입력의 playerID 수정
+                loopInput.playerID = gameLoop.myPlayerID;
+            }
+
+            // 이번 프레임에 들어온 입력을 모든 피어에게 브로드캐스트
+            if(!inputs.isEmpty()){
+                loopInputLog.inputFrame = gameLoop.currentFrame;
+                loopInputLog.inputs = inputs;
+                p2pInput(loopInputLog.toSaveData());
+            }
+        }
+
 
         // 게임 종료 시
         if(gameLoop.getGameResult() != GameLoopResultType.InGame){
-            //메인메뉴로 나가기
             if(isKeyInputJustPressed(0, "escape")) {
-                getGame().changeLoop(new MainMenuLoop(getGame()));
+                getGame().changeLoop(new LobbyLoop(getGame()));
             }
-            //리플레이 저장하고 메인메뉴로 나가기
             else if(isKeyInputJustPressed(0, "record")) {
                 String data = gameLoop.getReplayData();
 
@@ -88,21 +144,46 @@ public class GameLoopPlayerLoop extends Loop{
                 }
 
                 // 리플레이 저장 즉시 메인메뉴로 사출
-                getGame().changeLoop(new MainMenuLoop(getGame()));
+                getGame().changeLoop(new LobbyLoop(getGame()));
             }
         }
 
-        gameLoop.process(inputs);
+
+
+        long currentFrame = gameLoop.currentFrame;
+
+        //현재 프레임의 자신의 입력을 스냅샷에 저장
+        putInputs(currentFrame, inputs);
+        
+        // 롤백 필요시
+        if(rollbackTargetFrame > -1){
+            gameLoop = GameLoopSerializer.getInstance().deserialize(snapshots.get(rollbackTargetFrame).state);;
+            gameLoop.setGame(getGame());
+            gameLoop.gameResultListener = this;
+
+            rollbackTargetFrame = -1;
+        }
+
+        // currentFrame + 1까지 돌림
+        while(gameLoop.currentFrame < currentFrame + 1){
+            gameLoop.process(snapshots.get(gameLoop.currentFrame).inputs);
+
+            //스냅샷 state 저장
+            putState(gameLoop.currentFrame, GameLoopSerializer.getInstance().serialize(gameLoop));
+        }
+
+        // 너무 오래된 스냅샷 청소
+        snapshots.keySet().removeIf(frame -> frame < currentFrame - 60L * 10);  // 60 = 1초
     }
 
 
     @Override
     public void draw(Graphics2D g) {
-        gameLoop.draw(g);
+        if(isPlaying()) gameLoop.draw(g);
 
         super.draw(g);
 
-        if (gameLoop.getGameResult() != GameLoopResultType.InGame) {
+        if (isPlaying() && gameLoop.getGameResult() != GameLoopResultType.InGame) {
             String message = "";
             if (gameLoop.getGameResult() == GameLoopResultType.Win) {
                 message = "Well done! You Win!";
@@ -121,6 +202,164 @@ public class GameLoopPlayerLoop extends Loop{
             g.setColor(Color.white);
             g.drawString(message,(800-g.getFontMetrics().stringWidth(message))/2,325);
         }
+    }
 
+    @Override
+    protected IRUDPPeerListener generateIRUDPPeerListener() {
+        final GameLoopPlayerLoop thisLoop = this;
+        return new  IRUDPPeerListener() {
+            @Override
+            public boolean onConnected(RUDPPeer peer, Connection connection) {
+                return false;
+            }
+
+            @Override
+            public boolean onDisconnected(RUDPPeer peer, Connection connection) {
+                if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
+                    System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
+                    System.exit(0);
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
+                if (data instanceof PacketDataS2CPreprocessForGame) {
+                    // 게임 생성
+                    //멀티플레이 정보에 따라서 시드, 플레이어 카운트, 마이 플레이어 아이디, 맵데이터 넣어줘야함
+                    PacketDataS2CPreprocessForGame d =  (PacketDataS2CPreprocessForGame) data;
+                    gameLoop = new GameLoop(getGame(),
+                            d.gameLoopSeed,
+                            d.playersUID.size(),
+                            d.playerIDInLobby,
+                            d.mapID);
+                    gameLoop.gameResultListener = thisLoop;
+
+                    putState(gameLoop.currentFrame, GameLoopSerializer.getInstance().serialize(gameLoop));
+
+                    // 피어 연결
+                    ArrayList<InetSocketAddress> peerAdresses = new ArrayList<>();
+                    for(int i = 0; d.playersUID.size() > i; i++){
+                        if(i == gameLoop.getMyPlayerID())continue;
+
+                        try {
+                            InetSocketAddress address = new InetSocketAddress(d.addresses.get(i), d.ports.get(i));
+
+                            System.out.println("피어 연결 시도 " + d.addresses.get(i) + ":" + d.ports.get(i));
+
+                            getGame().getRudpPeer().connect(address);
+
+                            peerAdresses.add(address);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    System.gc(); // 잠깐의 여유 동안 GC 수행
+
+                    // 일정 간격으로 확인하여 모든 피어가 연결되었다면 while 탈출
+                    while(true){
+                        try {
+                            Thread.sleep(100);
+
+                            boolean connectedWithAll = true;
+                            for(InetSocketAddress address : peerAdresses){
+                                if(!getGame().getRudpPeer().isConnected(address)){
+
+                                    System.out.println(address.getAddress() + ":" + address.getPort() + "피어 연결 안되었음");
+
+                                    connectedWithAll = false;
+                                    break;
+                                }
+                            }
+
+                            if(connectedWithAll){
+                                break;
+                            }
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    //전처리 완료 전송
+                    preprocessOK();
+                    System.out.println("전처리 완료오오오");
+
+                    return true;
+                }
+                else if (data instanceof PacketDataS2CStartGame) {
+                    gameStarted = true;
+                    return true;
+                }
+                else if (data instanceof PacketDataP2PInput) {
+                    // 받은 데이터 파싱
+                    loopInputLog.setFromSaveData(((PacketDataP2PInput) data).inputLog);
+
+                    // 받은 데이터의 입력 프레임
+                    long frame = loopInputLog.inputFrame;
+
+                    // 받은 입력 데이터를 스냅샷에 추가
+                    putInputs(frame, loopInputLog.inputs);
+
+                    // 현재 프레임보다 더 과거의 입력이라면 rollbackTargetFrame을 설정하여 롤백이 필요함을 알림
+                    if(frame < gameLoop.currentFrame)
+                        if(rollbackTargetFrame == -1L || frame < rollbackTargetFrame){
+                            rollbackTargetFrame = frame;
+                        }
+                    return true;
+                }
+                return false;
+            }
+        };
+    }
+
+    void preprocessOK(){
+        try {
+            getGame().getRudpPeer().broadcastAboutTag("server", new PacketDataC2SPreprocessOK());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    void p2pInput(String inputLogString) {
+        try {
+            PacketDataP2PInput packetData = new PacketDataP2PInput();
+
+            packetData.inputLog = inputLogString;
+
+            getGame().getRudpPeer().broadcast(packetData, "server");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    void gameResult(){
+        if(gameLoop.getGameResult() == GameLoopResultType.InGame){
+            System.err.println("아직 게임이 끝나지 않은 상태에서는 게임 결과를 서버로 전송할 수 없음");
+            return;
+        }
+
+        try {
+            getGame().getRudpPeer().broadcastAboutTag("server", new PacketDataC2SGameResult(
+                    gameLoop.getScore(), gameLoop.getGameResult() ==  GameLoopResultType.Win
+            ));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
+    // 해당 프레임의 스냅샷에 입력 데이터 추가
+    void putInputs(long frame, ArrayList<LoopInput> inputs){
+        GameLoopSnapshot snapshot = snapshots.getOrDefault(frame, new GameLoopSnapshot());
+        if(inputs != null && !inputs.isEmpty()){
+            snapshot.inputs.addAll(inputs);
+        }
+        snapshots.put(frame, snapshot);
+    }
+    // 해당 프레임의 스냅샷에 게임 상태 데이터 추가
+    void putState(long frame, byte[] state){
+        GameLoopSnapshot snapshot = snapshots.getOrDefault(frame, new GameLoopSnapshot());
+        snapshot.state = state;
+        snapshots.put(frame, snapshot);
     }
 }

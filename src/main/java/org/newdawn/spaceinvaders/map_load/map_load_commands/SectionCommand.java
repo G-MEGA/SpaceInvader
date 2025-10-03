@@ -7,6 +7,8 @@ public class SectionCommand extends MapLoadCommand{
 
     public SectionType getSectionCommandType() { return _sectionCommandType; }
 
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public SectionCommand(){}
     public SectionCommand(SectionType sectionCommandType){
         super();
 

@@ -249,4 +249,6 @@ public abstract class Loop  {
             }
         }
     }
+
+    public void onExitLoop(){}
 }

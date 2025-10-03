@@ -252,4 +252,6 @@
 1000 700 450 ActiveSkill 3
 
 >new-wave
-1000 0 0 Enemy 4
+1000 400 63 Enemy 4
+
+:game-end

@@ -508,6 +508,9 @@ public class GameLoop extends Loop {
     public void process(ArrayList<LoopInput> inputs){
         super.process(inputs);
 
+        // 이 클래스는 직접적으로 네트워킹 하지 않으니 주석처리
+//        getGame().getRudpPeer().processReceivedData();
+
         //section 실행 관련 로직
         if (gameResult == GameLoopResultType.InGame){
             deserializeMapdata();

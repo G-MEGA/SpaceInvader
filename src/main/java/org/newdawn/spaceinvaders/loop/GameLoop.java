@@ -467,7 +467,7 @@ public class GameLoop extends Loop {
         for (StoreSlot storeSlot : storeSlots) {
             if (storeSlot.getItem() instanceof PassiveSkill){
                 PlayerPassiveSkillType type = ((PassiveSkill)storeSlot.getItem()).getType();
-                storeSlotFactory.setPassiveSkillItemPrice(storeSlot, type, aliveShips.get(myPlayerID));
+                storeSlotFactory.setPassiveSkillItemPrice(storeSlot, type, getPlayerShip(myPlayerID));
             }
         }
     }
@@ -607,7 +607,7 @@ public class GameLoop extends Loop {
                 enemyFactory.spawnEnemy(enemyHiveMind, command.getGameObjectId(), command.getInstantiateX(), command.getInstantiateY());
                 break;
             case PassiveSkill:
-                storeSlotFactory.createPassiveSkillItemSlot(command.getGameObjectId(), command.getInstantiateX(), command.getInstantiateY(), aliveShips.get(myPlayerID));
+                storeSlotFactory.createPassiveSkillItemSlot(command.getGameObjectId(), command.getInstantiateX(), command.getInstantiateY(), getPlayerShip(myPlayerID));
                 break;
             case ActiveSkill:
                 storeSlotFactory.createActiveSkillItemSlot(command.getGameObjectId(), command.getInstantiateX(), command.getInstantiateY());

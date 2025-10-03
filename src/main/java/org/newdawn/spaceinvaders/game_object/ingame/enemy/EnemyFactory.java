@@ -66,15 +66,15 @@ public class EnemyFactory extends GameObject{
         
         gameLoop.notifyEnemyInstantiated();
 
-        enemy.setPosRotation(spawnPosX, spawnPosY, spawnAngle);
         hiveMind.addListener(enemy);
         
         if (isWarning){
-            EnemyWarner enemyWarner = new EnemyWarner(enemy, gameLoop);
+            SpawnSignal enemyWarner = new SpawnSignal(enemy, gameLoop, spawnPosX, spawnPosY, spawnAngle, SpawnSignal.EnemySignal);
             gameLoop.addGameObject(enemyWarner);
             return enemy;
         }
         
+        enemy.setPosRotation(spawnPosX, spawnPosY, spawnAngle);
         gameLoop.addEnemy(enemy);
         return enemy;
     }

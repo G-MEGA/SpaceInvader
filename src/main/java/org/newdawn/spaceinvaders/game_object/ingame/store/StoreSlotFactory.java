@@ -1,6 +1,7 @@
 package org.newdawn.spaceinvaders.game_object.ingame.store;
 
 import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.SpawnSignal;
 import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.ActiveSkill;
@@ -59,7 +60,8 @@ public class StoreSlotFactory {
         }
 
         StoreSlot storeSlot = new StoreSlot(gameLoop, skillLevel.intValue()*2 + 1, passiveSkill, spawnPosX, spawnPosY);
-        gameLoop.addStoreSlot(storeSlot);
+        SpawnSignal spawnSignal = new SpawnSignal(storeSlot, gameLoop, spawnPosX, spawnPosY, 0, SpawnSignal.StoreItemSignal);
+        gameLoop.addGameObject(spawnSignal);
     }
 
     public void setPassiveSkillItemPrice(StoreSlot storeSlot, PlayerPassiveSkillType type, PlayerShip playerShip) {
@@ -93,7 +95,8 @@ public class StoreSlotFactory {
         }
 
         StoreSlot storeSlot = new StoreSlot(gameLoop, 3, activeSkill, spawnPosX, spawnPosY);
-        gameLoop.addStoreSlot(storeSlot);
+        SpawnSignal spawnSignal = new SpawnSignal(storeSlot, gameLoop, spawnPosX, spawnPosY, 0, SpawnSignal.StoreItemSignal);
+        gameLoop.addGameObject(spawnSignal);
     }
 
 }

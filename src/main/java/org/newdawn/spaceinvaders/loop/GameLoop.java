@@ -128,6 +128,7 @@ public class GameLoop extends Loop {
     private TextRenderer playerHealthText;
     private TextRenderer activeSkillText;
     private TextRenderer passiveSkillHeaderText;
+    private TextRenderer storeRemainTimeShower;
     private HashMap<PlayerPassiveSkillType, TextRenderer> passiveSkillsTexts;
     private void updatePassiveSkillText(){
         for (PlayerPassiveSkillType type : PlayerPassiveSkillType.values()) {
@@ -205,8 +206,7 @@ public class GameLoop extends Loop {
     private boolean hasSectionEnd = true;
     private SectionData currentSection;
     private long sectionElapsed = 0;
-
-
+    private int storeSectionDuration = 15 << 16;
 
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public GameLoop(){
@@ -245,19 +245,27 @@ public class GameLoop extends Loop {
         playerHealthText = new TextRenderer(this, "Health : " + Long.toString(ships.get(myPlayerID).getHealth()), 15);
         activeSkillText = new TextRenderer(this, "Active Skill : " + ships.get(myPlayerID).getActiveSkillName(), 15);
         passiveSkillHeaderText = new TextRenderer(this, "(Passive Skills)", 15);
+        indicatorText = new TextRenderer(this, "", 20);
+        indicatorText.alignment = 1;
+        storeRemainTimeShower = new TextRenderer(this, "", 13, Color.yellow);
+        storeRemainTimeShower.alignment = 1;
 
         scoreText.setSortingLayer(100);
         coinCountText.setSortingLayer(100);
         playerHealthText.setSortingLayer(100);
         activeSkillText.setSortingLayer(100);
         passiveSkillHeaderText.setSortingLayer(100);
-
+        indicatorText.setSortingLayer(101);
+        storeRemainTimeShower.setSortingLayer(100);
+        
         addGameObject(scoreText);
         addGameObject(coinCountText);
         addGameObject(playerHealthText);
         addGameObject(activeSkillText);
         addGameObject(passiveSkillHeaderText);
-
+        addGameObject(indicatorText);
+        addGameObject(storeRemainTimeShower);
+        
         updatePassiveSkillText();
         
         scoreText.setPos(0, 0);
@@ -265,17 +273,13 @@ public class GameLoop extends Loop {
         playerHealthText.setPos(0, 35 << 16);
         activeSkillText.setPos(0, 55 << 16);
         passiveSkillHeaderText.setPos(0, 75 << 16);
+        indicatorText.setPos(400 << 16, 50 << 16);
+        storeRemainTimeShower.setPos(400 << 16, 30 << 16);
         int index = 0;
         for (TextRenderer text : passiveSkillsTexts.values()) {
             text.setPos(0, (95 + index++ * 10) << 16);
         }
-
-        //* Indicator Text 관련 초기화
-        indicatorText = new TextRenderer(this, "", 20);
-        indicatorText.alignment = 1;
-        indicatorText.setPos(400 << 16, 50 << 16);
-        indicatorText.setSortingLayer(101);
-        addGameObject(indicatorText);
+        
     }
 
     private void updateText() {
@@ -287,6 +291,15 @@ public class GameLoop extends Loop {
         String activeSkillTextContent = "Active Skill : " + ships.get(myPlayerID).getActiveSkillName();
         activeSkillTextContent += ships.get(myPlayerID).isActiveSkillActable() ? "" : "( " + Long.toString(ships.get(myPlayerID).getRemainCoolTime() >> 16) + " )";
         activeSkillText.setText(activeSkillTextContent);
+
+        if (currentSection != null && currentSection.getSectionType() == SectionType.Store){
+            storeRemainTimeShower.setText("Remain Store Time : " + Integer.toString(FixedPointUtil.toInt(FixedPointUtil.sub(storeSectionDuration, sectionElapsed))));
+        }
+        else{
+            storeRemainTimeShower.setText("");
+        }
+
+
         updatePassiveSkillText();
     }
     /**
@@ -519,7 +532,7 @@ public class GameLoop extends Loop {
 
         //section 실행 관련 로직
         if (gameResult == GameLoopResultType.InGame){
-            deserializeMapdata();
+            executeMapCommand();
         }
 
         // 이 클래스는 직접적으로 네트워킹 하지 않으니 주석처리
@@ -560,7 +573,7 @@ public class GameLoop extends Loop {
         sectionElapsed += getGame().fixedDeltaTime;
     }
 
-    private void deserializeMapdata() {
+    private void executeMapCommand() {
         if (currentSection == null || !currentSection.hasMoreInstantiateCommands()){
             if (hasSectionEnd){
                 currentSection = sections.poll();
@@ -581,7 +594,7 @@ public class GameLoop extends Loop {
                 }
                 //* 현재 Section이 Store 타입이라면, Scection 시작 15초 후에 Section 종료
                 if (currentSection.getSectionType() == SectionType.Store){
-                    if (sectionElapsed >= (15 << 16)){
+                    if (sectionElapsed >= storeSectionDuration){
                         hasSectionEnd = true;
                         sectionElapsed = 0;
 

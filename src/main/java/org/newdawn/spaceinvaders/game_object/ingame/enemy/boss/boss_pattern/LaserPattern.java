@@ -6,7 +6,7 @@
 package org.newdawn.spaceinvaders.game_object.ingame.enemy.boss.boss_pattern;
 
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
-import org.newdawn.spaceinvaders.game_object.ingame.enemy.EnemyWarner;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.SpawnSignal;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.boss.Boss;
 import org.newdawn.spaceinvaders.game_object.ingame.laser.EnemyLaser;
 import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
@@ -68,7 +68,7 @@ public class LaserPattern extends BossPattern {
 
         while (currentWarnerSpawnPosX > 0 && currentWarnerSpawnPosX < (800 << 16)
             && currentWarnerSpawnPosY > 0 && currentWarnerSpawnPosY < (600 << 16)) {
-            EnemyWarner warner = new EnemyWarner((GameLoop)getLoop(), currentWarnerSpawnPosX, currentWarnerSpawnPosY, spawnAngle + (270<< 16), warningTime);
+            SpawnSignal warner = new SpawnSignal((GameLoop)getLoop(), currentWarnerSpawnPosX, currentWarnerSpawnPosY, spawnAngle + (270<< 16), warningTime, SpawnSignal.EnemySignal);
 
             currentWarnerSpawnPosX += FixedPointUtil.mul(FixedPointUtil.cos(spawnAngle), warnerSpawnIntervel);
             currentWarnerSpawnPosY += FixedPointUtil.mul(FixedPointUtil.sin(spawnAngle), warnerSpawnIntervel);

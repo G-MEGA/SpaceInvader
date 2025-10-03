@@ -2,6 +2,7 @@ package org.newdawn.spaceinvaders.loop;
 
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -75,7 +76,10 @@ public abstract class Loop  {
             gameObject.propagateGetLayerSet(layerSet);
         }
         
-        for (Integer layer : layerSet) {
+        ArrayList<Integer> layerList = new ArrayList<>(layerSet);
+        Collections.sort(layerList);
+
+        for (Integer layer : layerList) {
             // cycle round drawing all the entities we have in the game
             for (int i=0;i<gameObjects.size();i++) {
                 GameObject gameObject = gameObjects.get(i);

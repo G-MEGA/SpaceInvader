@@ -164,7 +164,7 @@ public class GameLoop extends Loop {
         isIndicatorShown = true;
     }
 
-    private final int bombDamage = 100;
+    public static final int BOMB_DAMAGE = 100;
 
     private long coinCount = 0;
     public long getCoinCount() { return coinCount; }
@@ -406,16 +406,6 @@ public class GameLoop extends Loop {
 
     public long getCurrentTime(){
         return getGame().fixedDeltaTime * currentFrame;
-    }
-
-    //TODO notify류 메소드는 이벤트 버스 패턴으로 리펙토링하자...
-    public void notifyBomb(){
-        System.out.println("펑");
-        for (Enemy enemy : enemies) {
-            enemy.decreaseHealth(bombDamage);
-        }
-        
-        cleanUpEnemies();
     }
 
     /**

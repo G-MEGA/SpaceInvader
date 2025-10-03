@@ -2,6 +2,7 @@ package org.newdawn.spaceinvaders.game_object.ingame.enemy;
 
 import java.util.ArrayList;
 
+import event_bus.IEventBusSubscriber;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.GameCharacter;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
@@ -13,9 +14,10 @@ import org.newdawn.spaceinvaders.game_object.logic.IHiveMindListener;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 import org.newdawn.spaceinvaders.loop.Loop;
+import org.newdawn.spaceinvaders.loop.game_loop.EventBombUsed;
 import org.newdawn.spaceinvaders.singleton.LootItemFactory;
 
-public abstract class Enemy extends GameCharacter implements IHiveMindListener {
+public abstract class Enemy extends GameCharacter implements IHiveMindListener, IEventBusSubscriber {
     protected HiveMind hiveMind;
 
     protected SpriteRenderer spriteRenderer;
@@ -58,6 +60,8 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
         }
         
         setCollider(gameLoop);
+
+        gameLoop.getEventBus().register(EventBombUsed.class, this);
     }
 
     public Enemy(GameLoop gameLoop, HiveMind hiveMind, long initialHealth){
@@ -154,6 +158,20 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener {
         if (collider instanceof PlayerShip){
             collideWithPlayerShip();
         }
+    }
+
+    @Override
+    public void notify(Object event){
+        if (event instanceof EventBombUsed){
+            decreaseHealth((GameLoop.BOMB_DAMAGE));
+        }
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+
+        ((GameLoop)getLoop()).getEventBus().unregister(EventBombUsed.class, this);
     }
 
     protected void collideWithPlayerShip(){

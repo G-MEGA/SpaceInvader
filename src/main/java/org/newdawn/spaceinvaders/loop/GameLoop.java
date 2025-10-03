@@ -1,5 +1,6 @@
 package org.newdawn.spaceinvaders.loop;
 
+import event_bus.EventBus;
 import networking.Network;
 import networking.rudp.Connection;
 import networking.rudp.IRUDPPeerListener;
@@ -12,6 +13,7 @@ import org.newdawn.spaceinvaders.enums.IndicatorTextType;
 import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
 import org.newdawn.spaceinvaders.enums.SectionType;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
+import org.newdawn.spaceinvaders.loop.game_loop.EventStoreSectionEnded;
 import org.newdawn.spaceinvaders.loop.game_loop.IGameLoopGameResultListener;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.loop_input.LoopInputLog;
@@ -80,6 +82,7 @@ public class GameLoop extends Loop {
     private ArrayList<PlayerShip> ships = new ArrayList<>();
     public ArrayList<PlayerShip> getPlayerShips() { return ships; }
     public PlayerShip getPlayerShip(int id) { return ships.get(id); }
+    public PlayerShip getMyPlayerShip() { return ships.get(myPlayerID); }
 
     private ArrayList<PlayerShip> aliveShips = new ArrayList<>();
     public PlayerShip getAliveShip(int index) { return aliveShips.get(index); }
@@ -103,6 +106,9 @@ public class GameLoop extends Loop {
         addGameObject(enemy);
     }
 
+    private EventBus eventBus = new EventBus();
+    public EventBus getEventBus() { return eventBus; }
+
     private GameLoopResultType gameResult = GameLoopResultType.InGame;
     public GameLoopResultType getGameResult() {
         return gameResult;
@@ -120,7 +126,6 @@ public class GameLoop extends Loop {
         gameResultListener.onGameResultChanged(gameResult);
     }
     public transient IGameLoopGameResultListener gameResultListener;
-
 
     //* 게임 화면에 존재하는 Text UI들
     private TextRenderer scoreText;
@@ -191,13 +196,6 @@ public class GameLoop extends Loop {
             return true;
         }
         return false;    
-    }
-
-    //* 상점 section에서 존재하는 slot들
-    private ArrayList<StoreSlot> storeSlots = new ArrayList<>();
-    public void addStoreSlot(StoreSlot storeSlot){
-        storeSlots.add(storeSlot);
-        addGameObject(storeSlot);
     }
 
     //TODO NULL CHECKING 확인하기
@@ -471,18 +469,6 @@ public class GameLoop extends Loop {
     }
 
     public void notifySkillStoreItemAcquired() {
-        for (int i = 0; i < storeSlots.size(); i++){
-            if (storeSlots.get(i).isDestroyed()){
-                storeSlots.remove(i);
-            }
-        }
-
-        for (StoreSlot storeSlot : storeSlots) {
-            if (storeSlot.getItem() instanceof PassiveSkill){
-                PlayerPassiveSkillType type = ((PassiveSkill)storeSlot.getItem()).getType();
-                storeSlotFactory.setPassiveSkillItemPrice(storeSlot, type, getPlayerShip(myPlayerID));
-            }
-        }
     }
 
     public String getReplayData(){
@@ -598,10 +584,7 @@ public class GameLoop extends Loop {
                         hasSectionEnd = true;
                         sectionElapsed = 0;
 
-                        for (StoreSlot storeSlot : storeSlots){
-                            storeSlot.destroy();
-                        }
-                        storeSlots.clear();
+                        getEventBus().publish(new EventStoreSectionEnded());
                     }
                 }
             }

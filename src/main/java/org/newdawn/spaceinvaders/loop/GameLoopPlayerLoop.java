@@ -10,8 +10,7 @@ import org.newdawn.spaceinvaders.enums.GameLoopResultType;
 import org.newdawn.spaceinvaders.loop.game_loop.IGameLoopGameResultListener;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -184,6 +183,9 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
         super.draw(g);
 
         if (isPlaying() && gameLoop.getGameResult() != GameLoopResultType.InGame) {
+            Font font = g.getFont();
+            g.setFont(new Font(font.getFontName(), Font.BOLD, 20));
+
             String message = "";
             if (gameLoop.getGameResult() == GameLoopResultType.Win) {
                 message = "Well done! You Win!";

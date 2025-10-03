@@ -186,6 +186,9 @@ public class ReplayerLoop extends Loop{
 
         super.draw(g);
 
+        Font font = g.getFont();
+        g.setFont(new Font(font.getFontName(), Font.BOLD, 20));
+
         String message;
         int messageY = 590;
 

@@ -237,45 +237,41 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
 
                     putState(gameLoop.currentFrame, GameLoopSerializer.getInstance().serialize(gameLoop));
 
-                    // 피어 연결
-                    ArrayList<InetSocketAddress> peerAdresses = new ArrayList<>();
+                    // 연결할 주소들 리스트 업
+                    ArrayList<InetSocketAddress> peerAddresses = new ArrayList<>();
                     for(int i = 0; d.playersUID.size() > i; i++){
                         if(i == gameLoop.getMyPlayerID())continue;
 
-                        try {
-                            InetSocketAddress address = new InetSocketAddress(d.addresses.get(i), d.ports.get(i));
-
-                            System.out.println("피어 연결 시도 " + d.addresses.get(i) + ":" + d.ports.get(i));
-
-                            getGame().getRudpPeer().connect(address);
-
-                            peerAdresses.add(address);
-                        } catch (Exception e) {
-                            throw new RuntimeException(e);
-                        }
+                        InetSocketAddress address = new InetSocketAddress(d.addresses.get(i), d.ports.get(i));
+                        peerAddresses.add(address);
                     }
 
-                    System.gc(); // 잠깐의 여유 동안 GC 수행
-
-                    // 일정 간격으로 확인하여 모든 피어가 연결되었다면 while 탈출
-                    while(true){
+                    while(!peerAddresses.isEmpty()){
                         try {
-                            Thread.sleep(100);
-
-                            boolean connectedWithAll = true;
-                            for(InetSocketAddress address : peerAdresses){
-                                if(!getGame().getRudpPeer().isConnected(address)){
-
-                                    System.out.println(address.getAddress() + ":" + address.getPort() + "피어 연결 안되었음");
-
-                                    connectedWithAll = false;
-                                    break;
+                            // 연결 된 피어는 목록에서 제거
+                            for(int i = peerAddresses.size() - 1; i >= 0; i--){
+                                if(getGame().getRudpPeer().isConnected(peerAddresses.get(i))){
+                                    peerAddresses.remove(i);
                                 }
                             }
 
-                            if(connectedWithAll){
-                                break;
+                            System.out.println("=== 피어 연결 시도 ====");
+                            for(InetSocketAddress address : peerAddresses){
+
+                                System.out.println("연결 시도 - " + address.getAddress().getHostAddress() + ":" + address.getPort());
+                                // 한 번 시도할 때마다 5번씩 연결 요청
+                                for(int k = 0; k < 5; k++){
+                                    Thread.sleep(10);
+                                    try {
+                                        getGame().getRudpPeer().connect(address);
+                                    } catch (Exception e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
                             }
+
+                            // 1초에 한 번씩 시도
+                            Thread.sleep(1000);
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }

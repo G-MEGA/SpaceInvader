@@ -58,6 +58,7 @@ public class LaserPattern extends BossPattern {
         isExecuted = true;
 
         PlayerShip target = ((GameLoop)getLoop()).getRandomAlivePlayerShip();
+        
         spawnPosX = boss.getPosX();
         spawnPosY = boss.getPosY(); 
         spawnAngle = FixedPointUtil.atan2(target.getPosY() - boss.getPosY(), target.getPosX() - boss.getPosX());

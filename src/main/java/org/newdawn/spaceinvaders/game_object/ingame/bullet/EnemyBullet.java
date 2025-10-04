@@ -2,8 +2,12 @@ package org.newdawn.spaceinvaders.game_object.ingame.bullet;
 
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 import org.newdawn.spaceinvaders.loop.GameLoop;
+import org.newdawn.spaceinvaders.loop.game_loop.EventBombUsed;
 
-public class EnemyBullet extends Bullet{
+import event_bus.EventBus;
+import event_bus.IEventBusSubscriber;
+
+public class EnemyBullet extends Bullet implements IEventBusSubscriber{
     private static final String spriteRef = "sprites/enemy/enemyBullet.png";
 
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
@@ -13,6 +17,8 @@ public class EnemyBullet extends Bullet{
 
     public EnemyBullet(GameLoop gameLoop, long spawnAngle, long spawnCentralX, long spawnCentralY, long spawnOffset, long spawnSpeed) {
         super(gameLoop, spawnAngle, spawnCentralX, spawnCentralY, spawnOffset, spawnSpeed, spriteRef);
+
+        gameLoop.getEventBus().register(EventBombUsed.class, this);
     }
     
     @Override
@@ -31,5 +37,19 @@ public class EnemyBullet extends Bullet{
     public void onHitByPlayerShip() {
         used = true;
         destroy();
+    }
+
+    @Override
+    public void notify(Object event) {
+        if (event instanceof EventBombUsed){
+            destroy();
+        }
+    }
+    
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+
+        ((GameLoop)getLoop()).getEventBus().unregister(EventBombUsed.class, this);
     }
 }

@@ -51,7 +51,7 @@ public class Boss extends Enemy{
     }
     
     public Boss(GameLoop gameLoop){
-        super(gameLoop, 100);
+        super(gameLoop, 100, 300);
 
         bossHealthText = new TextRenderer(getLoop(), "", 30, Color.red);
         bossHealthText.setPos(400 << 16, 0);
@@ -77,7 +77,7 @@ public class Boss extends Enemy{
     protected void draw(Graphics2D g){
         super.draw(g);
 
-        bossHealthText.setText(Long.toString(_health));
+        bossHealthText.setText(Long.toString(health));
     }
 
     @Override

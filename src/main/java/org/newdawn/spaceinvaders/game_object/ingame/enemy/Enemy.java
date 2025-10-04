@@ -20,7 +20,6 @@ import org.newdawn.spaceinvaders.singleton.LootItemFactory;
 public abstract class Enemy extends GameCharacter implements IHiveMindListener, IEventBusSubscriber {
     protected HiveMind hiveMind;
 
-    protected SpriteRenderer spriteRenderer;
     //* 이미지 등록시 frames와 onHitFrames의 원소 갯수는 같아야 한다.
     protected ArrayList<String> frames = new ArrayList<>();
     protected ArrayList<String> onHitFrames = new ArrayList<>();
@@ -69,6 +68,17 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener, 
 
         this.hiveMind = hiveMind;
         this.hiveMind.addListener(this);
+    }
+    
+    public Enemy(GameLoop gameLoop, long initialHealth, int healthBarWidth){
+        this(gameLoop,  initialHealth);
+
+        super.healthBarWidth = healthBarWidth;
+    }
+    public Enemy(GameLoop gameLoop, HiveMind hiveMind, long initialHealth, int healthBarWidth){
+        this(gameLoop, hiveMind, initialHealth);
+
+        super.healthBarWidth = healthBarWidth;
     }
 
     protected void setCollider(Loop loop){
@@ -175,7 +185,7 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener, 
     }
 
     protected void collideWithPlayerShip(){
-        if (--_health <= 0){
+        if (--health <= 0){
             destroy();
         }
     }

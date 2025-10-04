@@ -10,8 +10,6 @@ import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.Loop;
 
 public class Barrier extends GameCharacter {
-    private SpriteRenderer spriteRenderer;
-
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public Barrier(){
         super();

@@ -178,9 +178,6 @@ public class PlayerShip extends GameCharacter{
     private final long reflexibleTime = 2L << 16;
     private boolean isReflexible = false;;
 
-    SpriteRenderer spriteRenderer;
-    public SpriteRenderer getSpriteRenderer() { return spriteRenderer; }
-
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public PlayerShip(){
         super();
@@ -339,9 +336,9 @@ public class PlayerShip extends GameCharacter{
     }
 
     private void onHurt(ICollider2DOwner collider){
-        //TODO 흠.. 이게 맞나?
+        //* Enemy Laser 맞으면 바로 죽음
         if (collider instanceof EnemyLaser){
-            decreaseHealth(_health);
+            decreaseHealth(health);
             ((GameLoop)getLoop()).notifyPlayerShipDeath();
             destroy();
         }
@@ -368,7 +365,7 @@ public class PlayerShip extends GameCharacter{
             currentShield -= 1;
             return;
         }
-        if (--_health == 0){
+        if (--health == 0){
             ((GameLoop)getLoop()).notifyPlayerShipDeath();
             destroy();
         }

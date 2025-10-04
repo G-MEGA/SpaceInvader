@@ -4,6 +4,7 @@ import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.effect.BlankScreenEffect;
 import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
 import org.newdawn.spaceinvaders.loop.GameLoop;
+import org.newdawn.spaceinvaders.loop.game_loop.EventBombUsed;
 
 public class BombSkill extends ActiveSkill {
     private static final String skillSpriteRef = "sprites/testActiveSkill.png";
@@ -22,7 +23,7 @@ public class BombSkill extends ActiveSkill {
 
     @Override
     public void activate() {
-        gameLoop.notifyBomb();
+        gameLoop.getEventBus().publish(new EventBombUsed());
 
         new BlankScreenEffect(gameLoop, bombEffectDuration);
     }

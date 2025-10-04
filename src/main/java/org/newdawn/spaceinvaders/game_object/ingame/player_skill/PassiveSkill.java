@@ -30,4 +30,19 @@ public class PassiveSkill extends PlayerSkill{
         gameLoop.notifySkillStoreItemAcquired();
         return true;
     }
+
+    @Override
+    public int getPrice(PlayerShip playerShip) {
+        return playerShip.getPassiveSkillLevel(getType())*2 + 1;
+    }
+
+    @Override
+    public String getPriceString(PlayerShip playerShip) {
+        if (playerShip.isPasiveSkillMaxLevel(type)){
+            return "?";
+        }
+        else{
+            return Integer.toString(getPrice(playerShip));
+        }
+    }
 }

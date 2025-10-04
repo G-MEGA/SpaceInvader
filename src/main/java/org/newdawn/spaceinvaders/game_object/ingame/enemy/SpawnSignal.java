@@ -88,7 +88,7 @@ public class SpawnSignal extends GameObject2D{
                     gameLoop.addEnemy((Enemy)spawnGameObject);
                 }
                 else if (spawnSignalType == StoreItemSignal){
-                    gameLoop.addStoreSlot((StoreSlot)spawnGameObject);
+                    gameLoop.addGameObject((StoreSlot)spawnGameObject);
                 }
                 else{
                     gameLoop.addGameObject(spawnGameObject);

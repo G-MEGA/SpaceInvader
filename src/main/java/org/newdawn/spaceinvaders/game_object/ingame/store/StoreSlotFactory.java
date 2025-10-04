@@ -34,24 +34,19 @@ public class StoreSlotFactory {
 
     public void createPassiveSkillItemSlot(int skillId, long spawnPosX, long spawnPosY, PlayerShip playerShip){
         PassiveSkill passiveSkill = null;
-        Integer skillLevel = 0;
-        //TODO 스킬 레벨에 따른 가격 변동 추가
+
         switch (skillId) {
             case PS_FIRE_SPEED:
                 passiveSkill = new PassiveSkill(PlayerPassiveSkillType.FireSpeed, gameLoop);
-                skillLevel = playerShip.getPassiveSkillLevel(PlayerPassiveSkillType.FireSpeed);
                 break;
             case PS_DAMAGE_UP:
                 passiveSkill = new PassiveSkill(PlayerPassiveSkillType.DamageUp, gameLoop);
-                skillLevel = playerShip.getPassiveSkillLevel(PlayerPassiveSkillType.DamageUp);
                 break;
             case PS_ADDITIONAL_ENGINE:
                 passiveSkill = new PassiveSkill(PlayerPassiveSkillType.AdditionalEngine, gameLoop);
-                skillLevel = playerShip.getPassiveSkillLevel(PlayerPassiveSkillType.AdditionalEngine);
                 break;
             case PS_REPAIR_KIT:
                 passiveSkill = new PassiveSkill(PlayerPassiveSkillType.RepairKit, gameLoop);
-                skillLevel = playerShip.getPassiveSkillLevel(PlayerPassiveSkillType.RepairKit);
                 break;
         }
         if (passiveSkill == null){
@@ -59,18 +54,9 @@ public class StoreSlotFactory {
             return;
         }
 
-        StoreSlot storeSlot = new StoreSlot(gameLoop, skillLevel.intValue()*2 + 1, passiveSkill, spawnPosX, spawnPosY);
+        StoreSlot storeSlot = new StoreSlot(gameLoop, passiveSkill, spawnPosX, spawnPosY);
         SpawnSignal spawnSignal = new SpawnSignal(storeSlot, gameLoop, spawnPosX, spawnPosY, 0, SpawnSignal.StoreItemSignal);
         gameLoop.addGameObject(spawnSignal);
-    }
-
-    public void setPassiveSkillItemPrice(StoreSlot storeSlot, PlayerPassiveSkillType type, PlayerShip playerShip) {
-        if (playerShip.isPasiveSkillMaxLevel(type)){
-            storeSlot.setPriceUnknown(true);
-        }
-        else{
-            storeSlot.setPrice(playerShip.getPassiveSkillLevel(type)*2 + 1);
-        }
     }
     
     public void createActiveSkillItemSlot(int skillId, long spawnPosX, long spawnPosY){
@@ -94,7 +80,7 @@ public class StoreSlotFactory {
             return;
         }
 
-        StoreSlot storeSlot = new StoreSlot(gameLoop, 3, activeSkill, spawnPosX, spawnPosY);
+        StoreSlot storeSlot = new StoreSlot(gameLoop, activeSkill, spawnPosX, spawnPosY);
         SpawnSignal spawnSignal = new SpawnSignal(storeSlot, gameLoop, spawnPosX, spawnPosY, 0, SpawnSignal.StoreItemSignal);
         gameLoop.addGameObject(spawnSignal);
     }

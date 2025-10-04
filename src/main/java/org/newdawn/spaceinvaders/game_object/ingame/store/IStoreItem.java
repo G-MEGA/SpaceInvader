@@ -16,4 +16,7 @@ public interface IStoreItem {
      * @return 구매 성공 시 {@code true}, 실패 시 {@code false}
      */
     public boolean onAcquire(GameLoop gameLoop, PlayerShip playerShip);
+
+    int getPrice(PlayerShip playerShip);
+    String getPriceString(PlayerShip playerShip);
 }

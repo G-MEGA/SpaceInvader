@@ -26,4 +26,11 @@ public abstract class ActiveSkill extends PlayerSkill{
     }
     
     public abstract void activate();
+
+    public int getPrice(PlayerShip playerShip){
+        return 3;
+    }
+    public String getPriceString(PlayerShip playerShip){
+        return Integer.toString(getPrice(playerShip));
+    }
 }

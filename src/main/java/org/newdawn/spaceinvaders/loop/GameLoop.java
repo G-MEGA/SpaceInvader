@@ -164,7 +164,7 @@ public class GameLoop extends Loop {
         isIndicatorShown = true;
     }
 
-    public static final int BOMB_DAMAGE = 100;
+    public static final int BOMB_DAMAGE = 1;
 
     private long coinCount = 0;
     public long getCoinCount() { return coinCount; }

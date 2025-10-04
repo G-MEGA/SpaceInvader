@@ -3,6 +3,7 @@ package networking.rudp.PacketData;
 import java.util.ArrayList;
 
 public class PacketDataS2CPreprocessForGame extends PacketData{
+    public String gameSessionID;
     public long gameLoopSeed;
     public int mapID;
     public int playerIDInLobby;

@@ -281,7 +281,7 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
 
                     //전처리 완료 전송
                     preprocessOK();
-                    System.out.println("전처리 완료오오오");
+                    System.out.println("전처리 완료. 세션ID : " + d.gameSessionID);
 
                     return true;
                 }

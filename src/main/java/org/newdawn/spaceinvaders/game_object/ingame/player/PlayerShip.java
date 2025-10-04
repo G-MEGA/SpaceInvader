@@ -336,7 +336,7 @@ public class PlayerShip extends GameCharacter{
     }
 
     private void onHurt(ICollider2DOwner collider){
-        //TODO 흠.. 이게 맞나?
+        //* Enemy Laser 맞으면 바로 죽음
         if (collider instanceof EnemyLaser){
             decreaseHealth(health);
             ((GameLoop)getLoop()).notifyPlayerShipDeath();

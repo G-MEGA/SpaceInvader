@@ -313,9 +313,9 @@ public class GameLoop extends Loop {
         clearGameObjects();
         initEntities();
         initText();
-        for(PlayerShip ship:ships){
-            ship.onWaveStart();
-        }
+        // for(PlayerShip ship:ships){
+        //     ship.onWaveStart();
+        // }
     }
 
     /**
@@ -554,10 +554,17 @@ public class GameLoop extends Loop {
             if (hasSectionEnd){
                 currentSection = sections.poll();
                 hasSectionEnd = false;
+
                 //* 다음 section이 존재하지 않는다면 stage 클리어로 처리
-                //TODO 근데 이러면 :game-end을 두는 의미가 없어지네
                 if (currentSection == null) {
                     notifyWin();
+                    return;
+                }
+                
+                if (currentSection.getSectionType() == SectionType.NewWave){
+                    for(PlayerShip ship:ships){
+                        ship.onWaveStart();
+                    }
                 }
             }
             else{

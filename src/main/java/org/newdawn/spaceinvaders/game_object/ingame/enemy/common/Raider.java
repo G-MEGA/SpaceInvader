@@ -50,8 +50,8 @@ public class Raider extends SweeperEnemy{
     }
 
     @Override
-    protected void onTouchBoundary(){
+    protected void onTouchGameOverLine(){
         // 얘는 화면 아래에 닿아도 게임 오버가 되지 않도록 onTouchBoundary를 오버라이딩함
-        decreaseHealth(getHealth());
+        decreaseHealth(getHealth() + 9999999999L);
     }
 }

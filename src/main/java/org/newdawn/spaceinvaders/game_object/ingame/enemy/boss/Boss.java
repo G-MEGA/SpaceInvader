@@ -51,7 +51,7 @@ public class Boss extends Enemy{
     }
     
     public Boss(GameLoop gameLoop){
-        super(gameLoop, 100, 300);
+        super(gameLoop, 500, 300);
 
         bossHealthText = new TextRenderer(getLoop(), "", 30, Color.red);
         bossHealthText.setPos(400 << 16, 0);

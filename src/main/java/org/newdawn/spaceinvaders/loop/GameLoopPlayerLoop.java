@@ -328,7 +328,7 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
 
             getGame().getRudpPeer().broadcast(packetData, "server");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(inputLogString, e);
         }
     }
     void gameResult(){

@@ -30,7 +30,7 @@ public class Main {
     Container loginContainer;
     Container registerContainer;
 
-    Map<String, String> authInfo;
+    Map<String, Object> authInfo;
     boolean authenticated = false;
 
     IRUDPPeerListener rudpPeerListener = new IRUDPPeerListener() {
@@ -208,7 +208,7 @@ public class Main {
                 System.out.println("Firebase 로그인 완료 " + authInfo.get("idToken"));
                 authFrame.setVisible(false);
 
-                tryAuth(authInfo.get("idToken"));
+                tryAuth((String) authInfo.get("idToken"));
             } catch (Exception ex) {
                 //인증 실패시 실패사유 출력
                 JsonObject json = JsonParser.parseString(ex.getMessage()).getAsJsonObject();
@@ -250,7 +250,7 @@ public class Main {
                 System.out.println("Firebase 회원가입 완료 " + authInfo.get("idToken"));
                 authFrame.setVisible(false);
 
-                tryAuth(authInfo.get("idToken"));
+                tryAuth((String) authInfo.get("idToken"));
             } catch (Exception ex) {
                 //인증 실패시 실패사유 출력
                 JsonObject json = JsonParser.parseString(ex.getMessage()).getAsJsonObject();
@@ -279,7 +279,7 @@ public class Main {
     }
     public void startGame(){
         rudpPeer.removeListener(rudpPeerListener);
-        Game g = new Game(60L << 16, rudpPeer, authInfo.get("localId"));
+        Game g = new Game(60L << 16, rudpPeer, (String) authInfo.get("localId"), (String) authInfo.get("idToken"));
         g.loop();
     }
     public void tryAuth(String authToken) throws Exception {

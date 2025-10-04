@@ -114,6 +114,8 @@ public class GameLoop extends Loop {
         return gameResult;
     }
     private void setGameResult(GameLoopResultType gameResult) {
+        if(this.gameResult != GameLoopResultType.InGame)return;  // 낙장불입
+
         if(this.gameResult !=  gameResult) {
             this.gameResult = gameResult;
 

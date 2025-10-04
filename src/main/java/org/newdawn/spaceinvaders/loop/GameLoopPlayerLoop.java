@@ -51,6 +51,8 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
     Map<Long, GameLoopSnapshot> snapshots = new HashMap<>();
     LoopInputLog loopInputLog = new LoopInputLog();
 
+    PacketDataS2CPreprocessForGame preprocessInfo = null;
+
     public GameLoopPlayerLoop(Game game){
         super(game);
     }
@@ -229,22 +231,22 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
                 if (data instanceof PacketDataS2CPreprocessForGame) {
                     // 게임 생성
                     //멀티플레이 정보에 따라서 시드, 플레이어 카운트, 마이 플레이어 아이디, 맵데이터 넣어줘야함
-                    PacketDataS2CPreprocessForGame d =  (PacketDataS2CPreprocessForGame) data;
+                    preprocessInfo =  (PacketDataS2CPreprocessForGame) data;
                     gameLoop = new GameLoop(getGame(),
-                            d.gameLoopSeed,
-                            d.playersUID.size(),
-                            d.playerIDInLobby,
-                            d.mapID);
+                            preprocessInfo.gameLoopSeed,
+                            preprocessInfo.playersUID.size(),
+                            preprocessInfo.playerIDInLobby,
+                            preprocessInfo.mapID);
                     gameLoop.gameResultListener = thisLoop;
 
                     putState(gameLoop.currentFrame, GameLoopSerializer.getInstance().serialize(gameLoop));
 
                     // 연결할 주소들 리스트 업
                     ArrayList<InetSocketAddress> peerAddresses = new ArrayList<>();
-                    for(int i = 0; d.playersUID.size() > i; i++){
+                    for(int i = 0; preprocessInfo.playersUID.size() > i; i++){
                         if(i == gameLoop.getMyPlayerID())continue;
 
-                        InetSocketAddress address = new InetSocketAddress(d.addresses.get(i), d.ports.get(i));
+                        InetSocketAddress address = new InetSocketAddress(preprocessInfo.addresses.get(i), preprocessInfo.ports.get(i));
                         peerAddresses.add(address);
                     }
 
@@ -281,7 +283,7 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
 
                     //전처리 완료 전송
                     preprocessOK();
-                    System.out.println("전처리 완료. 세션ID : " + d.gameSessionID);
+                    System.out.println("전처리 완료. 세션ID : " + preprocessInfo.gameSessionID);
 
                     return true;
                 }
@@ -335,12 +337,28 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
             return;
         }
 
+        // 서버에 게임 종료 알림
         try {
             getGame().getRudpPeer().broadcastAboutTag("server", new PacketDataC2SGameResult(
                     gameLoop.getScore(), gameLoop.getGameResult() ==  GameLoopResultType.Win
             ));
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+
+        // 게임 클리어 시 파이어베이스에 저장
+        if(gameLoop.getMyPlayerID() == 0 && gameLoop.getGameResult() ==  GameLoopResultType.Win){
+            try {
+                getGame().firebaseRankings.saveGameResult(
+                        getGame().authToken,
+                        preprocessInfo.gameSessionID,
+                        preprocessInfo.mapID,
+                        gameLoop.getScore(),
+                        preprocessInfo.playersUID
+                        );
+            } catch (IOException e) {
+                throw new RuntimeException("Firebase 저장 실패", e);
+            }
         }
     }
 

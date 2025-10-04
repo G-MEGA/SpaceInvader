@@ -1,5 +1,6 @@
 package org.newdawn.spaceinvaders.loop;
 
+import firebase.FirebaseRankings;
 import networking.Network;
 import networking.rudp.Connection;
 import networking.rudp.IRUDPPeerListener;
@@ -14,7 +15,9 @@ import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.map_load.MapInfo;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map;
 
 //- 방 내부
 //	- 내가 참가했던 게임 중 가장 하이스코어, 참가 인원
@@ -39,6 +42,7 @@ public class LobbyLoop extends Loop{
 
     GameObject2D mapSelectionGUI;
     TextRenderer mapInfoTextRenderer;
+    TextRenderer mapRankingsTextRenderer;
     GameObject2D mapSelectionButtonContainer;
     ArrayList<Button> mapSelectionButtons;  // 맵 목록(방장만 터치 가능)
 
@@ -60,6 +64,7 @@ public class LobbyLoop extends Loop{
         mapSelectionButtonContainer = new GameObject2D(this);
         mapSelectionButtons = new ArrayList<>();  // 맵 목록(방장만 터치 가능)
         mapInfoTextRenderer = new TextRenderer(this, "맵 정보", 15);
+        mapRankingsTextRenderer = new TextRenderer(this, "랭킹", 13, Color.pink, 2);
 
         readyButton = new Button(this, () -> {
             if(waitingForServer){return;}
@@ -94,6 +99,7 @@ public class LobbyLoop extends Loop{
             b.addTextRenderer(mapInfo.getTitle(), 20, Color.WHITE, 0);
             mapSelectionButtonContainer.addChild(b);
         }
+        mapRankingsTextRenderer.setPos(100L << 16, 200L << 16);
         mapInfoTextRenderer.setPos(100L << 16, 0L << 16);
         mapSelectionGUI.setPos(0L << 16, 75L << 16);
 
@@ -109,6 +115,7 @@ public class LobbyLoop extends Loop{
         lobbyGUI.addChild(readyButton);
 
         mapSelectionGUI.addChild(mapSelectionButtonContainer);
+        mapSelectionGUI.addChild(mapRankingsTextRenderer);
         mapSelectionGUI.addChild(mapInfoTextRenderer);
         lobbyGUI.addChild(mapSelectionGUI);
 
@@ -178,6 +185,30 @@ public class LobbyLoop extends Loop{
                         }
                         playerListText.setText(playerlistString);
 
+                        // 랭킹 정보 가져오기
+                        mapRankingsTextRenderer.setText("");
+                        try {
+
+                            Map<String, Long> myBestRank = getGame().firebaseRankings.getMyBestRank(getGame().authToken, getGame().myUID, d.mapID);
+                            java.util.List<FirebaseRankings.GameResult> top10 = getGame().firebaseRankings.getTop10Rankings(getGame().authToken, d.mapID);
+
+                            String rankString = "";
+                            if(!myBestRank.containsKey("error")){
+                                rankString += "* 나의 랭킹 *\n" +
+                                        myBestRank.get("rank") + "위 "+ myBestRank.get("bestScore") + "점\n\n";
+                            }
+
+                            rankString += "* 리더 보드 *\n";
+                            for(int i = 0; i < top10.size(); i++){
+                                rankString += i + 1 + "위 " + top10.get(i).score + "점 " + top10.get(i).players.toString() + "\n";
+                            }
+
+                            mapRankingsTextRenderer.setText(rankString);
+                        } catch (IOException e) {
+                            throw new RuntimeException("firebase로부터 랭킹 정보 가져오기 실패", e);
+                        }
+
+                        // 락 풀어주기
                         waitingForServer = false;
                     }
                     return true;

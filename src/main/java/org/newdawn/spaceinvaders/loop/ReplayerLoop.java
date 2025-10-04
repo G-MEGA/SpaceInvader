@@ -91,43 +91,6 @@ public class ReplayerLoop extends Loop{
             return;
         }
 
-        //TODO Rollback Test
-        if (isKeyInputPressed(0, "mouse_button_left")) {
-            long startTime = System.nanoTime();
-
-            rollbackFrame = currentFrame;
-            rollbackLogIndex = currentLogIndex;
-
-            // 직렬화
-            rollbackSnapshot = GameLoopSerializer.getInstance().serialize(gameLoop);
-
-            long endTime = System.nanoTime();
-            // 4. 소요 시간 계산 및 출력
-            long durationNs = endTime - startTime; // 나노초 단위
-            double durationMs = durationNs / 1_000_000.0; // 밀리초 단위로 변환
-            System.out.println("직렬화된 데이터 크기: " + rollbackSnapshot.length + " bytes");
-            System.out.println("직렬화에 걸린 시간: " + durationNs + " ns");
-            System.out.println("직렬화에 걸린 시간: " + String.format("%.6f", durationMs) + " ms");
-        }
-        else if(isKeyInputJustPressed(0, "mouse_button_right") && rollbackFrame >= 0 && rollbackSnapshot != null) {
-            long startTime = System.nanoTime();
-
-            currentFrame = rollbackFrame;
-            currentLogIndex = rollbackLogIndex;
-
-            // 역직렬화
-            gameLoop = GameLoopSerializer.getInstance().deserialize(rollbackSnapshot);;
-            gameLoop.setGame(getGame());
-
-            long endTime = System.nanoTime();
-            // 소요 시간 계산 및 출력
-            long durationNs = endTime - startTime; // 나노초 단위
-            double durationMs = durationNs / 1_000_000.0; // 밀리초 단위로 변환
-            System.out.println("REVERSE 직렬화에 걸린 시간: " + durationNs + " ns");
-            System.out.println("REVERSE 직렬화에 걸린 시간: " + String.format("%.6f", durationMs) + " ms");
-        }
-
-
         int leftLoop = playSpeed;
 
         while(!paused && leftLoop>0){

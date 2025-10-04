@@ -1,79 +1,53 @@
 package firebase;
-import com.google.gson.Gson;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import okhttp3.*;
+
+import java.io.IOException;
 import java.util.Map;
 
 public class FirebaseClientAuth {
 
-    private static final String WEB_API_KEY = "AIzaSyAx6jRdo05AbC0eKQqDFO-NQEWemVd7bsg"; // Firebase 콘솔에서 복사한 키
+    private static final String WEB_API_KEY = "AIzaSyAx6jRdo05AbC0eKQqDFO-NQEWemVd7bsg";
+    private static final OkHttpClient client = new OkHttpClient(); // 클라이언트는 재사용하는 것이 효율적
     private static final Gson gson = new Gson();
+    private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
-    /**
-     * Firebase에 이메일/비밀번호로 회원가입을 요청
-     */
-    public Map<String, String> signUp(String email, String password) throws Exception {
+    public Map<String, Object> signUp(String email, String password) throws IOException {
         String url = "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" + WEB_API_KEY;
         return requestAuth(url, email, password);
     }
 
-    /**
-     * Firebase에 이메일/비밀번호로 로그인을 요청
-     */
-    public Map<String, String> signIn(String email, String password) throws Exception {
+    public Map<String, Object> signIn(String email, String password) throws IOException {
         String url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=" + WEB_API_KEY;
         return requestAuth(url, email, password);
     }
 
-    private Map<String, String> requestAuth(String urlString, String email, String password) throws Exception {
-        URL url = new URL(urlString);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setDoOutput(true);
-
-        // 요청 본문(Payload) 생성
+    private Map<String, Object> requestAuth(String url, String email, String password) throws IOException {
+        // 1. 요청 본문(Payload) 생성
         String jsonPayload = String.format(
                 "{\"email\":\"%s\",\"password\":\"%s\",\"returnSecureToken\":true}",
                 email, password
         );
+        RequestBody body = RequestBody.create(jsonPayload, JSON);
 
-        try (OutputStream os = conn.getOutputStream()) {
-            byte[] input = jsonPayload.getBytes(StandardCharsets.UTF_8);
-            os.write(input, 0, input.length);
-        }
+        // 2. HTTP 요청 생성
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
 
-        int responseCode = conn.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            try (InputStreamReader reader = new InputStreamReader(conn.getInputStream())) {
-                Map<String, String> result = gson.fromJson(reader, Map.class);
-                return result;
-            }
-        } else {
-            // 1. 에러 스트림을 가져옵니다.
-            InputStream errorStream = conn.getErrorStream();
-            if (errorStream == null) {
-                throw new RuntimeException("Firebase Auth Failed with response code: " + responseCode);
+        // 3. 요청 실행 및 응답 처리 (try-with-resources로 자동 close)
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                // 에러 발생 시 응답 본문을 포함하여 예외 발생
+                throw new IOException("Unexpected code " + response + " with body: " + response.body().string());
             }
 
-            // 2. 스트림의 내용을 문자열로 읽어들입니다.
-            StringBuilder response = new StringBuilder();
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(errorStream, StandardCharsets.UTF_8))) {
-                String responseLine;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
-                }
-            }
-
-            // 3. 실제 에러 메시지를 출력하고 예외를 발생시킵니다.
-            String actualErrorMessage = response.toString();
-            throw new RuntimeException(actualErrorMessage);
+            // 성공 시 JSON 응답을 Map으로 변환하여 반환
+            String responseBody = response.body().string();
+            return gson.fromJson(responseBody, new TypeToken<Map<String, Object>>(){}.getType());
         }
     }
 }

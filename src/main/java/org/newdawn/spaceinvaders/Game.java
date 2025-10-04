@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import firebase.FirebaseRankings;
 import networking.rudp.RUDPPeer;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
@@ -47,6 +48,8 @@ public class Game extends Canvas
         return rudpPeer;
     }
     public final String myUID;
+    public final String authToken;
+    public final FirebaseRankings firebaseRankings = new FirebaseRankings();
 
     private MapList mapList;
 
@@ -73,7 +76,7 @@ public class Game extends Canvas
 	/**
 	 * Construct our game and set it running.
 	 */
-	public Game(long fixedFPS, RUDPPeer rudpPeer, String myUID) {
+	public Game(long fixedFPS, RUDPPeer rudpPeer, String myUID, String authToken) {
         this.fixedFPS = fixedFPS;
         this.fixedDeltaTime = FixedPointUtil.div(FixedPointUtil.ONE, fixedFPS);
 
@@ -125,6 +128,7 @@ public class Game extends Canvas
 
         this.rudpPeer = rudpPeer;
         this.myUID = myUID;
+        this.authToken = authToken;
         System.out.println("myUID: " + myUID);
 
         changeLoop(new MainMenuLoop(this));  // 게임 시작 후 가장 처음 진입할 Loop);

@@ -50,6 +50,8 @@ public class SideBulletStreamPattern extends BossPattern {
     private void shootBullet() {
         PlayerShip target = ((GameLoop)getLoop()).getRandomAlivePlayerShip();
 
+        if(target == null) return;
+
         long leftBulletSpawnPosX = FixedPointUtil.sub(boss.getPosX(), 250 << 16);
         long rightBulletSpawnPosX = FixedPointUtil.add(boss.getPosX(), 250 << 16);
         long bulletSpawnPosY = FixedPointUtil.add(boss.getPosY(), 53 << 16);

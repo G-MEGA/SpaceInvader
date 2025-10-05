@@ -58,6 +58,8 @@ public class LaserPattern extends BossPattern {
         isExecuted = true;
 
         PlayerShip target = ((GameLoop)getLoop()).getRandomAlivePlayerShip();
+
+        if(target == null) return;
         
         spawnPosX = boss.getPosX();
         spawnPosY = boss.getPosY(); 

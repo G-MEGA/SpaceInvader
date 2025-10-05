@@ -1,0 +1,10 @@
+/title 테스트용 간단 맵
+/description 테스트용으로 만든 간단한 맵이다.\n여러 줄 설명\n테스트
+
+>new-wave
+1000 100 60 Enemy 0
+1000 200 60 Enemy 0
+1000 300 60 Enemy 0
+1000 400 60 Enemy 0
+
+:game-end

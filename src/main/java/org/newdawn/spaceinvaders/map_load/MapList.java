@@ -50,10 +50,10 @@ public class MapList {
                 String[] lines = content.split("\n");
                 for(String l: lines){
                     if(l.contains("/title")){
-                        title = l.split(" ")[1].trim();
+                        title = l.split(" ", 2)[1].trim();
                     }
                     else if(l.contains("/description")){
-                        description = l.split(" ")[1].trim();
+                        description = l.split(" ", 2)[1].trim().replace("\\n", "\n");
                     }
 
                     if(!title.isEmpty() && !description.isEmpty()){

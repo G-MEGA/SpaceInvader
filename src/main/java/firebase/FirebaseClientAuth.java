@@ -42,7 +42,8 @@ public class FirebaseClientAuth {
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 // 에러 발생 시 응답 본문을 포함하여 예외 발생
-                throw new IOException("Unexpected code " + response + " with body: " + response.body().string());
+                throw new IOException(response.body().string());
+//                throw new IOException("Unexpected code " + response + " with body: " + response.body().string());
             }
 
             // 성공 시 JSON 응답을 Map으로 변환하여 반환

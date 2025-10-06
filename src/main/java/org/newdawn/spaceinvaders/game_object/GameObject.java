@@ -7,7 +7,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Set;
 
-public abstract class GameObject  {
+public class GameObject  {
     private Loop loop;
     protected Loop getLoop() {
         return loop;

@@ -60,6 +60,7 @@ public class Game extends Canvas
 
 	/** The last time at which we recorded the frame rate */
 	private long lastFpsTime;
+    private long leftDelta = 0;
 	/** The current number of frames recorded */
 	private int fps;
 	/** The normal title of the game window */
@@ -203,6 +204,7 @@ public class Game extends Canvas
 			// will be used to calculate how far the entities should
 			// move this loop
 			long delta = SystemTimer.getTime() - lastLoopTime;
+            leftDelta += FixedPointUtil.fromDouble(delta/1000.0);  // ms를 초단위로 변환 후 고정 소수점으로
 			lastLoopTime = SystemTimer.getTime();
 
 			// update the frame counter
@@ -223,16 +225,20 @@ public class Game extends Canvas
 			g.setColor(Color.black);
 			g.fillRect(0,0,800,600);
 
-            if(queuedInputs.isEmpty()){
-                loop.process();
-            }
-            else{
-                // process() 작동 중 들어오는 입력을 놓치지 않기 위하여
-                // process() 이전에 미리 교체
-                ArrayList<LoopInput> inputsForThisFrame = queuedInputs;
-                queuedInputs = new ArrayList<LoopInput>();
+            while(leftDelta > 0){
+                leftDelta -= fixedDeltaTime;  // 고정 deltaTime 구현
 
-                loop.process(inputsForThisFrame);
+                if(queuedInputs.isEmpty()){
+                    loop.process();
+                }
+                else{
+                    // process() 작동 중 들어오는 입력을 놓치지 않기 위하여
+                    // process() 이전에 미리 교체
+                    ArrayList<LoopInput> inputsForThisFrame = queuedInputs;
+                    queuedInputs = new ArrayList<LoopInput>();
+
+                    loop.process(inputsForThisFrame);
+                }
             }
 
             loop.draw(g);

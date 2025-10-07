@@ -204,7 +204,6 @@ public class Game extends Canvas
 			// will be used to calculate how far the entities should
 			// move this loop
 			long delta = SystemTimer.getTime() - lastLoopTime;
-            leftDelta += FixedPointUtil.fromDouble(delta/1000.0);  // ms를 초단위로 변환 후 고정 소수점으로
 			lastLoopTime = SystemTimer.getTime();
 
 			// update the frame counter
@@ -225,6 +224,7 @@ public class Game extends Canvas
 			g.setColor(Color.black);
 			g.fillRect(0,0,800,600);
 
+            leftDelta += FixedPointUtil.fromDouble(delta/1000.0);  // ms를 초단위로 변환 후 고정 소수점으로
             while(leftDelta > 0){
                 leftDelta -= fixedDeltaTime;  // 고정 deltaTime 구현
 

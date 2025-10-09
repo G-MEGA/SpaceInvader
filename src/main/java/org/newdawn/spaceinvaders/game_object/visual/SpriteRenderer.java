@@ -50,6 +50,7 @@ public class SpriteRenderer extends GameObject2D {
         return sprite.getHeight();
     }
 
+    @Override
     protected void draw(Graphics2D g) {
         if(spriteRef==null) return;
         if(sprite==null){

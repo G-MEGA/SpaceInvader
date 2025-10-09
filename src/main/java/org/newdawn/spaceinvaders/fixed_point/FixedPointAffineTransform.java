@@ -9,6 +9,7 @@ public class FixedPointAffineTransform {
     long rotation = 0;
     long scale = FixedPointUtil.ONE;
 
+    // 이상의 정보로부터 다음 값들을 계산
     AffineTransform affineTransform = new AffineTransform();
     AffineTransform tempTransform = new AffineTransform();
     long xAxisX = FixedPointUtil.ONE;

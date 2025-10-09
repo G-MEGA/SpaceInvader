@@ -28,7 +28,11 @@ public class Main {
     Container authContainer;
 
     Container loginContainer;
+    JLabel loginNotificationLabel;
+    JButton loginButton;
     Container registerContainer;
+    JLabel registerNotificationLabel;
+    JButton registerButton;
 
     Map<String, Object> authInfo;
     boolean authenticated = false;
@@ -66,7 +70,7 @@ public class Main {
                     startGame();
                 }
                 else{
-                    //TODO 인증 실패
+                    onServerAuthFailed();
                 }
             }
             return true;
@@ -94,7 +98,8 @@ public class Main {
         }
 
         if(!rudpPeer.isConnected(serverAddress)){
-            //TODO 서버 연결에 실패 한 경우 처리
+            System.err.println("서버와의 연결에 실패했습니다.");
+            System.exit(0);
         }
 
         authFrame = new JFrame("로그인/회원가입");
@@ -141,11 +146,11 @@ public class Main {
         loginPasswordPanel.setPreferredSize(new Dimension(200, 30));
         loginContainer.add(loginPasswordPanel);
 
-        JLabel loginNotificationLabel = new JLabel();
+        loginNotificationLabel = new JLabel();
         loginContainer.add(loginNotificationLabel);
 
         JPanel loginButtonPanel = new JPanel(new FlowLayout());
-        JButton loginButton = new JButton("로그인");
+        loginButton = new JButton("로그인");
         loginButtonPanel.add(loginButton);
 
         loginContainer.add(loginButtonPanel);
@@ -181,11 +186,11 @@ public class Main {
         registerPasswordCheckPanel.setPreferredSize(new Dimension(200, 30));
         registerContainer.add(registerPasswordCheckPanel);
 
-        JLabel registerNotificationLabel = new JLabel();
+        registerNotificationLabel = new JLabel();
         registerContainer.add(registerNotificationLabel);
 
         JPanel registerButtonPanel = new JPanel(new FlowLayout());
-        JButton registerButton = new JButton("회원가입");
+        registerButton = new JButton("회원가입");
         registerButtonPanel.add(registerButton);
 
         registerContainer.add(registerButtonPanel);
@@ -288,7 +293,35 @@ public class Main {
         rudpPeer.broadcastAboutTag("server", new PacketDataC2SAuth(authToken));
     }
 
+    private void onServerAuthFailed(){
+        loginButton.setEnabled(true);
+        loginNotificationLabel.setText("서버측 인증 실패");
+        registerButton.setEnabled(true);
+        registerNotificationLabel.setText("서버측 인증 실패");
+        authFrame.pack();
+        authFrame.setVisible(true);
+    }
+
     public static void main(String[] argv) throws Exception {
         new Main();
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

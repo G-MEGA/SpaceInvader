@@ -37,17 +37,12 @@ public class MainMenuLoop extends Loop {
         spriteRenderer.setScale(20 << 16);
         addGameObject(spriteRenderer);
 
-        SpriteRenderer spriteRenderer2 = new SpriteRenderer(this);
-        spriteRenderer2.setSpriteRef("sprites/ship.gif");
-        spriteRenderer2.setPos(400 << 16, 400 << 16);
-        addGameObject(spriteRenderer2);
-
-        TextRenderer titleText = new TextRenderer(this, "우-주- 침략자", 120, Color.WHITE, 1);
+        TextRenderer titleText = new TextRenderer(this, "Space Invader", 100, Color.WHITE, 1);
         titleText.setPos(400L << 16, 0L << 16);
         titleText.alignment = 1;
         addGameObject(titleText);
 
-        TextRenderer subTitleText = new TextRenderer(this, "~이천만 인민을 위한 김정은 수령의 불꽃같은 특공~", 25, Color.WHITE, 2);
+        TextRenderer subTitleText = new TextRenderer(this, "~총과 폭탄으로 성립하는 우주 외교~", 25, Color.WHITE, 2);
         subTitleText.setPos(400L << 16, titleText.getPosY() + (200L << 16));
         subTitleText.alignment = 1;
         addGameObject(subTitleText);

@@ -65,6 +65,7 @@ public class TextRenderer extends GameObject2D {
         this(loop, text, fontSize, Color.WHITE, 0);
     }
 
+    @Override
     public void draw(Graphics2D g){
         super.draw(g);
         AffineTransform t = getGlobalTransform().getAffineTransform();

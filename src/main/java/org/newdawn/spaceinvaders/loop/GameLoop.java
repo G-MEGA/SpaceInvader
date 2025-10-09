@@ -408,11 +408,6 @@ public class GameLoop extends Loop {
     }
 
     public String getReplayData(){
-//            리플레이 저장 입력 및 처리를 이 클래스에서 안하니 리플레이 녹화 버튼 입력이 리플레이 데이터에 들어가도 괜찮음
-//            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외
-//            inputLogs.remove(inputLogs.size() - 1);  // 녹화버튼 입력 제외
-
-
         StringBuilder sb = new StringBuilder();
 
         //region GameLoop 구성 데이터 저장
@@ -428,10 +423,6 @@ public class GameLoop extends Loop {
         // 모든 인풋 데이터 저장
         for(LoopInputLog loopInputLog : inputLogs){
             String loopInputLogData = loopInputLog.toSaveData();
-
-//            리플레이 저장 입력 및 처리를 이 클래스에서 안하니 리플레이 녹화 버튼 입력이 리플레이 데이터에 들어가도 괜찮음
-//                if(loopInputLogData.contains("record"))
-//                    continue;
 
             sb.append(loopInputLogData).append("\n");
         }

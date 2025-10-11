@@ -1,0 +1,23 @@
+
+
+
+>new-wave
+1000 50 100 Enemy Default
+1500 120 80 Enemy A
+2000 200 150 Enemy B
+2500 300 120 Coin 1
+2700 320 140 Coin 5
+3000 350 160 Coin 10
+3500 400 200 Item Speed-Up 1
+3800 420 220 Item Damage-Up 2
+
+>store
+>new-wave
+1000 60 90 Enemy A
+1300 180 140 Enemy B
+1600 250 200 Coin 5
+1900 280 210 Coin 10
+2200 300 230 Item Speed-Down 1
+2500 350 250 Enemy Default
+3000 400 280 Item Speed-Up 3
+:game-end

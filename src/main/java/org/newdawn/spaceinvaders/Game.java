@@ -1,21 +1,22 @@
 package org.newdawn.spaceinvaders;
 
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputKey;
-import org.newdawn.spaceinvaders.loop.GameLoop;
+import firebase.FirebaseRankings;
+import networking.rudp.RUDPPeer;
+import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
+import org.newdawn.spaceinvaders.loop_input.LoopInput;
+import org.newdawn.spaceinvaders.loop_input.LoopInputKey;
+import org.newdawn.spaceinvaders.loop_input.LoopInputMouseMove;
 import org.newdawn.spaceinvaders.loop.Loop;
 import org.newdawn.spaceinvaders.loop.MainMenuLoop;
+import org.newdawn.spaceinvaders.map_load.MapList;
 import org.newdawn.spaceinvaders.singleton.PlayerSetting;
 import org.newdawn.spaceinvaders.singleton.SystemTimer;
 import org.newdawn.spaceinvaders.sprite.SpriteStore;
@@ -37,10 +38,20 @@ import org.newdawn.spaceinvaders.sprite.SpriteStore;
  */
 public class Game extends Canvas
 {
-    public final int fixedFPS;
-    public final double fixedDeltaTime;
+    public final long fixedFPS;
+    public final long fixedDeltaTime;
 
-    private Loop loop = new MainMenuLoop(this);
+    private Loop loop;
+    private RUDPPeer rudpPeer;
+    public RUDPPeer getRudpPeer()
+    {
+        return rudpPeer;
+    }
+    public final String myUID;
+    public final String authToken;
+    public final FirebaseRankings firebaseRankings = new FirebaseRankings();
+
+    private MapList mapList;
 
 	/** The stragey that allows us to use accelerate page flipping */
 	private BufferStrategy strategy;
@@ -49,21 +60,81 @@ public class Game extends Canvas
 
 	/** The last time at which we recorded the frame rate */
 	private long lastFpsTime;
+    private long leftDelta = 0;
 	/** The current number of frames recorded */
 	private int fps;
 	/** The normal title of the game window */
 	private String windowTitle = "Space Invaders 102";
 	/** The game window that we'll update with the frame count */
 	private JFrame container;
+    public JFrame  getContainer()
+    {
+        return container;
+    }
 
-    private ArrayList<GameLoopInput> queuedInputs = new ArrayList<>();
+    private ArrayList<LoopInput> queuedInputs = new ArrayList<>();
 
 	/**
 	 * Construct our game and set it running.
 	 */
-	public Game(int fixedFPS) {
+	public Game(long fixedFPS, RUDPPeer rudpPeer, String myUID, String authToken) {
         this.fixedFPS = fixedFPS;
-        this.fixedDeltaTime = 1.0/fixedFPS;
+        this.fixedDeltaTime = FixedPointUtil.div(FixedPointUtil.ONE, fixedFPS);
+
+        SpriteStore.get().getSprite("sprites/ship.gif", (16 << 16) + FixedPointUtil.ZERO_5, (11 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/shot.gif", 6L << 16, (11 << 16) + FixedPointUtil.ZERO_5);
+		//* Enemies Sprites
+        SpriteStore.get().getSprite("sprites/enemy/alien.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/enemy/alien2.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/enemy/alien3.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+
+		SpriteStore.get().getSprite("sprites/enemy/alien.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/enemy/alien2.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/enemy/alien3.gif", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+		
+		SpriteStore.get().getSprite("sprites/enemy/guardian1.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/enemy/guardian2.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+        SpriteStore.get().getSprite("sprites/enemy/guardian3.png", (21 << 16) + FixedPointUtil.ZERO_5, (14 << 16) + FixedPointUtil.ZERO_5);
+		SpriteStore.get().getSprite("sprites/enemy/guardianOnHit1.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/guardianOnHit2.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/guardianOnHit3.png", 32 << 16, 32 << 16);
+
+		SpriteStore.get().getSprite("sprites/enemy/artillery1.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/artillery2.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/artillery3.png", 32 << 16, 32 << 16);
+
+		SpriteStore.get().getSprite("sprites/enemy/raider1.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/raider2.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/raider3.png", 32 << 16, 32 << 16);
+
+		SpriteStore.get().getSprite("sprites/enemy/enemyOnHit1.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/enemyOnHit2.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/enemy/enemyOnHit3.png", 32 << 16, 32 << 16);
+		SpriteStore.get().getSprite("sprites/enemy/enemyBullet.png", 6L << 16, (11 << 16) + FixedPointUtil.ZERO_5);
+
+		SpriteStore.get().getSprite("sprites/enemy/boss.png", 287 << 16, (63 << 16) + FixedPointUtil.ZERO_5);
+		SpriteStore.get().getSprite("sprites/enemy/bossOnHit.png", 287 << 16, (63 << 16) + FixedPointUtil.ZERO_5);
+
+        //* Loading Skill Icon Sprites
+        SpriteStore.get().getSprite("sprites/testPassiveSkill.png", 32 << 16, 32 << 16);
+        SpriteStore.get().getSprite("sprites/testActiveSkill.png", 32 << 16, 32 << 16);
+        //* Loading ETC Sprites
+        SpriteStore.get().getSprite("sprites/testBarrier.png", 25 << 16, 8 << 16);
+		SpriteStore.get().getSprite("sprites/enemyLaser.png", 8 << 16, 512 << 16);
+        SpriteStore.get().getSprite("sprites/testLaser.png", 8 << 16, 512 << 16);
+		SpriteStore.get().getSprite("sprites/testWarning.png", 10 << 16, 10 << 16);
+		SpriteStore.get().getSprite("sprites/storeItemSpawnSignal.png", 10 << 16, 10 << 16);
+		SpriteStore.get().getSprite("sprites/scoringItem.png", 12 << 16, 12 << 16);
+		SpriteStore.get().getSprite("sprites/whiteBackground.png", 400 << 16, 300 << 16, 100 << 16);
+
+        this.rudpPeer = rudpPeer;
+        this.myUID = myUID;
+        this.authToken = authToken;
+        System.out.println("myUID: " + myUID);
+
+        changeLoop(new MainMenuLoop(this));  // 게임 시작 후 가장 처음 진입할 Loop);
+
+        mapList = new MapList();
 
 		// create a frame to contain our game
 		container = new JFrame("Space Invaders 102");
@@ -93,19 +164,24 @@ public class Game extends Canvas
 				System.exit(0);
 			}
 		});
+
+        container.setLocationRelativeTo(null);
 		
 		// add a key input system (defined below) to our canvas
 		// so we can respond to key pressed
 		addKeyListener(new KeyInputHandler());
+
+        addMouseListener(new MouseInputHandler());
+
+        addMouseMotionListener(new MouseInputHandler());
 		
 		// request the focus so key events come to us
 		requestFocus();
 
-		// create the buffering strategy which will allow AWT
+		// create the buffering strategy which will allow AWTㄴ
 		// to manage our accelerated graphics
 		createBufferStrategy(2);
 		strategy = getBufferStrategy();
-
 	}
 
 	/**
@@ -148,20 +224,24 @@ public class Game extends Canvas
 			g.setColor(Color.black);
 			g.fillRect(0,0,800,600);
 
-            if(queuedInputs.isEmpty()){
-                loop.process();
-            }
-            else{
-                // process() 작동 중 들어오는 입력을 놓치지 않기 위하여
-                // process() 이전에 미리 교체
-                ArrayList<GameLoopInput> inputsForThisFrame = queuedInputs;
-                queuedInputs = new ArrayList<GameLoopInput>();
+            leftDelta += FixedPointUtil.fromDouble(delta/1000.0);  // ms를 초단위로 변환 후 고정 소수점으로
+            while(leftDelta > 0){
+                leftDelta -= fixedDeltaTime;  // 고정 deltaTime 구현
 
-                loop.process(inputsForThisFrame);
+                if(queuedInputs.isEmpty()){
+                    loop.process();
+                }
+                else{
+                    // process() 작동 중 들어오는 입력을 놓치지 않기 위하여
+                    // process() 이전에 미리 교체
+                    ArrayList<LoopInput> inputsForThisFrame = queuedInputs;
+                    queuedInputs = new ArrayList<LoopInput>();
+
+                    loop.process(inputsForThisFrame);
+                }
             }
 
             loop.draw(g);
-
 
             // finally, we've completed drawing so clear up the graphics
             // and flip the buffer over
@@ -172,9 +252,13 @@ public class Game extends Canvas
 			// we've recorded when we started the frame. We add 10 milliseconds
 			// to this and then factor in the current time to give 
 			// us our final value to wait for
-			SystemTimer.sleep(lastLoopTime+(long)(fixedDeltaTime*1000)-SystemTimer.getTime());
+			SystemTimer.sleep(lastLoopTime+(long)(FixedPointUtil.toDouble(fixedDeltaTime)*1000)-SystemTimer.getTime());
 		}
 	}
+
+    public MapList getMapList() {
+        return mapList;
+    }
 	
 	/**
 	 * A class to handle keyboard input from the user. The class
@@ -205,7 +289,7 @@ public class Game extends Canvas
             String inputName = playerSetting.KeyToInputName(e.getKeyCode());
             if(inputName == null) return;
 
-            queuedInputs.add(new GameLoopInputKey(inputName, true));
+            queuedInputs.add(new LoopInputKey(0, inputName, true));
 		} 
 		
 		/**
@@ -219,7 +303,7 @@ public class Game extends Canvas
             String inputName = playerSetting.KeyToInputName(e.getKeyCode());
             if(inputName == null) return;
 
-            queuedInputs.add(new GameLoopInputKey(inputName, false));
+            queuedInputs.add(new LoopInputKey(0, inputName, false));
 		}
 
 		/**
@@ -232,34 +316,98 @@ public class Game extends Canvas
 		}
 	}
 
+    private class MouseInputHandler extends MouseAdapter {
+        @Override
+        public void mousePressed(MouseEvent e) {
+            super.mousePressed(e);
 
+            PlayerSetting playerSetting = PlayerSetting.getInstance();
 
-    public void changeLoop(Loop loop) {
-        this.loop = loop;
+            int buttonCode;
+            if(e.getButton() == MouseEvent.BUTTON1){
+                buttonCode = playerSetting.MOUSE_BUTTON_LEFT;
+            }
+            else if(e.getButton() == MouseEvent.BUTTON3){
+                buttonCode = playerSetting.MOUSE_BUTTON_RIGHT;
+            }
+            else{
+                buttonCode = -9999;
+            }
+
+            String inputName = playerSetting.KeyToInputName(buttonCode);
+            if(inputName == null) return;
+
+            queuedInputs.add(new LoopInputKey(0, inputName, true));
+        }
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            super.mouseReleased(e);
+
+            PlayerSetting playerSetting = PlayerSetting.getInstance();
+
+            int buttonCode;
+            if(e.getButton() == MouseEvent.BUTTON1){
+                buttonCode = playerSetting.MOUSE_BUTTON_LEFT;
+            }
+            else if(e.getButton() == MouseEvent.BUTTON3){
+                buttonCode = playerSetting.MOUSE_BUTTON_RIGHT;
+            }
+            else{
+                buttonCode = -9999;
+            }
+
+            String inputName = playerSetting.KeyToInputName(buttonCode);
+            if(inputName == null) return;
+
+            queuedInputs.add(new LoopInputKey(0, inputName, false));
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            super.mouseMoved(e);
+
+            queuedInputs.add(new LoopInputMouseMove(0, e.getX(), e.getY()));
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            super.mouseDragged(e);
+
+            queuedInputs.add(new LoopInputMouseMove(0, e.getX(), e.getY()));
+        }
     }
 
 
-    /**
-     * The entry point into the game. We'll simply create an
-     * instance of class which will start the display and game
-     * loop.
-     *
-     * @param argv The arguments that are passed into our game
-     */
-	public static void main(String argv[]) {
-        SpriteStore.get().getSprite("sprites/ship.gif", 16.5, 11.5);
-        SpriteStore.get().getSprite("sprites/shot.gif", 6, 11.5);
-        SpriteStore.get().getSprite("sprites/alien.gif", 21.5, 14.5);
-        SpriteStore.get().getSprite("sprites/alien2.gif", 21.5, 14.5);
-        SpriteStore.get().getSprite("sprites/alien3.gif", 21.5, 14.5);
 
+    public void changeLoop(Loop loop) {
+        if(this.loop != null){
+            this.loop.onExitLoop();
+        }
+        if(this.loop != null && this.loop.getIrudpPeerListener() != null) {
+            rudpPeer.removeListener(this.loop.getIrudpPeerListener());
+        }
 
+        this.loop = loop;
 
-		Game g = new Game(100);
-
-		// Start the main game loop, note: this method will not
-		// return until the game has finished running. Hence we are
-		// using the actual main thread to run the game.
-		g.loop();
-	}
+        if(this.loop != null && this.loop.getIrudpPeerListener() != null){
+            rudpPeer.addListener(this.loop.getIrudpPeerListener());
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

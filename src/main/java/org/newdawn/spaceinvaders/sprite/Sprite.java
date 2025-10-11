@@ -1,7 +1,10 @@
 package org.newdawn.spaceinvaders.sprite;
 
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.geom.AffineTransform;
+
+import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 
 /**
  * A sprite to be displayed on the screen. Note that a sprite
@@ -15,16 +18,41 @@ import java.awt.geom.AffineTransform;
 public class Sprite {
 	/** The image to be drawn for this sprite */
 	private Image image;
+    private long pivotX, pivotY;
+    private long scale;
     private AffineTransform transform = new AffineTransform();
-	
+	private int width;
+	private int height;
 	/**
 	 * Create a new sprite based on an image
 	 * 
 	 * @param image The image that is this sprite
 	 */
-	public Sprite(Image image, double pivotX, double pivotY) {
+	public Sprite(Image image, long pivotX, long pivotY, long scale) {
         this.image = image;
-        this.transform.setToTranslation(-pivotX, -pivotY);
+
+        this.scale = scale;
+
+        this.pivotX = FixedPointUtil.mul(pivotX, scale);
+        this.pivotY = FixedPointUtil.mul(pivotY, scale);
+
+        this.transform.setToTranslation(
+                FixedPointUtil.toDouble(-this.pivotX),
+                FixedPointUtil.toDouble(-this.pivotY));
+        this.transform.scale(FixedPointUtil.toDouble(this.scale), FixedPointUtil.toDouble(this.scale));
+
+        width = FixedPointUtil.toInt(
+                FixedPointUtil.mul(
+                        FixedPointUtil.fromLong(image.getWidth(null)),
+                        scale
+                        )
+                );
+        height = FixedPointUtil.toInt(
+                FixedPointUtil.mul(
+                        FixedPointUtil.fromLong(image.getHeight(null)),
+                        scale
+                )
+        );
 	}
 	
 	/**
@@ -33,7 +61,7 @@ public class Sprite {
 	 * @return The width in pixels of this sprite
 	 */
 	public int getWidth() {
-		return image.getWidth(null);
+        return width;
 	}
 
 	/**
@@ -42,14 +70,14 @@ public class Sprite {
 	 * @return The height in pixels of this sprite
 	 */
 	public int getHeight() {
-		return image.getHeight(null);
+		return height;
 	}
 
-    public double getPivotX() {
-        return -transform.getTranslateX();
+    public long getPivotX() {
+        return pivotX;
     }
-    public double getPivotY() {
-        return -transform.getTranslateY();
+    public long getPivotY() {
+        return pivotY;
     }
 
 //	/**

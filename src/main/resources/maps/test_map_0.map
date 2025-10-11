@@ -1,0 +1,17 @@
+/title 테스트맵
+/description 테스트용으로 만든 간단한 맵이다.\n여러 줄 설명\n테스트
+
+>new-wave
+1000 100 150 ActiveSkill 0
+1000 300 150 ActiveSkill 1
+1000 500 150 ActiveSkill 2
+1000 700 150 ActiveSkill 3
+1000 100 60 Enemy 0
+1000 200 60 Enemy 0
+1000 300 60 Enemy 0
+1000 400 60 Enemy 0
+1000 500 60 Enemy 0
+1000 600 60 Enemy 0
+1000 700 60 Enemy 0
+
+:game-end

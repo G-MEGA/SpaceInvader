@@ -1,8 +1,14 @@
 package org.newdawn.spaceinvaders.loop;
 
+import networking.Network;
+import networking.rudp.Connection;
+import networking.rudp.IRUDPPeerListener;
+import networking.rudp.PacketData.PacketData;
+import networking.rudp.RUDPPeer;
 import org.newdawn.spaceinvaders.Game;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInputLog;
+import org.newdawn.spaceinvaders.loop_input.LoopInput;
+import org.newdawn.spaceinvaders.loop_input.LoopInputLog;
+import serializer.GameLoopSerializer;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -13,53 +19,77 @@ public class ReplayerLoop extends Loop{
     long currentFrame;
     int currentLogIndex = 0;
 
-    ArrayList<GameLoopInputLog> inputLogs = new ArrayList<>();
+    ArrayList<LoopInputLog> inputLogs = new ArrayList<>();
     GameLoop gameLoop;
     int playSpeed = 1;
     boolean paused = false;
+
+    long rollbackFrame = -1;
+    int rollbackLogIndex = -1;
+
+    byte[] rollbackSnapshot;
 
     public ReplayerLoop(Game game, String replaySaveData) {
         super(game);
 
         this.replaySaveData = replaySaveData;
 
-        gameLoop = new GameLoop(game, true);
-
         String[] splited = replaySaveData.trim().split("\n");
 
+        long randomSeed = -1;
+        int playerCount = -1;
+        int myPlayerID = -1;
+        int mapID = -1;
+
         for(String s: splited){
-            inputLogs.add(new GameLoopInputLog(s));
+            if(s.startsWith("GameLoop::randomSeed=")){
+                randomSeed = Long.parseLong(s.split("=")[1]);
+            }
+            else if(s.startsWith("GameLoop::playerCount=")){
+                playerCount = Integer.parseInt(s.split("=")[1]);
+            }
+            else if(s.startsWith("GameLoop::myPlayerID=")){
+                myPlayerID = Integer.parseInt(s.split("=")[1]);
+            }
+            else if(s.startsWith("GameLoop::mapID=")){
+                mapID = Integer.parseInt(s.split("=")[1]);
+            }
+            else{
+                inputLogs.add(new LoopInputLog(s));
+            }
         }
 
+        gameLoop = new GameLoop(game, randomSeed, playerCount , myPlayerID , mapID );
         currentFrame = gameLoop.currentFrame;
     }
 
     @Override
-    public void process(ArrayList<GameLoopInput> inputs) {
+    public void process(ArrayList<LoopInput> inputs) {
         super.process(inputs);
 
-        if(isKeyInputJustPressed("escape")) {
-            game.changeLoop(new MainMenuLoop(game));
+        getGame().getRudpPeer().processReceivedData();
+
+        if(isKeyInputJustPressed(0, "escape")) {
+            getGame().changeLoop(new MainMenuLoop(getGame()));
         }
 
-        if(isKeyInputJustPressed("right")) {
+        if(isKeyInputJustPressed(0, "right")) {
             playSpeed++;
         }
-        if(isKeyInputJustPressed("left")) {
+        if(isKeyInputJustPressed(0, "left")) {
             playSpeed--;
             if(playSpeed<0){
                 playSpeed = 0;
             }
         }
-        if(isKeyInputJustPressed("fire")) {
+        if(isKeyInputJustPressed(0, "accept")) {
             paused = !paused;
         }
         // Replay 다시 재생
-        if(isKeyInputJustPressed("record")) {
-            game.changeLoop(new ReplayerLoop(game, replaySaveData));
+        if(isKeyInputJustPressed(0, "record")) {
+            getGame().changeLoop(new ReplayerLoop(getGame(), replaySaveData));
             return;
         }
-
 
         int leftLoop = playSpeed;
 
@@ -70,9 +100,11 @@ public class ReplayerLoop extends Loop{
                 return;
             }
 
-            GameLoopInputLog currentLog = inputLogs.get(currentLogIndex);
+            LoopInputLog currentLog = inputLogs.get(currentLogIndex);
 
-            assert currentLog.inputFrame <= gameLoop.currentFrame;
+            if(currentLog.inputFrame < gameLoop.currentFrame){
+                throw new IllegalStateException("currentLog.inputFrame < gameLoop.currentFrame");
+            }
 
             if(currentLog.inputFrame == gameLoop.currentFrame){
                 gameLoop.process(currentLog.inputs);
@@ -88,27 +120,59 @@ public class ReplayerLoop extends Loop{
     }
 
     @Override
+    protected IRUDPPeerListener generateIRUDPPeerListener() {
+        return new  IRUDPPeerListener() {
+            @Override
+            public boolean onConnected(RUDPPeer peer, Connection connection) {
+                return false;
+            }
+
+            @Override
+            public boolean onDisconnected(RUDPPeer peer, Connection connection) {
+                if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
+                    System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
+                    System.exit(0);
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
+                return false;
+            }
+        };
+    }
+
+    @Override
     public void draw(Graphics2D g) {
         gameLoop.draw(g);
 
         super.draw(g);
 
-        String message;
-        int messageY = 20;
+        Font font = g.getFont();
+        g.setFont(new Font(font.getFontName(), Font.BOLD, 20));
 
-        message = "● Replay - 좌우 방향키로 배속조절, 스페이스바로 일시정지";
+        String message;
+        int messageY = 590;
+
+        message = "● Replay - 좌우 방향키로 배속조절, 엔터로 일시정지";
         g.setColor(Color.red);
         g.drawString(message,5,messageY);
-        messageY += 15;
+
+        message = "PlaySpeed : x" + String.valueOf(playSpeed);
+        g.setColor(Color.red);
+        g.drawString(message,600,messageY);
+
+        messageY -= 20;
 
         message = "Frame Number : " + String.valueOf(currentFrame);
         g.setColor(Color.red);
         g.drawString(message,5,messageY);
-        messageY += 15;
+        messageY -= 20;
 
-        message = "PlaySpeed : x" + String.valueOf(playSpeed);
-        g.setColor(Color.red);
-        g.drawString(message,5,messageY);
-        messageY += 15;
+//        message = "PlaySpeed : x" + String.valueOf(playSpeed);
+//        g.setColor(Color.red);
+//        g.drawString(message,5,messageY);
+//        messageY -= 20;
     }
 }

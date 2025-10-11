@@ -1,9 +1,17 @@
 package org.newdawn.spaceinvaders.loop;
 
+import networking.Network;
+import networking.rudp.Connection;
+import networking.rudp.IRUDPPeerListener;
+import networking.rudp.PacketData.PacketData;
+import networking.rudp.RUDPPeer;
 import org.newdawn.spaceinvaders.Game;
-import org.newdawn.spaceinvaders.game_loop_input.GameLoopInput;
+import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
+import org.newdawn.spaceinvaders.loop_input.LoopInput;
+import org.newdawn.spaceinvaders.game_object.gui.Button;
+import org.newdawn.spaceinvaders.game_object.gui.IButtonListener;
+import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
-import org.newdawn.spaceinvaders.sprite.SpriteStore;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -16,60 +24,60 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 
 public class MainMenuLoop extends Loop {
-    double t = 0.0;
+    long t = 0L;
     SpriteRenderer spriteRenderer;
 
     public MainMenuLoop(Game game) {
         super(game);
 
         spriteRenderer = new SpriteRenderer(this);
-        spriteRenderer.sprite = SpriteStore.get().getSprite("sprites/ship.gif");
-        spriteRenderer.setPosition(250, 400);
-        spriteRenderer.setRotation(Math.toRadians(37));
-        spriteRenderer.setScale(20);
-        gameObjects.add(spriteRenderer);
+        spriteRenderer.setSpriteRef("sprites/ship.gif");
+        spriteRenderer.setPos(250L << 16, 400 << 16);
+        spriteRenderer.setRotation(37 << 16);
+        spriteRenderer.setScale(20 << 16);
+        addGameObject(spriteRenderer);
 
-        SpriteRenderer spriteRenderer2 = new SpriteRenderer(this);
-        spriteRenderer2.sprite = SpriteStore.get().getSprite("sprites/ship.gif");
-        spriteRenderer2.setPosition(400, 400);
-        gameObjects.add(spriteRenderer2);
+        TextRenderer titleText = new TextRenderer(this, "Space Invader", 100, Color.WHITE, 1);
+        titleText.setPos(400L << 16, 0L << 16);
+        titleText.alignment = 1;
+        addGameObject(titleText);
 
-    }
+        TextRenderer subTitleText = new TextRenderer(this, "~총과 폭탄으로 성립하는 우주 외교~", 25, Color.WHITE, 2);
+        subTitleText.setPos(400L << 16, titleText.getPosY() + (200L << 16));
+        subTitleText.alignment = 1;
+        addGameObject(subTitleText);
 
-    @Override
-    public void process(ArrayList<GameLoopInput> inputs) {
-        super.process(inputs);
+        // 게임 시작 버튼
+        Button startButton = new Button(this, new IButtonListener() {
+            @Override
+            public void buttonPressed() {
+                game.changeLoop(new LobbyListLoop(game));
+            }
+        }, 250, 50);
+        startButton.setPos(400L << 16, subTitleText.getPosY() + (100L << 16));
+        startButton.alignment = 1;
+        addGameObject(startButton);
+        startButton.addTextRenderer("게임 시작", 25, Color.WHITE, 0);
 
-        t += game.fixedDeltaTime;
-        spriteRenderer.setRotation(Math.sin(t * Math.PI * 2) * Math.PI * 0.125 + Math.PI*0.25);
+        // 리플레이 버튼
+        Button replayButton = new Button(this, new IButtonListener() {
+            @Override
+            public void buttonPressed() {
+                // 1. JFileChooser로 파일 선택하기
+                JFileChooser chooser = new JFileChooser();
+                FileNameExtensionFilter filter = new FileNameExtensionFilter("텍스트 파일 (*.txt, *.java)", "txt", "java");
+                chooser.setFileFilter(filter); // 파일 필터 설정
 
-        // 게임 진입
-        if(isKeyInputJustPressed("accept")){
-            game.changeLoop(new GameLoop(game));
-        }
+                int result = chooser.showOpenDialog(game);
 
-        // 게임 끄기
-        if(isKeyInputJustPressed("escape")) {
-            System.exit(0);
-        }
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = chooser.getSelectedFile();
+                    Path filePath = selectedFile.toPath();
 
-        // Replay 재생
-        if(isKeyInputJustPressed("record")) {
-            // 1. JFileChooser로 파일 선택하기
-            JFileChooser chooser = new JFileChooser();
-            FileNameExtensionFilter filter = new FileNameExtensionFilter("텍스트 파일 (*.txt, *.java)", "txt", "java");
-            chooser.setFileFilter(filter); // 파일 필터 설정
-
-            int result = chooser.showOpenDialog(game);
-
-            if (result == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = chooser.getSelectedFile();
-                Path filePath = selectedFile.toPath();
-
-                // 2. 선택한 파일 내용을 String으로 읽기
-                try {
-                    // Java 11 이상: 가장 간단한 방법
-                    String data = Files.readString(filePath, StandardCharsets.UTF_8);
+                    // 2. 선택한 파일 내용을 String으로 읽기
+                    try {
+                        // Java 11 이상: 가장 간단한 방법
+                        String data = Files.readString(filePath, StandardCharsets.UTF_8);
 
                     /*
                     // Java 7, 8 환경일 경우: byte 배열로 읽은 후 String으로 변환
@@ -77,36 +85,73 @@ public class MainMenuLoop extends Loop {
                     String content = new String(fileBytes, StandardCharsets.UTF_8);
                     */
 
-                    game.changeLoop(new ReplayerLoop(game, data));
+                        game.changeLoop(new ReplayerLoop(game, data));
 
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(game,
-                            "파일을 읽는 중 오류가 발생했습니다: " + ex.getMessage(),
-                            "읽기 오류",
-                            JOptionPane.ERROR_MESSAGE);
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(game,
+                                "파일을 읽는 중 오류가 발생했습니다: " + ex.getMessage(),
+                                "읽기 오류",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
                 }
             }
+        }, 250, 50);
+        replayButton.setPos(400L << 16, startButton.getPosY() + (60L << 16));
+        replayButton.alignment = 1;
+        addGameObject(replayButton);
+        replayButton.addTextRenderer("리플레이", 25, Color.WHITE, 0);
 
-        }
+        // 나가기 버튼
+        Button exitButton = new Button(this, new IButtonListener() {
+            @Override
+            public void buttonPressed() {
+                System.exit(0);
+            }
+        }, 250, 50);
+        exitButton.setPos(400L << 16, replayButton.getPosY() + (60L << 16));
+        exitButton.alignment = 1;
+        addGameObject(exitButton);
+        exitButton.addTextRenderer("나가기", 25, Color.WHITE, 0);
     }
 
-    public void draw(Graphics2D g) {
-        super.draw(g);
+    @Override
+    public void process(ArrayList<LoopInput> inputs) {
+        super.process(inputs);
 
-        Font font = g.getFont();
+        getGame().getRudpPeer().processReceivedData();
 
-        String message;
-        int messageY = 200;
+        t += getGame().fixedDeltaTime;
 
-        g.setFont(new Font(font.getFontName(), Font.BOLD, font.getSize()*10));
+        spriteRenderer.setRotation(
+                FixedPointUtil.fromDouble(
+                        Math.toDegrees(
+                                Math.sin(FixedPointUtil.toDouble(t) * Math.PI * 2) * Math.PI * 0.125 +
+                                        Math.PI*0.25)));
 
-        message = "메인 화면";
-        g.setColor(Color.white);
-        g.drawString(message,(800-g.getFontMetrics().stringWidth(message))/2,messageY);
-        messageY += 50;
+        processGameObjects();
+    }
 
-        g.setFont(new Font(font.getFontName(), Font.BOLD, font.getSize()*2));
-        message = "Enter 게임 시작, R 리플레이 재생";
-        g.drawString(message,(800-g.getFontMetrics().stringWidth(message))/2,messageY);
+    @Override
+    protected IRUDPPeerListener generateIRUDPPeerListener() {
+        return new  IRUDPPeerListener() {
+            @Override
+            public boolean onConnected(RUDPPeer peer, Connection connection) {
+                return false;
+            }
+
+            @Override
+            public boolean onDisconnected(RUDPPeer peer, Connection connection) {
+                if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
+                    System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
+                    System.exit(0);
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
+                return false;
+            }
+        };
     }
 }

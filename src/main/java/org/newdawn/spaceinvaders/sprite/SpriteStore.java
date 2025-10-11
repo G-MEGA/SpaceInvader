@@ -1,5 +1,7 @@
 package org.newdawn.spaceinvaders.sprite;
 
+import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
+
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
@@ -43,7 +45,7 @@ public class SpriteStore {
 	 * @param ref The reference to the image to use for the sprite
 	 * @return A sprite instance containing an accelerate image of the request reference
 	 */
-	public Sprite getSprite(String ref, double pivotX, double pivotY) {
+	public Sprite getSprite(String ref, long pivotX, long pivotY, long scale) {
 		// if we've already got the sprite in the cache
 		// then just return the existing version
 		if (sprites.get(ref) != null) {
@@ -79,13 +81,16 @@ public class SpriteStore {
 		image.getGraphics().drawImage(sourceImage,0,0,null);
 		
 		// create a sprite, add it the cache then return it
-		Sprite sprite = new Sprite(image, pivotX,  pivotY);
+		Sprite sprite = new Sprite(image, pivotX,  pivotY, scale);
 		sprites.put(ref,sprite);
 		
 		return sprite;
 	}
+    public Sprite getSprite(String ref, long pivotX, long pivotY) {
+        return getSprite(ref, pivotX, pivotY, FixedPointUtil.ONE);
+    }
     public Sprite getSprite(String ref) {
-        return getSprite(ref, 0.0, 0.0);
+        return getSprite(ref, 0L, 0L, FixedPointUtil.ONE);
     }
 	
 	/**

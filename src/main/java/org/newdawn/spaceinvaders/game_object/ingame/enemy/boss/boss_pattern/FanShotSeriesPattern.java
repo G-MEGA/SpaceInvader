@@ -9,7 +9,7 @@ import org.newdawn.spaceinvaders.loop.Loop;
 public class FanShotSeriesPattern extends BossPattern {
     private boolean isExecuted = false;
 
-    private static final long shootInterval = FixedPointUtil.ZERO_2 + FixedPointUtil.ZERO_1;
+    private static final long SHOOT_INTERVAl = FixedPointUtil.ZERO_2 + FixedPointUtil.ZERO_1;
     private long shootElapsed = 0;
     private int remainShootCount = 5;
 
@@ -34,10 +34,10 @@ public class FanShotSeriesPattern extends BossPattern {
             return;
         }
         else{
-            if (shootElapsed < shootInterval){
+            if (shootElapsed < SHOOT_INTERVAl){
                 shootElapsed += deltaTime;
-                if (shootElapsed > shootInterval){
-                    shootElapsed = shootInterval;
+                if (shootElapsed > SHOOT_INTERVAl){
+                    shootElapsed = SHOOT_INTERVAl;
                 }
             }
             else{

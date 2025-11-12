@@ -69,7 +69,7 @@ public class EnemyFactory extends GameObject{
         hiveMind.addListener(enemy);
         
         if (isWarning){
-            SpawnSignal enemyWarner = new SpawnSignal(enemy, gameLoop, spawnPosX, spawnPosY, spawnAngle, SpawnSignal.EnemySignal);
+            SpawnSignal enemyWarner = new SpawnSignal(enemy, gameLoop, spawnPosX, spawnPosY, spawnAngle, SpawnSignal.ENEMY_SIGNAL);
             gameLoop.addGameObject(enemyWarner);
             return enemy;
         }

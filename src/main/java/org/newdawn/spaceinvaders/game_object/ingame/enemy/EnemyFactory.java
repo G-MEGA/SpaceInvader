@@ -1,5 +1,6 @@
 package org.newdawn.spaceinvaders.game_object.ingame.enemy;
 
+import org.newdawn.spaceinvaders.PositionAngleSet;
 import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.boss.Boss;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.common.Alien;
@@ -29,17 +30,10 @@ public class EnemyFactory extends GameObject{
         this.gameLoop = gameLoop;
     }
 
-    public Enemy spawnEnemy(HiveMind hiveMind, int enemyType, long spawnPosX, long spawnPosY) {
-        return spawnEnemy(hiveMind, enemyType, spawnPosX, spawnPosY, 0, true);
+    public Enemy spawnEnemy(HiveMind hiveMind, int enemyType, PositionAngleSet positionAngleSet) {
+        return spawnEnemy(hiveMind, enemyType, positionAngleSet, true);
     }
-    public Enemy spawnEnemy(HiveMind hiveMind, int enemyType, long spawnPosX, long spawnPosY, long spawnAngle) {
-        return spawnEnemy(hiveMind, enemyType, spawnPosX, spawnPosY, spawnAngle, true);
-    }
-    public Enemy spawnEnemy(HiveMind hiveMind, int enemyType, long spawnPosX, long spawnPosY, boolean isWarning){
-        return spawnEnemy(hiveMind, enemyType, spawnPosX, spawnPosY, 0, isWarning);
-    }
-
-    public Enemy spawnEnemy(HiveMind hiveMind, int enemyType, long spawnPosX, long spawnPosY, long spawnAngle, boolean isWarning) {
+    public Enemy spawnEnemy(HiveMind hiveMind, int enemyType, PositionAngleSet positionAngleSet, boolean isWarning) {
         Enemy enemy = null;
         
         switch (enemyType) {
@@ -69,12 +63,12 @@ public class EnemyFactory extends GameObject{
         hiveMind.addListener(enemy);
         
         if (isWarning){
-            SpawnSignal enemyWarner = new SpawnSignal(enemy, gameLoop, spawnPosX, spawnPosY, spawnAngle, SpawnSignal.EnemySignal);
+            SpawnSignal enemyWarner = new SpawnSignal(enemy, gameLoop, positionAngleSet, SpawnSignal.EnemySignal);
             gameLoop.addGameObject(enemyWarner);
             return enemy;
         }
         
-        enemy.setPosRotation(spawnPosX, spawnPosY, spawnAngle);
+        enemy.setPosRotation(positionAngleSet.positionX, positionAngleSet.positionY, positionAngleSet.angle);
         gameLoop.addEnemy(enemy);
         return enemy;
     }

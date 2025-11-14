@@ -1,5 +1,6 @@
 package org.newdawn.spaceinvaders.game_object.ingame.enemy;
 
+import org.newdawn.spaceinvaders.PositionAngleSet;
 import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.game_object.ingame.store.StoreSlot;
@@ -27,29 +28,18 @@ public class SpawnSignal extends GameObject2D{
         super();
     }
 
-    public SpawnSignal(GameObject2D gameObject, GameLoop gameLoop, long spawnPosX, long spawnPosY, long rotation, int spawnSignalType) 
-    { this(gameObject, gameLoop, spawnPosX, spawnPosY, rotation, defaultWarningTime, spawnSignalType); }
+    public SpawnSignal(GameObject2D gameObject, GameLoop gameLoop, PositionAngleSet positionAngleSet, int spawnSignalType) 
+    { this(gameObject, gameLoop, positionAngleSet, defaultWarningTime, spawnSignalType); }
 
-    public SpawnSignal(GameObject2D gameObject, GameLoop gameLoop, long spawnPosX, long spawnPosY, long rotation, long warningTime, int spawnSignalType) {
-        this(gameLoop, spawnPosX, spawnPosY, rotation, warningTime, spawnSignalType);
+    public SpawnSignal(GameObject2D gameObject, GameLoop gameLoop, PositionAngleSet positionAngleSet, long warningTime, int spawnSignalType) {
+        this(gameLoop, positionAngleSet, warningTime, spawnSignalType);
 
         this.spawnGameObject = gameObject;
-        spawnGameObject.setPosRotation(spawnPosX, spawnPosY, rotation);
+        spawnGameObject.setPosRotation(positionAngleSet.positionX, positionAngleSet.positionY, positionAngleSet.angle);
         this.warningTime = warningTime;
-
-        // spriteRenderer = new SpriteRenderer(gameLoop);
-        // spriteRenderer.setSpriteRef(spriteRef);
-        // addChild(spriteRenderer);
-
-        // warnElapsed = 0l;
-        // this.gameLoop = gameLoop;
-
-        // setPos(enemy.getPosX(), enemy.getPosY());
-        // setRotation(enemy.getRotation());
     }
 
-    //TODO 이게 맞나..??
-    public SpawnSignal(GameLoop gameLoop, long spawnPosX, long spawnPosY, long rotation, long warningTime, int spawnSignalType) {
+    public SpawnSignal(GameLoop gameLoop, PositionAngleSet positionAngleSet, long warningTime, int spawnSignalType) {
         super(gameLoop);
 
         this.gameLoop = gameLoop;
@@ -74,8 +64,8 @@ public class SpawnSignal extends GameObject2D{
 
         warnElapsed = 0l;
 
-        setPos(spawnPosX, spawnPosY);
-        setRotation(rotation);
+        setPos(positionAngleSet.positionX, positionAngleSet.positionY);
+        setRotation(positionAngleSet.angle);
     }
 
     @Override

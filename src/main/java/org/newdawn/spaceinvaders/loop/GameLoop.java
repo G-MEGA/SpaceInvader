@@ -7,6 +7,7 @@ import networking.rudp.IRUDPPeerListener;
 import networking.rudp.PacketData.PacketData;
 import networking.rudp.RUDPPeer;
 import org.newdawn.spaceinvaders.Game;
+import org.newdawn.spaceinvaders.PositionAngleSet;
 import org.newdawn.spaceinvaders.enums.GameLoopResultType;
 import org.newdawn.spaceinvaders.enums.GameObjectType;
 import org.newdawn.spaceinvaders.enums.IndicatorTextType;
@@ -23,6 +24,9 @@ import org.newdawn.spaceinvaders.map_load.map_load_commands.InstantiateCommand;
 import org.newdawn.spaceinvaders.map_load.map_load_commands.MapLoadCommand;
 import org.newdawn.spaceinvaders.map_load.map_load_commands.SectionCommand;
 import org.newdawn.spaceinvaders.singleton.MapDataParser;
+
+import com.esotericsoftware.minlog.Log;
+
 import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
 
@@ -405,6 +409,7 @@ public class GameLoop extends Loop {
     }
 
     public void notifySkillStoreItemAcquired() {
+        //fuck
     }
 
     public String getReplayData(){
@@ -532,15 +537,19 @@ public class GameLoop extends Loop {
     }
 
     private void ExecuteInstantiateCommand(InstantiateCommand command) {
+        PositionAngleSet positionAngleSet = new PositionAngleSet(command.getInstantiateX(), command.getInstantiateY());
         switch (command.getGameObjectType()) {
             case Enemy:
-                enemyFactory.spawnEnemy(enemyHiveMind, command.getGameObjectId(), command.getInstantiateX(), command.getInstantiateY());
+                enemyFactory.spawnEnemy(enemyHiveMind, command.getGameObjectId(), positionAngleSet);
                 break;
             case PassiveSkill:
-                storeSlotFactory.createPassiveSkillItemSlot(command.getGameObjectId(), command.getInstantiateX(), command.getInstantiateY(), getPlayerShip(myPlayerID));
+                storeSlotFactory.createPassiveSkillItemSlot(command.getGameObjectId(), positionAngleSet, getPlayerShip(myPlayerID));
                 break;
             case ActiveSkill:
-                storeSlotFactory.createActiveSkillItemSlot(command.getGameObjectId(), command.getInstantiateX(), command.getInstantiateY());
+                storeSlotFactory.createActiveSkillItemSlot(command.getGameObjectId(), positionAngleSet);
+                break;
+            default:
+                System.err.println("Invalid GameObjectType Detected");
                 break;
         }
     }

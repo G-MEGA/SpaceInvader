@@ -119,6 +119,9 @@ public class PlayerShip extends GameCharacter{
             case 5:
                 newBulletDamage = 6; 
                 break;
+            default:
+                newBulletDamage = 1;
+                break;
         }
         bulletDamage = newBulletDamage;
     }
@@ -134,6 +137,9 @@ public class PlayerShip extends GameCharacter{
             case 3:
                 moveSpeedMultiplier = (1 << 16) + FixedPointUtil.ZERO_5;
                 break;
+            default:
+                moveSpeedMultiplier = 1 << 16;
+                break;
         }
         moveSpeed = FixedPointUtil.mul(defaultMoveSpeed, moveSpeedMultiplier);
     }
@@ -148,6 +154,9 @@ public class PlayerShip extends GameCharacter{
                 break;
             case 3:
                 initialShield = 2;
+                break;
+            default:
+                initialShield = 1;
                 break;
         }
         waveInitialShield = initialShield;

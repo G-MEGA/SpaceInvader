@@ -1,5 +1,7 @@
 package org.newdawn.spaceinvaders.enums;
 
+import org.newdawn.spaceinvaders.sprite.SpriteRef;
+
 public enum PlayerPassiveSkillType {
     FIRE_SPEED("FireSpeed", "sprites/testPassiveSkill.png", 3),
     DAMAGE_UP("DamageUp", "sprites/testPassiveSkill.png", 5),

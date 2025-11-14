@@ -52,12 +52,11 @@ public class EnemyFactory extends GameObject{
             case BOSS:
                 enemy = new Boss(gameLoop);
                 break;
+            default:
+                System.err.println(enemyType + "은 존재하지 않은 enemyType 입니다.");
+                return null;
         }
-        if (enemy == null){
-            System.err.println(enemyType + "은 존재하지 않은 enemyType 입니다.");
-            return null;
-        }
-        
+
         gameLoop.notifyEnemyInstantiated();
 
         hiveMind.addListener(enemy);

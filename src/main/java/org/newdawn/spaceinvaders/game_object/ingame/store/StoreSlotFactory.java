@@ -49,10 +49,9 @@ public class StoreSlotFactory {
             case PS_REPAIR_KIT:
                 passiveSkill = new PassiveSkill(PlayerPassiveSkillType.RepairKit, gameLoop);
                 break;
-        }
-        if (passiveSkill == null){
-            System.err.println(skillId + "은 존재하지 않은 passiveSkill ID 입니다.");
-            return;
+            default:
+                System.err.println(skillId + "은 존재하지 않은 passiveSkill ID 입니다.");
+                return;
         }
 
         StoreSlot storeSlot = new StoreSlot(gameLoop, passiveSkill, positionAngleSet.positionX, positionAngleSet.positionY);
@@ -76,10 +75,9 @@ public class StoreSlotFactory {
             case AS_REFLECT:
                 activeSkill = new ReflectSkill(gameLoop);
                 break;
-        }
-        if (activeSkill == null){
-            System.err.println(skillId + "은 존재하지 않은 activeSkill ID 입니다.");
-            return;
+            default:
+                System.err.println(skillId + "은 존재하지 않은 activeSkill ID 입니다.");
+                return;
         }
 
         StoreSlot storeSlot = new StoreSlot(gameLoop, activeSkill, positionAngleSet.positionX, positionAngleSet.positionY);

@@ -56,7 +56,7 @@ public class StoreSlotFactory {
 
         StoreSlot storeSlot = new StoreSlot(gameLoop, passiveSkill, positionAngleSet.positionX, positionAngleSet.positionY);
 
-        SpawnSignal spawnSignal = new SpawnSignal(storeSlot, gameLoop, positionAngleSet, SpawnSignal.StoreItemSignal);
+        SpawnSignal spawnSignal = new SpawnSignal(storeSlot, gameLoop, positionAngleSet, SpawnSignal.STORE_ITEM_SIGNAL);
 
         gameLoop.addGameObject(spawnSignal);
     }
@@ -83,7 +83,7 @@ public class StoreSlotFactory {
 
         StoreSlot storeSlot = new StoreSlot(gameLoop, activeSkill, positionAngleSet.positionX, positionAngleSet.positionY);
 
-        SpawnSignal spawnSignal = new SpawnSignal(storeSlot, gameLoop, positionAngleSet, SpawnSignal.StoreItemSignal);
+        SpawnSignal spawnSignal = new SpawnSignal(storeSlot, gameLoop, positionAngleSet, SpawnSignal.STORE_ITEM_SIGNAL);
 
         gameLoop.addGameObject(spawnSignal);
     }

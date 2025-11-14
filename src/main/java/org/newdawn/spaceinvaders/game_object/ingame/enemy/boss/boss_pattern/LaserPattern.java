@@ -73,7 +73,7 @@ public class LaserPattern extends BossPattern {
         while (currentWarnerSpawnPosX > 0 && currentWarnerSpawnPosX < (800 << 16)
             && currentWarnerSpawnPosY > 0 && currentWarnerSpawnPosY < (600 << 16)) {
             PositionAngleSet positionAngleSet = new PositionAngleSet(currentWarnerSpawnPosX, currentWarnerSpawnPosY, spawnAngle + (270<< 16));
-            SpawnSignal warner = new SpawnSignal((GameLoop)getLoop(), positionAngleSet, warningTime, SpawnSignal.EnemySignal);
+            SpawnSignal warner = new SpawnSignal((GameLoop)getLoop(), positionAngleSet, WARNING_TIME, SpawnSignal.ENEMY_SIGNAL);
 
             currentWarnerSpawnPosX += FixedPointUtil.mul(FixedPointUtil.cos(spawnAngle), WARNER_SPAWN_INTERVAL);
             currentWarnerSpawnPosY += FixedPointUtil.mul(FixedPointUtil.sin(spawnAngle), WARNER_SPAWN_INTERVAL);

@@ -539,13 +539,13 @@ public class GameLoop extends Loop {
     private void ExecuteInstantiateCommand(InstantiateCommand command) {
         PositionAngleSet positionAngleSet = new PositionAngleSet(command.getInstantiateX(), command.getInstantiateY());
         switch (command.getGameObjectType()) {
-            case Enemy:
+            case ENEMY:
                 enemyFactory.spawnEnemy(enemyHiveMind, command.getGameObjectId(), positionAngleSet);
                 break;
-            case PassiveSkill:
+            case PASSIVE_SKILL:
                 storeSlotFactory.createPassiveSkillItemSlot(command.getGameObjectId(), positionAngleSet, getPlayerShip(myPlayerID));
                 break;
-            case ActiveSkill:
+            case ACTIVE_SKILL:
                 storeSlotFactory.createActiveSkillItemSlot(command.getGameObjectId(), positionAngleSet);
                 break;
             default:

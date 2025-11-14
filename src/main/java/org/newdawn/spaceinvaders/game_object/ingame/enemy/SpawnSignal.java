@@ -29,7 +29,7 @@ public class SpawnSignal extends GameObject2D{
     }
 
     public SpawnSignal(GameObject2D gameObject, GameLoop gameLoop, PositionAngleSet positionAngleSet, int spawnSignalType) 
-    { this(gameObject, gameLoop, positionAngleSet, defaultWarningTime, spawnSignalType); }
+    { this(gameObject, gameLoop, positionAngleSet, DEFUALT_WARNING_TIME, spawnSignalType); }
 
     public SpawnSignal(GameObject2D gameObject, GameLoop gameLoop, PositionAngleSet positionAngleSet, long warningTime, int spawnSignalType) {
         this(gameLoop, positionAngleSet, warningTime, spawnSignalType);

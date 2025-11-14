@@ -71,7 +71,7 @@ public class GameLoop extends Loop {
     public int getScore() { return score; }
     public void increaseScore() {increaseScore(100); }
     public void increaseScore(int amount) {
-        if(gameResult != GameLoopResultType.InGame)return;
+        if(gameResult != GameLoopResultType.IN_GAME)return;
         score += amount;}
     private final long scoringTimeInterval = FixedPointUtil.ZERO_01;
     private final int scoringScore = 1;
@@ -113,12 +113,12 @@ public class GameLoop extends Loop {
     private EventBus eventBus = new EventBus();
     public EventBus getEventBus() { return eventBus; }
 
-    private GameLoopResultType gameResult = GameLoopResultType.InGame;
+    private GameLoopResultType gameResult = GameLoopResultType.IN_GAME;
     public GameLoopResultType getGameResult() {
         return gameResult;
     }
     private void setGameResult(GameLoopResultType gameResult) {
-        if(this.gameResult != GameLoopResultType.InGame)return;  // 낙장불입
+        if(this.gameResult != GameLoopResultType.IN_GAME)return;  // 낙장불입
 
         if(this.gameResult !=  gameResult) {
             this.gameResult = gameResult;
@@ -160,7 +160,7 @@ public class GameLoop extends Loop {
     private boolean isIndicatorShown = false;
     private final long indicatorShowTime = 2 << 16;
     private long indicatorShownElapsed = 0;
-    public void showIndicatorText(String text) { showIndicatorText(text, IndicatorTextType.Default);}
+    public void showIndicatorText(String text) { showIndicatorText(text, IndicatorTextType.DEFAULT);}
     public void showIndicatorText(String text, IndicatorTextType type){ showIndicatorText(text, type.getColor(), type.getFontStyle()); }
     public void showIndicatorText(String text, Color color, int fontStyle){
         indicatorText.setText(text);
@@ -296,7 +296,7 @@ public class GameLoop extends Loop {
         activeSkillTextContent += ships.get(myPlayerID).isActiveSkillActable() ? "" : "( " + Long.toString(ships.get(myPlayerID).getRemainCoolTime() >> 16) + " )";
         activeSkillText.setText(activeSkillTextContent);
 
-        if (currentSection != null && currentSection.getSectionType() == SectionType.Store){
+        if (currentSection != null && currentSection.getSectionType() == SectionType.STORE){
             storeRemainTimeShower.setText("Remain Store Time : " + Integer.toString(FixedPointUtil.toInt(FixedPointUtil.sub(storeSectionDuration, sectionElapsed))));
         }
         else{
@@ -369,10 +369,10 @@ public class GameLoop extends Loop {
         }
 
         // 다 죽었으면 패배
-        if(aliveShips.size()==0){setGameResult(GameLoopResultType.Lose);}
+        if(aliveShips.size()==0){setGameResult(GameLoopResultType.LOSE);}
     }
     public void notifyLose(){
-        setGameResult(GameLoopResultType.Lose);
+        setGameResult(GameLoopResultType.LOSE);
     }
 
     /**
@@ -380,7 +380,7 @@ public class GameLoop extends Loop {
      * are dead.
      */
     public void notifyWin() {
-        setGameResult(GameLoopResultType.Win);
+        setGameResult(GameLoopResultType.WIN);
     }
 
     /**
@@ -449,7 +449,7 @@ public class GameLoop extends Loop {
 //        getGame().getRudpPeer().processReceivedData();
 
         //section 실행 관련 로직
-        if (gameResult == GameLoopResultType.InGame){
+        if (gameResult == GameLoopResultType.IN_GAME){
             executeMapCommand();
         }
 
@@ -477,7 +477,7 @@ public class GameLoop extends Loop {
         }
 
         //endreigon
-        if (gameResult ==  GameLoopResultType.InGame){
+        if (gameResult ==  GameLoopResultType.IN_GAME){
             if (scoredTimeElapsed >= scoringTimeInterval){
                 increaseScore(scoringScore);
                 scoredTimeElapsed = 0;
@@ -503,7 +503,7 @@ public class GameLoop extends Loop {
                     return;
                 }
 
-                if (currentSection.getSectionType() == SectionType.NewWave){
+                if (currentSection.getSectionType() == SectionType.NEW_WAVE){
                     for(PlayerShip ship:ships){
                         ship.onWaveStart();
                     }
@@ -511,14 +511,14 @@ public class GameLoop extends Loop {
             }
             else{
                 //* 현재 Section이 New Wave 타입이라면, 적이 모두 파괴되었을 때 다음 Section으로 넘어감
-                if (currentSection.getSectionType() == SectionType.NewWave){
+                if (currentSection.getSectionType() == SectionType.NEW_WAVE){
                     if (!hasEnemy){
                         hasSectionEnd = true;
                         sectionElapsed = 0;
                     }
                 }
                 //* 현재 Section이 Store 타입이라면, Scection 시작 15초 후에 Section 종료
-                if (currentSection.getSectionType() == SectionType.Store){
+                if (currentSection.getSectionType() == SectionType.STORE){
                     if (sectionElapsed >= storeSectionDuration){
                         hasSectionEnd = true;
                         sectionElapsed = 0;

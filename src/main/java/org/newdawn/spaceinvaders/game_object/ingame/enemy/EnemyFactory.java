@@ -63,6 +63,7 @@ public class EnemyFactory extends GameObject{
         
         if (isWarning){
             SpawnSignal enemyWarner = new SpawnSignal(enemy, gameLoop, positionAngleSet, SpawnSignal.EnemySignal);
+
             gameLoop.addGameObject(enemyWarner);
             return enemy;
         }

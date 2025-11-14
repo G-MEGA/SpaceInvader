@@ -38,16 +38,16 @@ public class StoreSlotFactory {
 
         switch (skillId) {
             case PS_FIRE_SPEED:
-                passiveSkill = new PassiveSkill(PlayerPassiveSkillType.FireSpeed, gameLoop);
+                passiveSkill = new PassiveSkill(PlayerPassiveSkillType.FIRE_SPEED, gameLoop);
                 break;
             case PS_DAMAGE_UP:
-                passiveSkill = new PassiveSkill(PlayerPassiveSkillType.DamageUp, gameLoop);
+                passiveSkill = new PassiveSkill(PlayerPassiveSkillType.DAMAGE_UP, gameLoop);
                 break;
             case PS_ADDITIONAL_ENGINE:
-                passiveSkill = new PassiveSkill(PlayerPassiveSkillType.AdditionalEngine, gameLoop);
+                passiveSkill = new PassiveSkill(PlayerPassiveSkillType.ADDITIONAL_ENGINE, gameLoop);
                 break;
             case PS_REPAIR_KIT:
-                passiveSkill = new PassiveSkill(PlayerPassiveSkillType.RepairKit, gameLoop);
+                passiveSkill = new PassiveSkill(PlayerPassiveSkillType.REPAIR_KIT, gameLoop);
                 break;
             default:
                 System.err.println(skillId + "은 존재하지 않은 passiveSkill ID 입니다.");
@@ -57,6 +57,7 @@ public class StoreSlotFactory {
         StoreSlot storeSlot = new StoreSlot(gameLoop, passiveSkill, positionAngleSet.positionX, positionAngleSet.positionY);
 
         SpawnSignal spawnSignal = new SpawnSignal(storeSlot, gameLoop, positionAngleSet, SpawnSignal.StoreItemSignal);
+
         gameLoop.addGameObject(spawnSignal);
     }
     
@@ -83,6 +84,7 @@ public class StoreSlotFactory {
         StoreSlot storeSlot = new StoreSlot(gameLoop, activeSkill, positionAngleSet.positionX, positionAngleSet.positionY);
 
         SpawnSignal spawnSignal = new SpawnSignal(storeSlot, gameLoop, positionAngleSet, SpawnSignal.StoreItemSignal);
+
         gameLoop.addGameObject(spawnSignal);
     }
 

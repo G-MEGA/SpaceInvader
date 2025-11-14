@@ -8,13 +8,13 @@ import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class SpawnSignal extends GameObject2D{
-    public final static int EnemySignal = 0; 
-    public final static int StoreItemSignal = 1; 
+    public final static int ENEMY_SIGNAL = 0; 
+    public final static int STORE_ITEM_SIGNAL = 1; 
     private int spawnSignalType;
 
-    private final static String enemySpawnSignalSpriteRef = "sprites/testWarning.png";
-    private final static String storeItemSignalSpriteRef = "sprites/storeItemSpawnSignal.png";
-    private final static long defaultWarningTime = 1L << 16;
+    private final static String ENEMY_SPAWN_SIGNAL_SPRIE_REF = "sprites/testWarning.png";
+    private final static String STORE_ITEM_SIGNAL_SPRITE_REF = "sprites/storeItemSpawnSignal.png";
+    private final static long DEFUALT_WARNING_TIME = 1L << 16;
     private long warningTime;
 
     private SpriteRenderer spriteRenderer;
@@ -50,11 +50,11 @@ public class SpawnSignal extends GameObject2D{
 
         String spriteRef;
         switch (spawnSignalType) {
-            case EnemySignal:
-                spriteRef = enemySpawnSignalSpriteRef;
+            case ENEMY_SIGNAL:
+                spriteRef = ENEMY_SPAWN_SIGNAL_SPRIE_REF;
                 break;
-            case StoreItemSignal:
-                spriteRef = storeItemSignalSpriteRef;
+            case STORE_ITEM_SIGNAL:
+                spriteRef = STORE_ITEM_SIGNAL_SPRITE_REF;
                 break;
             default:
                 throw new IllegalArgumentException(spawnSignalType + "는 존재하지 않은 spawnSignalType 입니다.");
@@ -74,10 +74,10 @@ public class SpawnSignal extends GameObject2D{
 
         if (warnElapsed >= warningTime){
             if (gameLoop != null && spawnGameObject != null){
-                if (spawnSignalType == EnemySignal){
+                if (spawnSignalType == ENEMY_SIGNAL){
                     gameLoop.addEnemy((Enemy)spawnGameObject);
                 }
-                else if (spawnSignalType == StoreItemSignal){
+                else if (spawnSignalType == STORE_ITEM_SIGNAL){
                     gameLoop.addGameObject((StoreSlot)spawnGameObject);
                 }
                 else{

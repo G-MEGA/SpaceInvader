@@ -69,23 +69,23 @@ public class PlayerShip extends GameCharacter{
     } 
     private void applyPassiveSkill() {
         for (PlayerPassiveSkillType type : passiveSkills.keySet()) {
-            if (type == PlayerPassiveSkillType.FireSpeed){
+            if (type == PlayerPassiveSkillType.FIRE_SPEED){
                 applyFireSpeedPassiveSkill();
             }
-            if (type == PlayerPassiveSkillType.DamageUp){
+            if (type == PlayerPassiveSkillType.DAMAGE_UP){
                 applayDamageUpPassiveSkill();
             }
-            if (type == PlayerPassiveSkillType.AdditionalEngine){
+            if (type == PlayerPassiveSkillType.ADDITIONAL_ENGINE){
                 applyAdditionalPassiveSkill();
             }
-            if (type == PlayerPassiveSkillType.RepairKit){
+            if (type == PlayerPassiveSkillType.REPAIR_KIT){
                 applyRepairKitPassiveSkill();
             }
         }
     }
     private void applyFireSpeedPassiveSkill() {
         long fireSpeedMultiplier;
-        switch (passiveSkills.get(PlayerPassiveSkillType.FireSpeed)) {
+        switch (passiveSkills.get(PlayerPassiveSkillType.FIRE_SPEED)) {
                 case 1:
                     fireSpeedMultiplier = (1 << 16) + FixedPointUtil.ZERO_3;
                     break;
@@ -103,7 +103,7 @@ public class PlayerShip extends GameCharacter{
         }
     private void applayDamageUpPassiveSkill() {
         int newBulletDamage = 1;
-        switch (passiveSkills.get(PlayerPassiveSkillType.DamageUp)) {
+        switch (passiveSkills.get(PlayerPassiveSkillType.DAMAGE_UP)) {
             case 1:
                 newBulletDamage = 2; 
                 break;
@@ -127,7 +127,7 @@ public class PlayerShip extends GameCharacter{
     }
     private void applyAdditionalPassiveSkill() {
         long moveSpeedMultiplier = 1 << 16;
-        switch (passiveSkills.get(PlayerPassiveSkillType.AdditionalEngine)) {
+        switch (passiveSkills.get(PlayerPassiveSkillType.ADDITIONAL_ENGINE)) {
             case 1:
                 moveSpeedMultiplier = (1 << 16) + FixedPointUtil.ZERO_15;
                 break;
@@ -145,7 +145,7 @@ public class PlayerShip extends GameCharacter{
     }
     private void applyRepairKitPassiveSkill() {
         int initialShield = 1;
-        switch (passiveSkills.get(PlayerPassiveSkillType.RepairKit)) {
+        switch (passiveSkills.get(PlayerPassiveSkillType.REPAIR_KIT)) {
             case 1:
                 initialShield = 1;
                 break;

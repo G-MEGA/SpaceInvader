@@ -30,6 +30,7 @@ import javax.swing.JFileChooser;
 
 import org.newdawn.spaceinvaders.loop_input.LoopInputLog;
 import org.newdawn.spaceinvaders.loop.game_loop.GameLoopSnapshot;
+import org.newdawn.spaceinvaders.network.LoopRUDPPeerListener;
 import serializer.GameLoopSerializer;
 
 //플레이어 루프
@@ -211,19 +212,10 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
     @Override
     protected IRUDPPeerListener generateIRUDPPeerListener() {
         final GameLoopPlayerLoop thisLoop = this;
-        return new  IRUDPPeerListener() {
+        return new  LoopRUDPPeerListener() {
             @Override
             public boolean onConnected(RUDPPeer peer, Connection connection) {
                 return false;
-            }
-
-            @Override
-            public boolean onDisconnected(RUDPPeer peer, Connection connection) {
-                if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
-                    System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
-                    System.exit(0);
-                }
-                return true;
             }
 
             @Override

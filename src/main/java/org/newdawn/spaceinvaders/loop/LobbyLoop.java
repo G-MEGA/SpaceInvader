@@ -13,6 +13,7 @@ import org.newdawn.spaceinvaders.game_object.gui.IButtonListener;
 import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.map_load.MapInfo;
+import org.newdawn.spaceinvaders.network.LoopRUDPPeerListener;
 
 import java.awt.*;
 import java.io.IOException;
@@ -137,19 +138,10 @@ public class LobbyLoop extends Loop{
 
     @Override
     protected IRUDPPeerListener generateIRUDPPeerListener() {
-        return new  IRUDPPeerListener() {
+        return new  LoopRUDPPeerListener() {
             @Override
             public boolean onConnected(RUDPPeer peer, Connection connection) {
                 return false;
-            }
-
-            @Override
-            public boolean onDisconnected(RUDPPeer peer, Connection connection) {
-                if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
-                    System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
-                    System.exit(0);
-                }
-                return true;
             }
 
             @Override

@@ -110,33 +110,8 @@ public class RUDPPeer implements AutoCloseable{
         for (Connection connection : connections.values()){
             for(int i = 0; i < connection.getReceivedData().size(); i++){
                 PacketData packetData = connection.getReceivedData().poll();
-                boolean processed = true;
 
-                for(IRUDPPeerListener listener : listeners){
-                    if(listener == null) {
-                        System.err.println("RUDPPeer : listener is null");
-                        continue;
-                    }
-
-                    // 처리 수락, 거부 여부
-                    boolean result;
-
-                    if(packetData instanceof PacketDataDisconnect){
-                        result = listener.onDisconnected(this, connection);
-                    }
-                    else if(packetData instanceof PacketDataConnect){
-                        result = listener.onConnected(this, connection);
-                    }
-                    else{
-                        result = listener.onReceived(this, connection, packetData);
-                    }
-
-                    // 처리 거부시 루프 탈출
-                    if(!result){
-                        processed = false;
-                        break;
-                    }
-                }
+                boolean processed = processPacket(packetData, connection);
 
                 // 모든 Listener에서 처리 수락하면 큐에서 제거된 채로 진행
                 // 하나라도 처리 거부시 큐에 다시 넣음
@@ -145,6 +120,33 @@ public class RUDPPeer implements AutoCloseable{
                 }
             }
         }
+    }
+    private boolean processPacket(PacketData packetData, Connection connection){
+        for(IRUDPPeerListener listener : listeners){
+            if(listener == null) {
+                System.err.println("RUDPPeer : listener is null");
+                continue;
+            }
+
+            // 처리 수락, 거부 여부
+            boolean result;
+
+            if(packetData instanceof PacketDataDisconnect){
+                result = listener.onDisconnected(this, connection);
+            }
+            else if(packetData instanceof PacketDataConnect){
+                result = listener.onConnected(this, connection);
+            }
+            else{
+                result = listener.onReceived(this, connection, packetData);
+            }
+
+            // 처리 거부시 루프 탈출
+            if(!result){
+                return false;
+            }
+        }
+        return true;
     }
 
     public void connect(InetSocketAddress address) throws Exception {
@@ -220,9 +222,6 @@ public class RUDPPeer implements AutoCloseable{
                             InetSocketAddress senderAddress = (InetSocketAddress) channel.receive(buffer);
                             buffer.flip();
                             Packet receivedPacket = serializerForReceive.deserializePacket(buffer.array());
-                            if(printLog){
-                                System.out.printf("%s 수신 %s\n", localPort, receivedPacket.getType());
-                            }
                             // 패킷 처리
                             handlePacket(receivedPacket, senderAddress);
                         }
@@ -237,6 +236,10 @@ public class RUDPPeer implements AutoCloseable{
     }
 
     private void handlePacket(Packet packet, InetSocketAddress senderAddress) throws Exception {
+        if(printLog){
+            System.out.printf("%s 수신 %s\n", localPort, packet.getType());
+        }
+
         Connection connection = connections.get(senderAddress);
         //커넥션이 없을 경우
         if (connection == null) {
@@ -263,33 +266,11 @@ public class RUDPPeer implements AutoCloseable{
         if(connection.isDisconnecting()) return;
 
         // 패킷 처리
+        processPacket(packet, connection);
+    }
+    private void processPacket(Packet packet, Connection connection) throws Exception{
         if (packet.getType() == Packet.PacketType.DATA) {
-            // ACK 전송
-            sendPacket(connection, new Packet(packet.getSeqNumber()), serializerForReceive);
-
-            // receivedPacketsWaitingForSequence에 패킷 넣기
-            // 기대했던 순번보다 작다면 이미 받아서 처리까지 완료 했다는 뜻이므로 또 넣을 필요 없음
-            if(packet.getSeqNumber() >= connection.getExpectedReceivedSequenceNumber()){
-                connection.getReceivedPacketsWaitingForSequence().put(packet.getSeqNumber(), packet);
-            }
-
-            // 기대했던 순번이라면...
-            if (packet.getSeqNumber() == connection.getExpectedReceivedSequenceNumber()) {
-                //1. receivedPacketsWaitingForSequence 정렬
-                List<Packet> packetList = new ArrayList<>(connection.getReceivedPacketsWaitingForSequence().values().stream().toList());
-                packetList.sort(Comparator.comparing(Packet::getSeqNumber));
-                //2. for... expectedSeqNumber과 receivedPacketsWaitingForSequence의 요소가 맞으면
-                for(Packet p : packetList) {
-                    if(p.getSeqNumber() != connection.getExpectedReceivedSequenceNumber()) break;
-
-                    //3.    receivedPacketsWaitingForSequence에서 제거하고 receivedData에 넣기
-                    connection.getReceivedPacketsWaitingForSequence().remove(p.getSeqNumber());
-                    connection.getReceivedData().offer(serializerForReceive.deserializePacketData(p.getData()));
-
-                    //4. expectedSeqNumber++
-                    connection.incrementExpectedReceivedSequenceNumber();
-                }
-            }
+            processDataPacket(packet, connection);
         } else if (packet.getType() == Packet.PacketType.ACK) {
             // ACK 받은 패킷은 미확인 목록에서 제거
             connection.getSentPackets().remove(packet.getSeqNumber());
@@ -306,6 +287,34 @@ public class RUDPPeer implements AutoCloseable{
         //뭐든지 수신 받으면 커넥션 하트비트 갱신
         connection.updateLastHeartbeat();
     }
+    private void processDataPacket(Packet packet, Connection connection) throws Exception{
+        // ACK 전송
+        sendPacket(connection, new Packet(packet.getSeqNumber()), serializerForReceive);
+
+        // receivedPacketsWaitingForSequence에 패킷 넣기
+        // 기대했던 순번보다 작다면 이미 받아서 처리까지 완료 했다는 뜻이므로 또 넣을 필요 없음
+        if(packet.getSeqNumber() >= connection.getExpectedReceivedSequenceNumber()){
+            connection.getReceivedPacketsWaitingForSequence().put(packet.getSeqNumber(), packet);
+        }
+
+        // 기대했던 순번이라면...
+        if (packet.getSeqNumber() == connection.getExpectedReceivedSequenceNumber()) {
+            //1. receivedPacketsWaitingForSequence 정렬
+            List<Packet> packetList = new ArrayList<>(connection.getReceivedPacketsWaitingForSequence().values().stream().toList());
+            packetList.sort(Comparator.comparing(Packet::getSeqNumber));
+            //2. for... expectedSeqNumber과 receivedPacketsWaitingForSequence의 요소가 맞으면
+            for(Packet p : packetList) {
+                if(p.getSeqNumber() != connection.getExpectedReceivedSequenceNumber()) break;
+
+                //3.    receivedPacketsWaitingForSequence에서 제거하고 receivedData에 넣기
+                connection.getReceivedPacketsWaitingForSequence().remove(p.getSeqNumber());
+                connection.getReceivedData().offer(serializerForReceive.deserializePacketData(p.getData()));
+
+                //4. expectedSeqNumber++
+                connection.incrementExpectedReceivedSequenceNumber();
+            }
+        }
+    }
     //endregion
 
     //region 재전송 스레드
@@ -316,41 +325,59 @@ public class RUDPPeer implements AutoCloseable{
                 long currentTime = System.currentTimeMillis();
 
                 for(Connection c : connections.values()){
-                    //재전송. disconnect 패킷도 재전송이 되어야하니 disconnecting이어도 동작
-                    for(SentPacketInfo info : c.getSentPackets().values()){
-                        if(currentTime - info.getTimestamp() > RETRANSMISSION_TIMEOUT){
-                            System.err.printf("타임아웃! 재전송: %s\n", info.packet);
-                            sendPacket(c, info.getPacket(), serializerForRetransmit);
-                        }
-                    }
+                    processRetransmission(c, currentTime);
 
                     // isDisconnecting 이면 이 밑으로는 동작 안하고 스킵
                     if(c.isDisconnecting()) continue;
 
                     //하트비트
-                    long fromLastHeartbeat = currentTime - c.getLastHeartbeat().get();
-                    if(fromLastHeartbeat >= HEARTBEAT_TIMEOUT){
-                        // 너무 오래 끊겼으므로 disconnect
-                        disconnect(c);
-                    } else if (fromLastHeartbeat >= HEARTBEAT_INTERVAL) {
-                        // 하트비트 전송
-                        sendPacket(c, new Packet(Packet.PacketType.HEARTBEAT), serializerForRetransmit);
-                    }
+                    processHeartbeat(c, currentTime);
                 }
-                // disconnect 후 몇초 지났는지 확인 후 제거 로직
-                for(InetSocketAddress address : connections.keySet()){
-                    if(!connections.get(address).isDisconnecting()) continue;
 
-                    long fromDisconnecting = currentTime - connections.get(address).getLastHeartbeat().get();
-                    if(fromDisconnecting >= DISCONNECTING_DURATION){
-                        connections.remove(address);
-                    }
-                }
+                processRemovalDisconnected(currentTime);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 running = false;
             } catch (Exception e) {
                 System.err.printf("재전송 오류: %s\n", e.getMessage());
+            }
+        }
+    }
+    private void processRetransmission(Connection c, long currentTime) {
+        try {
+            //재전송. disconnect 패킷도 재전송이 되어야하니 disconnecting이어도 동작
+            for(SentPacketInfo info : c.getSentPackets().values()){
+                if(currentTime - info.getTimestamp() > RETRANSMISSION_TIMEOUT){
+                    System.err.printf("타임아웃! 재전송: %s\n", info.packet);
+                    sendPacket(c, info.getPacket(), serializerForRetransmit);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    private void processHeartbeat(Connection c, long currentTime) {
+        try {
+            long fromLastHeartbeat = currentTime - c.getLastHeartbeat().get();
+            if(fromLastHeartbeat >= HEARTBEAT_TIMEOUT){
+                // 너무 오래 끊겼으므로 disconnect
+                disconnect(c);
+            } else if (fromLastHeartbeat >= HEARTBEAT_INTERVAL) {
+                // 하트비트 전송
+                sendPacket(c, new Packet(Packet.PacketType.HEARTBEAT), serializerForRetransmit);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    private void processRemovalDisconnected(long currentTime) {
+        // disconnect 후 몇초 지났는지 확인 후 제거 로직
+        for(InetSocketAddress address : connections.keySet()){
+            if(!connections.get(address).isDisconnecting()) continue;
+
+            long fromDisconnecting = currentTime - connections.get(address).getLastHeartbeat().get();
+            if(fromDisconnecting >= DISCONNECTING_DURATION){
+                connections.remove(address);
             }
         }
     }

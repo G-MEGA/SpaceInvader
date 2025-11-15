@@ -70,27 +70,7 @@ public class ReplayerLoop extends Loop{
 
         getGame().getRudpPeer().processReceivedData();
 
-        if(isKeyInputJustPressed(0, "escape")) {
-            getGame().changeLoop(new MainMenuLoop(getGame()));
-        }
-
-        if(isKeyInputJustPressed(0, "right")) {
-            playSpeed++;
-        }
-        if(isKeyInputJustPressed(0, "left")) {
-            playSpeed--;
-            if(playSpeed<0){
-                playSpeed = 0;
-            }
-        }
-        if(isKeyInputJustPressed(0, "accept")) {
-            paused = !paused;
-        }
-        // Replay 다시 재생
-        if(isKeyInputJustPressed(0, "record")) {
-            getGame().changeLoop(new ReplayerLoop(getGame(), replaySaveData));
-            return;
-        }
+        handleInputs();
 
         int leftLoop = playSpeed;
 
@@ -117,6 +97,28 @@ public class ReplayerLoop extends Loop{
 
 
             currentFrame++;
+        }
+    }
+    private void handleInputs(){
+        if(isKeyInputJustPressed(0, "escape")) {
+            getGame().changeLoop(new MainMenuLoop(getGame()));
+        }
+
+        if(isKeyInputJustPressed(0, "right")) {
+            playSpeed++;
+        }
+        if(isKeyInputJustPressed(0, "left")) {
+            playSpeed--;
+            if(playSpeed<0){
+                playSpeed = 0;
+            }
+        }
+        if(isKeyInputJustPressed(0, "accept")) {
+            paused = !paused;
+        }
+        // Replay 다시 재생
+        if(isKeyInputJustPressed(0, "record")) {
+            getGame().changeLoop(new ReplayerLoop(getGame(), replaySaveData));
         }
     }
 

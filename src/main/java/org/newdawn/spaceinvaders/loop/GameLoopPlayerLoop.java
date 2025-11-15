@@ -103,54 +103,10 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
             }
         }
 
-
         // 게임 종료 시
         if(gameLoop.getGameResult() != GameLoopResultType.IN_GAME){
-            if(isKeyInputJustPressed(0, "escape")) {
-                getGame().changeLoop(new LobbyLoop(getGame()));
-            }
-            else if(isKeyInputJustPressed(0, "record")) {
-                String data = gameLoop.getReplayData();
-
-                // JFileChooser 객체 생성
-                JFileChooser chooser = new JFileChooser();
-
-                // 파일 저장 다이얼로그를 현재 프레임(this) 중앙에 띄움
-                int result = chooser.showSaveDialog(getGame());
-
-                // 사용자가 '저장' 버튼을 눌렀는지 확인
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    // 저장할 파일 경로를 File 객체로 받아옴
-                    File fileToSave = chooser.getSelectedFile();
-
-                    String filePath = fileToSave.getAbsolutePath(); // 저장할 파일 경로
-
-                    if (!filePath.endsWith(".txt")) {
-                        fileToSave = new File(fileToSave.getAbsolutePath() + ".txt");
-                        filePath = fileToSave.getAbsolutePath();
-                    }
-
-                    try {
-                        // Path 객체 생성
-                        Path path = Paths.get(filePath);
-
-                        // 파일에 문자열 쓰기 (기본 인코딩은 UTF-8)
-                        Files.writeString(path, data);
-
-                        System.out.println("파일 저장 성공");
-
-                    } catch (IOException e) {
-                        System.err.println("파일 저장 중 오류가 발생");
-                        e.printStackTrace();
-                    }
-                }
-
-                // 리플레이 저장 즉시 메인메뉴로 사출
-                getGame().changeLoop(new LobbyLoop(getGame()));
-            }
+            handleExitGame();
         }
-
-
 
         long currentFrame = gameLoop.currentFrame;
 
@@ -176,6 +132,50 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
 
         // 너무 오래된 스냅샷 청소
         snapshots.keySet().removeIf(frame -> frame < currentFrame - 60L * 10);  // 60 = 1초
+    }
+    private void handleExitGame(){
+        if(isKeyInputJustPressed(0, "escape")) {
+            getGame().changeLoop(new LobbyLoop(getGame()));
+        }
+        else if(isKeyInputJustPressed(0, "record")) {
+            String data = gameLoop.getReplayData();
+
+            // JFileChooser 객체 생성
+            JFileChooser chooser = new JFileChooser();
+
+            // 파일 저장 다이얼로그를 현재 프레임(this) 중앙에 띄움
+            int result = chooser.showSaveDialog(getGame());
+
+            // 사용자가 '저장' 버튼을 눌렀는지 확인
+            if (result == JFileChooser.APPROVE_OPTION) {
+                // 저장할 파일 경로를 File 객체로 받아옴
+                File fileToSave = chooser.getSelectedFile();
+
+                String filePath = fileToSave.getAbsolutePath(); // 저장할 파일 경로
+
+                if (!filePath.endsWith(".txt")) {
+                    fileToSave = new File(fileToSave.getAbsolutePath() + ".txt");
+                    filePath = fileToSave.getAbsolutePath();
+                }
+
+                try {
+                    // Path 객체 생성
+                    Path path = Paths.get(filePath);
+
+                    // 파일에 문자열 쓰기 (기본 인코딩은 UTF-8)
+                    Files.writeString(path, data);
+
+                    System.out.println("파일 저장 성공");
+
+                } catch (IOException e) {
+                    System.err.println("파일 저장 중 오류가 발생");
+                    e.printStackTrace();
+                }
+            }
+
+            // 리플레이 저장 즉시 메인메뉴로 사출
+            getGame().changeLoop(new LobbyLoop(getGame()));
+        }
     }
 
 
@@ -212,97 +212,7 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
     @Override
     protected IRUDPPeerListener generateIRUDPPeerListener() {
         final GameLoopPlayerLoop thisLoop = this;
-        return new  LoopRUDPPeerListener() {
-            @Override
-            public boolean onConnected(RUDPPeer peer, Connection connection) {
-                return false;
-            }
-
-            @Override
-            public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
-                if (data instanceof PacketDataS2CPreprocessForGame) {
-                    // 게임 생성
-                    //멀티플레이 정보에 따라서 시드, 플레이어 카운트, 마이 플레이어 아이디, 맵데이터 넣어줘야함
-                    preprocessInfo =  (PacketDataS2CPreprocessForGame) data;
-                    gameLoop = new GameLoop(getGame(),
-                            preprocessInfo.gameLoopSeed,
-                            preprocessInfo.playersUID.size(),
-                            preprocessInfo.playerIDInLobby,
-                            preprocessInfo.mapID);
-                    gameLoop.gameResultListener = thisLoop;
-
-                    putState(gameLoop.currentFrame, GameLoopSerializer.getInstance().serialize(gameLoop));
-
-                    // 연결할 주소들 리스트 업
-                    ArrayList<InetSocketAddress> peerAddresses = new ArrayList<>();
-                    for(int i = 0; preprocessInfo.playersUID.size() > i; i++){
-                        if(i == gameLoop.playerShipSystem.getMyPlayerID())continue;
-
-                        InetSocketAddress address = new InetSocketAddress(preprocessInfo.addresses.get(i), preprocessInfo.ports.get(i));
-                        peerAddresses.add(address);
-                    }
-
-                    while(!peerAddresses.isEmpty()){
-                        try {
-                            // 연결 된 피어는 목록에서 제거
-                            for(int i = peerAddresses.size() - 1; i >= 0; i--){
-                                if(getGame().getRudpPeer().isConnected(peerAddresses.get(i))){
-                                    peerAddresses.remove(i);
-                                }
-                            }
-
-                            System.out.println("=== 피어 연결 시도 ====");
-                            for(InetSocketAddress address : peerAddresses){
-
-                                System.out.println("연결 시도 - " + address.getAddress().getHostAddress() + ":" + address.getPort());
-                                // 한 번 시도할 때마다 5번씩 연결 요청
-                                for(int k = 0; k < 5; k++){
-                                    Thread.sleep(10);
-                                    try {
-                                        getGame().getRudpPeer().connect(address);
-                                    } catch (Exception e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                }
-                            }
-
-                            // 1초에 한 번씩 시도
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-
-                    //전처리 완료 전송
-                    preprocessOK();
-                    System.out.println("전처리 완료. 세션ID : " + preprocessInfo.gameSessionID);
-
-                    return true;
-                }
-                else if (data instanceof PacketDataS2CStartGame) {
-                    gameStarted = true;
-                    return true;
-                }
-                else if (data instanceof PacketDataP2PInput) {
-                    // 받은 데이터 파싱
-                    loopInputLog.setFromSaveData(((PacketDataP2PInput) data).inputLog);
-
-                    // 받은 데이터의 입력 프레임
-                    long frame = loopInputLog.inputFrame;
-
-                    // 받은 입력 데이터를 스냅샷에 추가
-                    putInputs(frame, loopInputLog.inputs);
-
-                    // 현재 프레임보다 더 과거의 입력이라면 rollbackTargetFrame을 설정하여 롤백이 필요함을 알림
-                    if(frame < gameLoop.currentFrame)
-                        if(rollbackTargetFrame == -1L || frame < rollbackTargetFrame){
-                            rollbackTargetFrame = frame;
-                        }
-                    return true;
-                }
-                return false;
-            }
-        };
+        return new  GameLoopRUDPPeerListener(thisLoop);
     }
 
     void preprocessOK(){
@@ -369,5 +279,123 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
         GameLoopSnapshot snapshot = snapshots.getOrDefault(frame, new GameLoopSnapshot());
         snapshot.state = state;
         snapshots.put(frame, snapshot);
+    }
+
+
+
+    private class GameLoopRUDPPeerListener extends LoopRUDPPeerListener {
+        GameLoopPlayerLoop loop;
+        GameLoopRUDPPeerListener(GameLoopPlayerLoop loop) {
+            this.loop = loop;
+        }
+
+        @Override
+        public boolean onConnected(RUDPPeer peer, Connection connection) {
+            return false;
+        }
+
+        @Override
+        public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
+            if (data instanceof PacketDataS2CPreprocessForGame) {
+                processPacketDataS2CPreprocessForGame((PacketDataS2CPreprocessForGame) data);
+                return true;
+            }
+            else if (data instanceof PacketDataS2CStartGame) {
+                gameStarted = true;
+                return true;
+            }
+            else if (data instanceof PacketDataP2PInput) {
+                processPacketDataP2PInput((PacketDataP2PInput) data);
+                return true;
+            }
+            return false;
+        }
+        private void processPacketDataS2CPreprocessForGame(PacketDataS2CPreprocessForGame data){
+            // 게임 생성
+            //멀티플레이 정보에 따라서 시드, 플레이어 카운트, 마이 플레이어 아이디, 맵데이터 넣어줘야함
+            preprocessInfo =  data;
+            gameLoop = new GameLoop(getGame(),
+                    preprocessInfo.gameLoopSeed,
+                    preprocessInfo.playersUID.size(),
+                    preprocessInfo.playerIDInLobby,
+                    preprocessInfo.mapID);
+            gameLoop.gameResultListener = loop;
+
+            putState(gameLoop.currentFrame, GameLoopSerializer.getInstance().serialize(gameLoop));
+
+            // 연결할 주소들 리스트 업
+            ArrayList<InetSocketAddress> peerAddresses = getPeerAddresses();
+
+            while(!peerAddresses.isEmpty()){
+                try {
+                    // 연결 된 피어는 목록에서 제거
+                    for(int i = peerAddresses.size() - 1; i >= 0; i--){
+                        if(getGame().getRudpPeer().isConnected(peerAddresses.get(i))){
+                            peerAddresses.remove(i);
+                        }
+                    }
+
+                    connectToPeers(peerAddresses);
+
+                    // 1초에 한 번씩 시도
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            //전처리 완료 전송
+            preprocessOK();
+            System.out.println("전처리 완료. 세션ID : " + preprocessInfo.gameSessionID);
+        }
+
+        private ArrayList<InetSocketAddress> getPeerAddresses(){
+            ArrayList<InetSocketAddress> peerAddresses = new ArrayList<>();
+            for(int i = 0; preprocessInfo.playersUID.size() > i; i++){
+                if(i == gameLoop.playerShipSystem.getMyPlayerID())continue;
+
+                InetSocketAddress address = new InetSocketAddress(preprocessInfo.addresses.get(i), preprocessInfo.ports.get(i));
+                peerAddresses.add(address);
+            }
+            return peerAddresses;
+        }
+
+        private void connectToPeers(ArrayList<InetSocketAddress> peerAddresses){
+            System.out.println("=== 피어 연결 시도 ====");
+            try {
+                for(InetSocketAddress address : peerAddresses){
+
+                    System.out.println("연결 시도 - " + address.getAddress().getHostAddress() + ":" + address.getPort());
+                    // 한 번 시도할 때마다 5번씩 연결 요청
+                    for(int k = 0; k < 5; k++){
+                        Thread.sleep(10);
+                        try {
+                            getGame().getRudpPeer().connect(address);
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private void processPacketDataP2PInput(PacketDataP2PInput data){
+            // 받은 데이터 파싱
+            loopInputLog.setFromSaveData((data).inputLog);
+
+            // 받은 데이터의 입력 프레임
+            long frame = loopInputLog.inputFrame;
+
+            // 받은 입력 데이터를 스냅샷에 추가
+            putInputs(frame, loopInputLog.inputs);
+
+            // 현재 프레임보다 더 과거의 입력이라면 rollbackTargetFrame을 설정하여 롤백이 필요함을 알림
+            if(frame < gameLoop.currentFrame)
+                if(rollbackTargetFrame == -1L || frame < rollbackTargetFrame){
+                    rollbackTargetFrame = frame;
+                }
+        }
     }
 }

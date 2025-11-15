@@ -26,6 +26,17 @@ public class EventBus {
 
     public void publish(Object event){
         // ConcurrentModification을 피하기 위하여 실제 register/unregister는 여기서 처리
+        processRegistrations();
+
+        // publish처리
+        if(!subscribers.containsKey(event.getClass())) return;
+        if(subscribers.get(event.getClass()).isEmpty()) return;
+
+        for(IEventBusSubscriber subscriber : subscribers.get(event.getClass())){
+            subscriber.notify(event);
+        }
+    }
+    private void processRegistrations(){
         for(Class eventClass:forRegister.keySet()){
             Set<IEventBusSubscriber> set = forRegister.get(eventClass);
             for(IEventBusSubscriber subscriber:set){
@@ -42,14 +53,6 @@ public class EventBus {
 
                 subscribers.get(eventClass).remove(subscriber);
             }
-        }
-
-        // publish처리
-        if(!subscribers.containsKey(event.getClass())) return;
-        if(subscribers.get(event.getClass()).isEmpty()) return;
-
-        for(IEventBusSubscriber subscriber : subscribers.get(event.getClass())){
-            subscriber.notify(event);
         }
     }
 }

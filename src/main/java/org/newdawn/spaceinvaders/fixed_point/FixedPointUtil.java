@@ -110,47 +110,56 @@ public class FixedPointUtil {
     public static long atan2(long y, long x) {
         long absY = Math.abs(y);
         long absX = Math.abs(x);
-
-        long tan;
-
-        if (absY <= absX) {
-            tan = div(absY, absX);
-        } else {
-            tan = div(absX, absY);
-        }
-
+        long tan = tanForAtan2(absY, absX);
         long atan = atan(tan);
 
         long angle;
         if (x >= 0 && y >= 0) {//1사분면
-            if (absY <= absX) {
-                angle = atan;
-            } else {
-                angle = (90L << SCALE) - atan;
-            }
+            angle = atan2OnQuadrant1(atan, absX, absY);
         } else if (x < 0 && y >= 0) {//2사분면
-            if (absY <= absX) {
-                angle = (180L << SCALE) - atan;
-            } else {
-                angle = (90L << SCALE) + atan;
-            }
-
+            angle = atan2OnQuadrant2(atan, absX, absY);
         } else if (x < 0) {//3사분면
-            if (absY <= absX) {
-                angle = (180L << SCALE) + atan;
-            } else {
-                angle = (270L << SCALE) - atan;
-            }
-
+            angle = atan2OnQuadrant3(atan, absX, absY);
         } else {//4사분면
-            if (absY <= absX) {
-                angle = (360L << SCALE) - atan;
-            } else {
-                angle = (270L << SCALE) + atan;
-            }
+            angle = atan2OnQuadrant4(atan, absX, absY);
         }
 
         return angle;
+    }
+    private static long tanForAtan2(long absY, long absX) {
+        if (absY <= absX) {
+            return div(absY, absX);
+        } else {
+            return div(absX, absY);
+        }
+    }
+    private static long atan2OnQuadrant1(long atan, long absX, long absY) {
+        if (absY <= absX) {
+            return atan;
+        } else {
+            return (90L << SCALE) - atan;
+        }
+    }
+    private static long atan2OnQuadrant2(long atan, long absX, long absY) {
+        if (absY <= absX) {
+            return (180L << SCALE) - atan;
+        } else {
+            return (90L << SCALE) + atan;
+        }
+    }
+    private static long atan2OnQuadrant3(long atan, long absX, long absY) {
+        if (absY <= absX) {
+            return (180L << SCALE) + atan;
+        } else {
+            return (270L << SCALE) - atan;
+        }
+    }
+    private static long atan2OnQuadrant4(long atan, long absX, long absY) {
+        if (absY <= absX) {
+            return (360L << SCALE) - atan;
+        } else {
+            return (270L << SCALE) + atan;
+        }
     }
 
     public static long dot(long x1, long y1, long x2, long y2) {

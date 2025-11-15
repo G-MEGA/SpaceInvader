@@ -10,6 +10,7 @@ import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.game_object.gui.Button;
 import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
+import org.newdawn.spaceinvaders.network.LoopRUDPPeerListener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -152,95 +153,7 @@ public class LobbyListLoop extends Loop{
 
     @Override
     protected IRUDPPeerListener generateIRUDPPeerListener() {
-        final Loop thisLoop = this;
-        return new  IRUDPPeerListener() {
-            @Override
-            public boolean onConnected(RUDPPeer peer, Connection connection) {
-                return false;
-            }
-
-            @Override
-            public boolean onDisconnected(RUDPPeer peer, Connection connection) {
-                if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
-                    System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
-                    System.exit(0);
-                }
-                return true;
-            }
-
-            @Override
-            public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
-                if(data instanceof PacketDataS2CLobbyList) {
-                    // 로비 목록 갱신
-                    for(Button b : lobbyButtons){
-                        lobbyButtonContainer.removeChild(b);
-                        b.destroy();
-                    }
-                    lobbyButtons.clear();
-
-                    PacketDataS2CLobbyList d = (PacketDataS2CLobbyList) data;
-                    for(int i = 0; i < d.lobbyIDs.size(); i++){
-                        final Integer lobbyID = d.lobbyIDs.get(i);
-                        String lobbyName = d.lobbyNames.get(i);
-                        Integer playersNum = d.playersNum.get(i);
-                        Integer maxPlayer = d.maxPlayers.get(i);
-                        Integer mapID = d.mapIDs.get(i);
-                        Boolean isPlaying = d.isPlaying.get(i);
-
-                        String mapTitle = getGame().getMapList().getList().get(mapID).getTitle();
-
-                        int height = 37;
-                        Button b = new Button(thisLoop, ()->{
-                            if(waitingForServer || creatingLobby){return;}
-
-                            enterLobby(lobbyID);
-                        }, 700, height);
-                        b.addTextRenderer(
-                                "  [로비 ID:" + lobbyID + "] [인원:" + playersNum + "/"+ maxPlayer + "] [맵:" +  mapTitle + "] [게임 중:" + isPlaying + "] " + lobbyName
-                                , (int)(10*(height/25.0)), Color.WHITE, 0);
-                        b.setPos(50L << 16, i*(((long)height) << 16));
-
-                        lobbyButtons.add(b);
-                        lobbyButtonContainer.addChild(b);
-                    }
-
-                    waitingForServer = false;
-                    return true;
-                }
-                else if (data instanceof PacketDataS2CEnterLobbyFaild) {
-                    PacketDataS2CEnterLobbyFaild d = (PacketDataS2CEnterLobbyFaild) data;
-                    //로비 입장 실패 사유 출력
-                    notificationText.setText(d.reason);
-
-                    requestLobbyList();
-
-                    waitingForServer = false;
-                    return true;
-                }
-                else if (data instanceof PacketDataS2CLobbyInfoUpdated) {
-                    PacketDataS2CLobbyInfoUpdated d = (PacketDataS2CLobbyInfoUpdated) data;
-                    if(d.lobbyID == -1){
-                        // d.lobbyID가 -1이면 나감 처리 되었다는 뜻
-                        // 로비 리스트에서는 아무 것도 할 필요 없음
-                    }
-                    else{
-                        //LobbyLoop로 넘겨야함
-                        getGame().changeLoop(new LobbyLoop(getGame()));
-                    }
-                    return false;
-                }
-
-
-
-                else if (data instanceof PacketDataP2PInput) {
-                    // 만약 게임 결과 나온 후 로비로 돌아왔을 때 P2P 패킷이 여태까지 남아있으면 안되니
-                    // 의미없이 소모
-                    return true;
-                }
-
-                return false;
-            }
-        };
+        return new  LobbyListLoopRUDPPeerListener(this);
     }
 
     void requestLobbyList() {
@@ -265,6 +178,99 @@ public class LobbyListLoop extends Loop{
             waitingForServer = true;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private class LobbyListLoopRUDPPeerListener extends LoopRUDPPeerListener{
+        LobbyListLoop loop;
+        LobbyListLoopRUDPPeerListener(LobbyListLoop loop) {
+            this.loop = loop;
+        }
+
+        @Override
+        public boolean onConnected(RUDPPeer peer, Connection connection) {
+            return false;
+        }
+
+        @Override
+        public boolean onDisconnected(RUDPPeer peer, Connection connection) {
+            if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
+                System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
+                System.exit(0);
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
+            if(data instanceof PacketDataS2CLobbyList) {
+                updateLobbyList((PacketDataS2CLobbyList) data);
+
+                waitingForServer = false;
+                return true;
+            }
+            else if (data instanceof PacketDataS2CEnterLobbyFaild) {
+                PacketDataS2CEnterLobbyFaild d = (PacketDataS2CEnterLobbyFaild) data;
+                //로비 입장 실패 사유 출력
+                notificationText.setText(d.reason);
+
+                requestLobbyList();
+
+                waitingForServer = false;
+                return true;
+            }
+            else if (data instanceof PacketDataS2CLobbyInfoUpdated) {
+                PacketDataS2CLobbyInfoUpdated d = (PacketDataS2CLobbyInfoUpdated) data;
+                if(d.lobbyID == -1){
+                    // d.lobbyID가 -1이면 나감 처리 되었다는 뜻
+                    // 로비 리스트에서는 아무 것도 할 필요 없음
+                }
+                else{
+                    //LobbyLoop로 넘겨야함
+                    getGame().changeLoop(new LobbyLoop(getGame()));
+                }
+                return false;
+            }
+            else if (data instanceof PacketDataP2PInput) {
+                // 만약 게임 결과 나온 후 로비로 돌아왔을 때 P2P 패킷이 여태까지 남아있으면 안되니
+                // 의미없이 소모
+                return true;
+            }
+
+            return false;
+        }
+        private void updateLobbyList(PacketDataS2CLobbyList d){
+            // 로비 목록 갱신
+            for(Button b : lobbyButtons){
+                lobbyButtonContainer.removeChild(b);
+                b.destroy();
+            }
+            lobbyButtons.clear();
+
+            for(int i = 0; i < d.lobbyIDs.size(); i++){
+                final Integer lobbyID = d.lobbyIDs.get(i);
+                String lobbyName = d.lobbyNames.get(i);
+                Integer playersNum = d.playersNum.get(i);
+                Integer maxPlayer = d.maxPlayers.get(i);
+                Integer mapID = d.mapIDs.get(i);
+                Boolean isPlaying = d.isPlaying.get(i);
+
+                String mapTitle = getGame().getMapList().getList().get(mapID).getTitle();
+
+                int height = 37;
+                Button b = new Button(loop, ()->{
+                    if(waitingForServer || creatingLobby){return;}
+
+                    enterLobby(lobbyID);
+                }, 700, height);
+                b.addTextRenderer(
+                        "  [로비 ID:" + lobbyID + "] [인원:" + playersNum + "/"+ maxPlayer + "] [맵:" +  mapTitle + "] [게임 중:" + isPlaying + "] " + lobbyName
+                        , (int)(10*(height/25.0)), Color.WHITE, 0);
+                b.setPos(50L << 16, i*(((long)height) << 16));
+
+                lobbyButtons.add(b);
+                lobbyButtonContainer.addChild(b);
+            }
         }
     }
 }

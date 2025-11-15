@@ -138,90 +138,7 @@ public class LobbyLoop extends Loop{
 
     @Override
     protected IRUDPPeerListener generateIRUDPPeerListener() {
-        return new  LoopRUDPPeerListener() {
-            @Override
-            public boolean onConnected(RUDPPeer peer, Connection connection) {
-                return false;
-            }
-
-            @Override
-            public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
-                if (data instanceof PacketDataS2CLobbyInfoUpdated) {
-                    PacketDataS2CLobbyInfoUpdated d = (PacketDataS2CLobbyInfoUpdated) data;
-                    if(d.lobbyID == -1){
-                        // d.lobbyID가 -1이면 나감 처리 되었다는 뜻
-                        getGame().changeLoop(new LobbyListLoop(getGame()));
-                    }
-                    else{
-                        //받은 정보로 UI 업뎃
-                        lobbyInfoText.setText(
-                                "[로비 ID:" + d.lobbyID + "] [최대 인원:" + d.maxPlayers + "] " + d.lobbyName
-                        );
-
-
-                        MapInfo mapInfo = getGame().getMapList().getList().get(d.mapID);
-                        mapInfoTextRenderer.setText(
-                                "<<<" + mapInfo.getTitle() + ">>>\n" + mapInfo.getDescription()
-                        );
-
-                        String playerlistString = "|플레이어 목록|\n\n";
-                        for(int i = 0; i < d.playersUID.size(); i++){
-                            String playerUID = d.playersUID.get(i);
-                            boolean playerReadied = d.playerReadied.get(i);
-                            if(playerReadied){
-                                playerlistString += playerUID + "\n";
-                            }
-                            else {
-                                playerlistString += playerUID + " *NOT READIED*\n";
-                            }
-                        }
-                        playerListText.setText(playerlistString);
-
-                        // 랭킹 정보 가져오기
-                        mapRankingsTextRenderer.setText("");
-                        try {
-
-                            Map<String, Long> myBestRank = getGame().firebaseRankings.getMyBestRank(getGame().authToken, getGame().myUID, d.mapID);
-                            java.util.List<FirebaseRankings.GameResult> top10 = getGame().firebaseRankings.getTop10Rankings(getGame().authToken, d.mapID);
-
-                            String rankString = "";
-                            if(!myBestRank.containsKey("error")){
-                                rankString += "* 나의 랭킹 *\n" +
-                                        myBestRank.get("rank") + "위 "+ myBestRank.get("bestScore") + "점\n\n";
-                            }
-
-                            rankString += "* 리더 보드 *\n";
-                            for(int i = 0; i < top10.size(); i++){
-                                rankString += i + 1 + "위 " + top10.get(i).score + "점 " + top10.get(i).players.toString() + "\n";
-                            }
-
-                            mapRankingsTextRenderer.setText(rankString);
-                        } catch (IOException e) {
-                            throw new RuntimeException("firebase로부터 랭킹 정보 가져오기 실패", e);
-                        }
-
-                        // 락 풀어주기
-                        waitingForServer = false;
-                    }
-                    return true;
-                }
-                else if (data instanceof PacketDataS2CPreprocessForGame) {
-                    // GameLoopPlayerLoop로 넘겨
-                    getGame().changeLoop(new GameLoopPlayerLoop(getGame()));
-                    return false;
-                }
-
-
-
-                else if (data instanceof PacketDataP2PInput) {
-                    // 만약 게임 결과 나온 후 로비로 돌아왔을 때 P2P 패킷이 여태까지 남아있으면 안되니
-                    // 의미없이 소모
-                    return true;
-                }
-
-                return false;
-            }
-        };
+        return new LobbyLoopRUDPPeerListener();
     }
 
     void updateLobbyInfo(int mapID) {
@@ -247,6 +164,96 @@ public class LobbyLoop extends Loop{
             waitingForServer = true;
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+
+
+    private class LobbyLoopRUDPPeerListener extends LoopRUDPPeerListener{
+        @Override
+        public boolean onConnected(RUDPPeer peer, Connection connection) {
+            return false;
+        }
+
+        @Override
+        public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
+            if (data instanceof PacketDataS2CLobbyInfoUpdated) {
+                PacketDataS2CLobbyInfoUpdated d = (PacketDataS2CLobbyInfoUpdated) data;
+                if(d.lobbyID == -1){
+                    // d.lobbyID가 -1이면 나감 처리 되었다는 뜻
+                    getGame().changeLoop(new LobbyListLoop(getGame()));
+                }
+                else{
+                    updateLobbyUI(d);
+                    // 락 풀어주기
+                    waitingForServer = false;
+                }
+                return true;
+            }
+            else if (data instanceof PacketDataS2CPreprocessForGame) {
+                // GameLoopPlayerLoop로 넘겨
+                getGame().changeLoop(new GameLoopPlayerLoop(getGame()));
+                return false;
+            }
+
+
+
+            else if (data instanceof PacketDataP2PInput) {
+                // 만약 게임 결과 나온 후 로비로 돌아왔을 때 P2P 패킷이 여태까지 남아있으면 안되니
+                // 의미없이 소모
+                return true;
+            }
+
+            return false;
+        }
+
+        private void updateLobbyUI(PacketDataS2CLobbyInfoUpdated d) {
+            //받은 정보로 UI 업뎃
+            lobbyInfoText.setText(
+                    "[로비 ID:" + d.lobbyID + "] [최대 인원:" + d.maxPlayers + "] " + d.lobbyName
+            );
+
+
+            MapInfo mapInfo = getGame().getMapList().getList().get(d.mapID);
+            mapInfoTextRenderer.setText(
+                    "<<<" + mapInfo.getTitle() + ">>>\n" + mapInfo.getDescription()
+            );
+
+            String playerlistString = "|플레이어 목록|\n\n";
+            for(int i = 0; i < d.playersUID.size(); i++){
+                String playerUID = d.playersUID.get(i);
+                boolean playerReadied = d.playerReadied.get(i);
+                if(playerReadied){
+                    playerlistString += playerUID + "\n";
+                }
+                else {
+                    playerlistString += playerUID + " *NOT READIED*\n";
+                }
+            }
+            playerListText.setText(playerlistString);
+
+            // 랭킹 정보 가져오기
+            mapRankingsTextRenderer.setText("");
+            try {
+
+                Map<String, Long> myBestRank = getGame().firebaseRankings.getMyBestRank(getGame().authToken, getGame().myUID, d.mapID);
+                java.util.List<FirebaseRankings.GameResult> top10 = getGame().firebaseRankings.getTop10Rankings(getGame().authToken, d.mapID);
+
+                String rankString = "";
+                if(!myBestRank.containsKey("error")){
+                    rankString += "* 나의 랭킹 *\n" +
+                            myBestRank.get("rank") + "위 "+ myBestRank.get("bestScore") + "점\n\n";
+                }
+
+                rankString += "* 리더 보드 *\n";
+                for(int i = 0; i < top10.size(); i++){
+                    rankString += i + 1 + "위 " + top10.get(i).score + "점 " + top10.get(i).players.toString() + "\n";
+                }
+
+                mapRankingsTextRenderer.setText(rankString);
+            } catch (IOException e) {
+                throw new RuntimeException("firebase로부터 랭킹 정보 가져오기 실패", e);
+            }
         }
     }
 }

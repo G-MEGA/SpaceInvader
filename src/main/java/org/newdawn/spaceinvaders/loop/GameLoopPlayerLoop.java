@@ -103,54 +103,10 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
             }
         }
 
-
         // 게임 종료 시
         if(gameLoop.getGameResult() != GameLoopResultType.IN_GAME){
-            if(isKeyInputJustPressed(0, "escape")) {
-                getGame().changeLoop(new LobbyLoop(getGame()));
-            }
-            else if(isKeyInputJustPressed(0, "record")) {
-                String data = gameLoop.getReplayData();
-
-                // JFileChooser 객체 생성
-                JFileChooser chooser = new JFileChooser();
-
-                // 파일 저장 다이얼로그를 현재 프레임(this) 중앙에 띄움
-                int result = chooser.showSaveDialog(getGame());
-
-                // 사용자가 '저장' 버튼을 눌렀는지 확인
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    // 저장할 파일 경로를 File 객체로 받아옴
-                    File fileToSave = chooser.getSelectedFile();
-
-                    String filePath = fileToSave.getAbsolutePath(); // 저장할 파일 경로
-
-                    if (!filePath.endsWith(".txt")) {
-                        fileToSave = new File(fileToSave.getAbsolutePath() + ".txt");
-                        filePath = fileToSave.getAbsolutePath();
-                    }
-
-                    try {
-                        // Path 객체 생성
-                        Path path = Paths.get(filePath);
-
-                        // 파일에 문자열 쓰기 (기본 인코딩은 UTF-8)
-                        Files.writeString(path, data);
-
-                        System.out.println("파일 저장 성공");
-
-                    } catch (IOException e) {
-                        System.err.println("파일 저장 중 오류가 발생");
-                        e.printStackTrace();
-                    }
-                }
-
-                // 리플레이 저장 즉시 메인메뉴로 사출
-                getGame().changeLoop(new LobbyLoop(getGame()));
-            }
+            handleExitGame();
         }
-
-
 
         long currentFrame = gameLoop.currentFrame;
 
@@ -176,6 +132,50 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
 
         // 너무 오래된 스냅샷 청소
         snapshots.keySet().removeIf(frame -> frame < currentFrame - 60L * 10);  // 60 = 1초
+    }
+    private void handleExitGame(){
+        if(isKeyInputJustPressed(0, "escape")) {
+            getGame().changeLoop(new LobbyLoop(getGame()));
+        }
+        else if(isKeyInputJustPressed(0, "record")) {
+            String data = gameLoop.getReplayData();
+
+            // JFileChooser 객체 생성
+            JFileChooser chooser = new JFileChooser();
+
+            // 파일 저장 다이얼로그를 현재 프레임(this) 중앙에 띄움
+            int result = chooser.showSaveDialog(getGame());
+
+            // 사용자가 '저장' 버튼을 눌렀는지 확인
+            if (result == JFileChooser.APPROVE_OPTION) {
+                // 저장할 파일 경로를 File 객체로 받아옴
+                File fileToSave = chooser.getSelectedFile();
+
+                String filePath = fileToSave.getAbsolutePath(); // 저장할 파일 경로
+
+                if (!filePath.endsWith(".txt")) {
+                    fileToSave = new File(fileToSave.getAbsolutePath() + ".txt");
+                    filePath = fileToSave.getAbsolutePath();
+                }
+
+                try {
+                    // Path 객체 생성
+                    Path path = Paths.get(filePath);
+
+                    // 파일에 문자열 쓰기 (기본 인코딩은 UTF-8)
+                    Files.writeString(path, data);
+
+                    System.out.println("파일 저장 성공");
+
+                } catch (IOException e) {
+                    System.err.println("파일 저장 중 오류가 발생");
+                    e.printStackTrace();
+                }
+            }
+
+            // 리플레이 저장 즉시 메인메뉴로 사출
+            getGame().changeLoop(new LobbyLoop(getGame()));
+        }
     }
 
 

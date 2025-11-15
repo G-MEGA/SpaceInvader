@@ -173,7 +173,7 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener, 
     @Override
     public void notify(Object event){
         if (event instanceof EventBombUsed){
-            decreaseHealth((GameLoop.BOMB_DAMAGE));
+            decreaseHealth((EventBombUsed.BOMB_DAMAGE));
         }
     }
 

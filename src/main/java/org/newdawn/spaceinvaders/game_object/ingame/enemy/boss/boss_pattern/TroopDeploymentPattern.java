@@ -22,9 +22,10 @@ public class TroopDeploymentPattern extends BossPattern {
     public void executePattern() {
         System.out.println("TroopDeploymentPattern executed");
         GameLoop gameLoop = (GameLoop)getLoop();
-
-        EnemyFactory enemyFactory = gameLoop.getEnemyFactory();
-        HiveMind enemyHiveMind = gameLoop.getEnemyHiveMind();
+        
+        //TODO FUCK
+        EnemyFactory enemyFactory = gameLoop.mapLoader.getEnemyFactory();
+        HiveMind enemyHiveMind = gameLoop.mapLoader.getEnemyHiveMind();
 
         int spawnCount = 7; //* 갯수가 홀수임을 가정함
         long spawnPosXInterval = 100l << 16;

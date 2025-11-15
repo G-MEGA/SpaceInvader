@@ -48,7 +48,7 @@ public class SideBulletStreamPattern extends BossPattern {
     }
 
     private void shootBullet() {
-        PlayerShip target = ((GameLoop)getLoop()).getRandomAlivePlayerShip();
+        PlayerShip target = ((GameLoop)getLoop()).playerShipSystem.getRandomAlivePlayerShip();
 
         if(target == null) return;
 

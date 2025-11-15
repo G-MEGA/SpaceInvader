@@ -57,7 +57,7 @@ public class EnemyFactory extends GameObject{
                 return null;
         }
 
-        gameLoop.notifyEnemyInstantiated();
+        gameLoop.enemySystem.notifyEnemyInstantiated();
 
         hiveMind.addListener(enemy);
         
@@ -69,7 +69,7 @@ public class EnemyFactory extends GameObject{
         }
         
         enemy.setPosRotation(positionAngleSet.positionX, positionAngleSet.positionY, positionAngleSet.angle);
-        gameLoop.addEnemy(enemy);
+        gameLoop.enemySystem.addEnemy(enemy);
         return enemy;
     }
 }

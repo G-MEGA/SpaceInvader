@@ -91,7 +91,7 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
         if(inputs != null){
             for (LoopInput loopInput : inputs) {
                 // 이번 프레임에 들어온 입력의 playerID 수정
-                loopInput.playerID = gameLoop.myPlayerID;
+                loopInput.playerID = gameLoop.playerShipSystem.getMyPlayerID();
             }
 
             // 이번 프레임에 들어온 입력을 모든 피어에게 브로드캐스트
@@ -244,7 +244,7 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
                     // 연결할 주소들 리스트 업
                     ArrayList<InetSocketAddress> peerAddresses = new ArrayList<>();
                     for(int i = 0; preprocessInfo.playersUID.size() > i; i++){
-                        if(i == gameLoop.getMyPlayerID())continue;
+                        if(i == gameLoop.playerShipSystem.getMyPlayerID())continue;
 
                         InetSocketAddress address = new InetSocketAddress(preprocessInfo.addresses.get(i), preprocessInfo.ports.get(i));
                         peerAddresses.add(address);
@@ -340,20 +340,20 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
         // 서버에 게임 종료 알림
         try {
             getGame().getRudpPeer().broadcastAboutTag("server", new PacketDataC2SGameResult(
-                    gameLoop.getScore(), gameLoop.getGameResult() ==  GameLoopResultType.WIN
+                    gameLoop.scoreSystem.getScore(), gameLoop.getGameResult() ==  GameLoopResultType.WIN
             ));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
         // 게임 클리어 시 파이어베이스에 저장
-        if(gameLoop.getMyPlayerID() == 0 && gameLoop.getGameResult() ==  GameLoopResultType.WIN){
+        if(gameLoop.playerShipSystem.getMyPlayerID() == 0 && gameLoop.getGameResult() ==  GameLoopResultType.WIN){
             try {
                 getGame().firebaseRankings.saveGameResult(
                         getGame().authToken,
                         preprocessInfo.gameSessionID,
                         preprocessInfo.mapID,
-                        gameLoop.getScore(),
+                        gameLoop.scoreSystem.getScore(),
                         preprocessInfo.playersUID
                         );
             } catch (IOException e) {

@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Random;
 
 public class Main {
-    final String ID_TOKEN = "idToken";
+    static final String ID_TOKEN = "idToken";
 
     RUDPPeer rudpPeer;
 
@@ -74,7 +74,7 @@ public class Main {
     public Main() throws Exception {
         GameLoopSerializer.getInstance();// GameLoopSerializer 초기화
 
-        rudpPeer = new RUDPPeer(Network.PEER_UDP_PORT + new Random(System.currentTimeMillis()).nextInt(1000));
+        rudpPeer = new RUDPPeer(Network.PEER_UDP_PORT + (int)(System.currentTimeMillis() % 1000));
 
         rudpPeer.addListener(rudpPeerListener);
 
@@ -116,9 +116,6 @@ public class Main {
         authContainer.add(registerContainer);
 
 
-        Dimension loginInfoLabelPrefferedSize = new Dimension(70, 30);
-        Dimension registerInfoLabelPrefferedSize = new Dimension(70, 30);
-        Dimension textFieldPrefferedSize = new Dimension(200, 30);
         //로그인 GUI 구성
         Panel loginEmailPanel = new Panel();
         loginEmailPanel.setLayout(new BoxLayout(loginEmailPanel, BoxLayout.X_AXIS));

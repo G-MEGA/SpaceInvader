@@ -8,6 +8,7 @@ import networking.rudp.RUDPPeer;
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.loop_input.LoopInputLog;
+import org.newdawn.spaceinvaders.network.LoopRUDPPeerListener;
 import serializer.GameLoopSerializer;
 
 import java.awt.*;
@@ -121,19 +122,10 @@ public class ReplayerLoop extends Loop{
 
     @Override
     protected IRUDPPeerListener generateIRUDPPeerListener() {
-        return new  IRUDPPeerListener() {
+        return new  LoopRUDPPeerListener() {
             @Override
             public boolean onConnected(RUDPPeer peer, Connection connection) {
                 return false;
-            }
-
-            @Override
-            public boolean onDisconnected(RUDPPeer peer, Connection connection) {
-                if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
-                    System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
-                    System.exit(0);
-                }
-                return true;
             }
 
             @Override

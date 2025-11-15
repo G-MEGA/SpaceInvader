@@ -12,6 +12,7 @@ import org.newdawn.spaceinvaders.game_object.gui.Button;
 import org.newdawn.spaceinvaders.game_object.gui.IButtonListener;
 import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
+import org.newdawn.spaceinvaders.network.LoopRUDPPeerListener;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -133,19 +134,10 @@ public class MainMenuLoop extends Loop {
 
     @Override
     protected IRUDPPeerListener generateIRUDPPeerListener() {
-        return new  IRUDPPeerListener() {
+        return new  LoopRUDPPeerListener() {
             @Override
             public boolean onConnected(RUDPPeer peer, Connection connection) {
                 return false;
-            }
-
-            @Override
-            public boolean onDisconnected(RUDPPeer peer, Connection connection) {
-                if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
-                    System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
-                    System.exit(0);
-                }
-                return true;
             }
 
             @Override

@@ -12,6 +12,7 @@ import networking.rudp.PacketData.PacketData;
 import networking.rudp.PacketData.PacketDataC2SAuth;
 import networking.rudp.PacketData.PacketDataS2CAuthOK;
 import networking.rudp.RUDPPeer;
+import org.newdawn.spaceinvaders.network.LoopRUDPPeerListener;
 import serializer.GameLoopSerializer;
 
 import javax.swing.*;
@@ -37,21 +38,12 @@ public class Main {
     Map<String, Object> authInfo;
     boolean authenticated = false;
 
-    IRUDPPeerListener rudpPeerListener = new IRUDPPeerListener() {
+    IRUDPPeerListener rudpPeerListener = new LoopRUDPPeerListener() {
         @Override
         public boolean onConnected(RUDPPeer peer, networking.rudp.Connection connection) {
             System.out.println(connection.getAddress().getAddress().getHostAddress() + " connected");
             if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
                 connection.tag = "server";
-            }
-            return true;
-        }
-
-        @Override
-        public boolean onDisconnected(RUDPPeer peer, networking.rudp.Connection connection) {
-            if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
-                System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
-                System.exit(0);
             }
             return true;
         }

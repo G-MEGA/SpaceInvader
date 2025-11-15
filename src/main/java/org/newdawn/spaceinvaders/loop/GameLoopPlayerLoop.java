@@ -64,12 +64,10 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
 
         //루프 나갈 때 서버 제외 모든 피어와 연결 끊기
         try {
-            getGame().getRudpPeer().disconnectAll("server");
+            getGame().getRudpPeer().disconnectAll(Network.SERVER_TAG);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        System.gc();
     }
 
     @Override
@@ -217,7 +215,7 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
 
     void preprocessOK(){
         try {
-            getGame().getRudpPeer().broadcastAboutTag("server", new PacketDataC2SPreprocessOK());
+            getGame().getRudpPeer().broadcastAboutTag(Network.SERVER_TAG, new PacketDataC2SPreprocessOK());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -228,7 +226,7 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
 
             packetData.inputLog = inputLogString;
 
-            getGame().getRudpPeer().broadcast(packetData, "server");
+            getGame().getRudpPeer().broadcast(packetData, Network.SERVER_TAG);
         } catch (Exception e) {
             throw new RuntimeException(inputLogString, e);
         }
@@ -241,7 +239,7 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
 
         // 서버에 게임 종료 알림
         try {
-            getGame().getRudpPeer().broadcastAboutTag("server", new PacketDataC2SGameResult(
+            getGame().getRudpPeer().broadcastAboutTag(Network.SERVER_TAG, new PacketDataC2SGameResult(
                     gameLoop.scoreSystem.getScore(), gameLoop.getGameResult() ==  GameLoopResultType.WIN
             ));
         } catch (Exception e) {

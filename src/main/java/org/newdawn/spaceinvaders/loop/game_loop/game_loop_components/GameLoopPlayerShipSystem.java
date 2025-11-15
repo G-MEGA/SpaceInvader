@@ -63,8 +63,6 @@ public class GameLoopPlayerShipSystem {
             ship.setPos(shipSpawnAreaPosX + shipSpawnDistance * playerID, 550 << 16);
         }
         //endregion
-
-        System.gc();
     }
 
     public void notifyPlayerShipDeath(){

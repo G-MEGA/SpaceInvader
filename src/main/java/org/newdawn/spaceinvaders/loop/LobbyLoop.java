@@ -145,14 +145,14 @@ public class LobbyLoop extends Loop{
         try {
             PacketDataC2SUpdateLobbyInfo d = new PacketDataC2SUpdateLobbyInfo();
             d.mapID = mapID;
-            getGame().getRudpPeer().broadcastAboutTag("server", d);
+            getGame().getRudpPeer().broadcastAboutTag(Network.SERVER_TAG, d);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
     void exitLobby(){
         try {
-            getGame().getRudpPeer().broadcastAboutTag("server", new PacketDataC2SExitLobby());
+            getGame().getRudpPeer().broadcastAboutTag(Network.SERVER_TAG, new PacketDataC2SExitLobby());
             waitingForServer = true;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -160,7 +160,7 @@ public class LobbyLoop extends Loop{
     }
     void ready(){
         try {
-            getGame().getRudpPeer().broadcastAboutTag("server", new PacketDataC2SReady());
+            getGame().getRudpPeer().broadcastAboutTag(Network.SERVER_TAG, new PacketDataC2SReady());
             waitingForServer = true;
         } catch (Exception e) {
             throw new RuntimeException(e);

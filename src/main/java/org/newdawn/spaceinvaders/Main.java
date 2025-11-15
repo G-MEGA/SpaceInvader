@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Random;
 
 public class Main {
+    final String ID_TOKEN = "idToken";
+
     RUDPPeer rudpPeer;
 
     JFrame authFrame;
@@ -51,9 +53,9 @@ public class Main {
         @Override
         public boolean onReceived(RUDPPeer peer, networking.rudp.Connection connection, PacketData data) {
             if(data instanceof PacketDataS2CAuthOK) {
-                if(authenticated) {
-                    return true;
-                }
+//                if(authenticated) {
+//                    return true;
+//                }
 
                 System.out.println("서버 측 인증 결과 " + ((PacketDataS2CAuthOK)data).ok);
                 if (((PacketDataS2CAuthOK)data).ok) {
@@ -95,7 +97,7 @@ public class Main {
         }
 
         authFrame = new JFrame("로그인/회원가입");
-        authFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        authFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         authContainer = authFrame.getContentPane();
         authContainer.setLayout(new BoxLayout(authContainer, BoxLayout.X_AXIS));
@@ -202,10 +204,10 @@ public class Main {
 
             try {
                 authInfo = auth.signIn(email, password);
-                System.out.println("Firebase 로그인 완료 " + authInfo.get("idToken"));
+                System.out.println("Firebase 로그인 완료 " + authInfo.get(ID_TOKEN));
                 authFrame.setVisible(false);
 
-                tryAuth((String) authInfo.get("idToken"));
+                tryAuth((String) authInfo.get(ID_TOKEN));
             } catch (Exception ex) {
                 //인증 실패시 실패사유 출력
                 JsonObject json = JsonParser.parseString(ex.getMessage()).getAsJsonObject();
@@ -244,10 +246,10 @@ public class Main {
 
             try {
                 authInfo = auth.signUp(email, password);
-                System.out.println("Firebase 회원가입 완료 " + authInfo.get("idToken"));
+                System.out.println("Firebase 회원가입 완료 " + authInfo.get(ID_TOKEN));
                 authFrame.setVisible(false);
 
-                tryAuth((String) authInfo.get("idToken"));
+                tryAuth((String) authInfo.get(ID_TOKEN));
             } catch (Exception ex) {
                 //인증 실패시 실패사유 출력
                 JsonObject json = JsonParser.parseString(ex.getMessage()).getAsJsonObject();
@@ -276,7 +278,7 @@ public class Main {
     }
     public void startGame(){
         rudpPeer.removeListener(rudpPeerListener);
-        Game g = new Game(60L << 16, rudpPeer, (String) authInfo.get("localId"), (String) authInfo.get("idToken"));
+        Game g = new Game(60L << 16, rudpPeer, (String) authInfo.get("localId"), (String) authInfo.get(ID_TOKEN));
         g.loop();
     }
     public void tryAuth(String authToken) throws Exception {

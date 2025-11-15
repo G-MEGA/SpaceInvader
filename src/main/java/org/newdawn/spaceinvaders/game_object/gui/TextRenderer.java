@@ -22,7 +22,7 @@ public class TextRenderer extends GameObject2D {
     }
     int fontSize;
     public void setFontSize(int size) {
-
+        fontSize = size;
     }
     Color color;
     public void setColor(Color color) {

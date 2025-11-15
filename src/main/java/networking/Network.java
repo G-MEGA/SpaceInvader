@@ -6,6 +6,8 @@ import com.esotericsoftware.kryonet.EndPoint;
 import java.util.ArrayList;
 
 public class Network {
+    public static final String SERVER_TAG = "server";
+
     static public final String SERVER_IP = "34.67.77.26";
 //    static public final String SERVER_IP = "127.0.0.1";
     // 포트 번호

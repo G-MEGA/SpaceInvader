@@ -11,7 +11,7 @@ public class PacketDataS2CPreprocessForGame extends PacketData{
     public ArrayList<String> addresses = new ArrayList<>();
     public ArrayList<Integer> ports = new ArrayList<>();
 
-    // Kryo 역직렬화를 위한 기본 생성자
     public PacketDataS2CPreprocessForGame(){
+        // Kryo 역직렬화를 위한 기본 생성자
     }
 }

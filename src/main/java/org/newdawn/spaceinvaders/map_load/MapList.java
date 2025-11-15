@@ -64,6 +64,7 @@ public class MapList {
             FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap());
             // JAR 파일 내의 경로를 가져옵니다.
             myPath = fileSystem.getPath(path);
+            fileSystem.close();
         } else {
             // IDE 등 일반 파일 시스템 환경일 경우
             myPath = Paths.get(uri);

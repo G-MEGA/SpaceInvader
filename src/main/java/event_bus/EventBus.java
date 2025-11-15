@@ -9,8 +9,9 @@ public class EventBus {
     Map<Class, LinkedHashSet<IEventBusSubscriber>> forRegister = new HashMap<>();
     Map<Class, LinkedHashSet<IEventBusSubscriber>> forUnregister = new HashMap<>();
 
-    //Kryo 직렬화를 위한 매개변수 없는 생성자
-    public EventBus() {}
+    public EventBus() {
+        //Kryo 직렬화를 위한 매개변수 없는 생성자
+    }
 
     public void register(Class eventClass, IEventBusSubscriber subscriber){
         if(!forRegister.containsKey(eventClass)) forRegister.put(eventClass, new LinkedHashSet<>());

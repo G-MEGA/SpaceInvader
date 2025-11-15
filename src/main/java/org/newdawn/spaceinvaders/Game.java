@@ -41,20 +41,20 @@ public class Game extends Canvas
     public final long fixedFPS;
     public final long fixedDeltaTime;
 
-    private Loop loop;
-    private RUDPPeer rudpPeer;
+    private transient Loop loop;
+    private transient RUDPPeer rudpPeer;
     public RUDPPeer getRudpPeer()
     {
         return rudpPeer;
     }
     public final String myUID;
     public final String authToken;
-    public final FirebaseRankings firebaseRankings = new FirebaseRankings();
+    public final transient FirebaseRankings firebaseRankings = new FirebaseRankings();
 
-    private MapList mapList;
+    private transient MapList mapList;
 
 	/** The stragey that allows us to use accelerate page flipping */
-	private BufferStrategy strategy;
+	private transient BufferStrategy strategy;
     /** True if the game is currently "running", i.e. the game loop is looping */
     private boolean gameRunning = true;
 
@@ -72,7 +72,7 @@ public class Game extends Canvas
         return container;
     }
 
-    private ArrayList<LoopInput> queuedInputs = new ArrayList<>();
+    private transient ArrayList<LoopInput> queuedInputs = new ArrayList<>();
 
 	/**
 	 * Construct our game and set it running.
@@ -304,15 +304,6 @@ public class Game extends Canvas
             if(inputName == null) return;
 
             queuedInputs.add(new LoopInputKey(0, inputName, false));
-		}
-
-		/**
-		 * Notification from AWT that a key has been typed. Note that
-		 * typing a key means to both press and then release it.
-		 *
-		 * @param e The details of the key that was typed. 
-		 */
-		public void keyTyped(KeyEvent e) {
 		}
 	}
 

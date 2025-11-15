@@ -27,6 +27,7 @@ public class GameObject  {
         onInLoopUpdated(this.inLoop);
     }
     protected void onInLoopUpdated(boolean value) {
+        //abstract로 하지 않은 이유는 필수적으로 구현을 요구하지는 않아서
     }
     boolean destroyed = false;
 
@@ -62,9 +63,15 @@ public class GameObject  {
     }
 
     //region 상속해서 구현할 것들
-    protected void process(long deltaTime){}
-    protected void postProcess(long deltaTime){}
-    protected void draw(Graphics2D g){}
+    protected void process(long deltaTime){
+        //abstract로 하지 않은 이유는 필수적으로 구현을 요구하지는 않아서
+    }
+    protected void postProcess(long deltaTime){
+        //abstract로 하지 않은 이유는 필수적으로 구현을 요구하지는 않아서
+    }
+    protected void draw(Graphics2D g){
+        //abstract로 하지 않은 이유는 필수적으로 구현을 요구하지는 않아서
+    }
     //endregion
 
     public final void destroy(){
@@ -123,7 +130,9 @@ public class GameObject  {
         child.setInLoop(inLoop);
         child.onAddedToParent();
     }
-    protected void onAddedToParent(){}
+    protected void onAddedToParent(){
+        //abstract로 하지 않은 이유는 필수적으로 구현을 요구하지는 않아서
+    }
     public final void removeChild(GameObject child){
         if(!children.contains(child) || child.parent != this) return;
         child.parent = null;
@@ -132,7 +141,9 @@ public class GameObject  {
         child.setInLoop(false);
         child.onRemovedFromParent();
     }
-    protected void onRemovedFromParent(){}
+    protected void onRemovedFromParent(){
+        //abstract로 하지 않은 이유는 필수적으로 구현을 요구하지는 않아서
+    }
     public final ArrayList<GameObject> getChildren(){
         return children;
     }

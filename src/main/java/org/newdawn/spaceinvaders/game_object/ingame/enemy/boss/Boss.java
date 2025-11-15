@@ -71,7 +71,9 @@ public class Boss extends Enemy{
     }
 
     @Override
-    public void onBroadcast() {}
+    public void onBroadcast() {
+        // 딱히 받을 내용 없음
+    }
     
     @Override
     protected void draw(Graphics2D g){

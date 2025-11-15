@@ -52,7 +52,7 @@ public class LobbyListLoop extends Loop{
         lobbyCreationDialog = new JDialog(getGame().getContainer(),"로비 생성");
         lobbyCreationDialog.setLocationRelativeTo(getGame().getContainer());
         lobbyCreationDialog.setResizable(false);
-        lobbyCreationDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        lobbyCreationDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         lobbyCreationDialog.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 lobbyCreationDialog.setVisible(false);
@@ -158,7 +158,7 @@ public class LobbyListLoop extends Loop{
 
     void requestLobbyList() {
         try {
-            getGame().getRudpPeer().broadcastAboutTag("server", new PacketDataC2SRequestLobbyList());
+            getGame().getRudpPeer().broadcastAboutTag(Network.SERVER_TAG, new PacketDataC2SRequestLobbyList());
             waitingForServer = true;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -166,7 +166,7 @@ public class LobbyListLoop extends Loop{
     }
     void createLobby(String lobbyName, int maxPlayers){
         try {
-            getGame().getRudpPeer().broadcastAboutTag("server", new PacketDataC2SCreateLobby(lobbyName,  maxPlayers));
+            getGame().getRudpPeer().broadcastAboutTag(Network.SERVER_TAG, new PacketDataC2SCreateLobby(lobbyName,  maxPlayers));
             waitingForServer = true;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -174,7 +174,7 @@ public class LobbyListLoop extends Loop{
     }
     void enterLobby(int lobbyID){
         try {
-            getGame().getRudpPeer().broadcastAboutTag("server", new PacketDataC2SEnterLobby(lobbyID));
+            getGame().getRudpPeer().broadcastAboutTag(Network.SERVER_TAG, new PacketDataC2SEnterLobby(lobbyID));
             waitingForServer = true;
         } catch (Exception e) {
             throw new RuntimeException(e);

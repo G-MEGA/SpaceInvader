@@ -295,13 +295,18 @@ public class PlayerShip extends GameCharacter{
     }
     private void applyBoundary(){
         // 화면 밖으로 나가지 못하게 제약
+        applyBoundaryX();
+        applyBoundaryY();
+    }
+    private void applyBoundaryX(){
         if ((velocityX <= 0L) && (getPosX() < (16 << 16) + FixedPointUtil.ZERO_5)) {
             setPosX((16 << 16) + FixedPointUtil.ZERO_5);
         }
         if ((velocityX >= 0L) && (getPosX() > ((800L << 16)) - (16 << 16) + FixedPointUtil.ZERO_5)) {
             setPosX(((800L << 16)) - (16 << 16) + FixedPointUtil.ZERO_5);
         }
-
+    }
+    private void applyBoundaryY(){
         if ((velocityY <= 0L) && (getPosY() < (16 << 16) + FixedPointUtil.ZERO_5)) {
             setPosY((16 << 16) + FixedPointUtil.ZERO_5);
         }

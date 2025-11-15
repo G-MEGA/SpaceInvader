@@ -23,6 +23,7 @@ import org.newdawn.spaceinvaders.map_load.SectionData;
 import org.newdawn.spaceinvaders.map_load.map_load_commands.InstantiateCommand;
 import org.newdawn.spaceinvaders.map_load.map_load_commands.MapLoadCommand;
 import org.newdawn.spaceinvaders.map_load.map_load_commands.SectionCommand;
+import org.newdawn.spaceinvaders.network.LoopRUDPPeerListener;
 import org.newdawn.spaceinvaders.singleton.MapDataParser;
 
 import com.esotericsoftware.minlog.Log;
@@ -569,19 +570,10 @@ public class GameLoop extends Loop {
 
     @Override
     protected IRUDPPeerListener generateIRUDPPeerListener() {
-        return new  IRUDPPeerListener() {
+        return new LoopRUDPPeerListener() {
             @Override
             public boolean onConnected(RUDPPeer peer, Connection connection) {
                 return false;
-            }
-
-            @Override
-            public boolean onDisconnected(RUDPPeer peer, Connection connection) {
-                if (connection.getAddress().getAddress().getHostAddress().equals(Network.SERVER_IP)) {
-                    System.out.println(connection.getAddress().getAddress().getHostAddress() + " disconnected");
-                    System.exit(0);
-                }
-                return true;
             }
 
             @Override

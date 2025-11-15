@@ -218,9 +218,15 @@ public class PlayerShip extends GameCharacter{
     protected void process(long deltaTime) {
         super.process(deltaTime);
 
+        applyInputForMovement(deltaTime);
+        applyInputByPointer(deltaTime);
+        applyBoundary();
+        checkActiveSkillCooldown(deltaTime);
+        checkReflexion(deltaTime);
+    }
+    private void applyInputForMovement(long deltaTime){
         GameLoop gameLoop = (GameLoop)getLoop();
 
-        //region 이동
         velocityX = 0;
         if ((gameLoop.isKeyInputPressed(playerID, "left")) && (!gameLoop.isKeyInputPressed(playerID, "right"))) {
             velocityX = -moveSpeed;
@@ -235,6 +241,10 @@ public class PlayerShip extends GameCharacter{
             velocityY = moveSpeed;
         }
 
+        applySpeedUp(deltaTime);
+        applySlowDown(deltaTime);
+    }
+    private void applySpeedUp(long deltaTime){
         //* 만약 SpeedUp된 상태면 PlayerShip의 이동 속도를 증가 시킴
         if (isSpeedUp){
             if (speedUpElapsed >= speedUpTime){
@@ -247,7 +257,8 @@ public class PlayerShip extends GameCharacter{
                 velocityY = FixedPointUtil.mul(velocityY, speedUpRatio);
             }
         }
-
+    }
+    private void applySlowDown(long deltaTime){
         //* 만약 SlowUp된 상태면 PlayerShip의 이동 속도를 감소 시킴
         if (isSlowDown){
             if (slowDownElapsed >= slowDownTime){
@@ -260,8 +271,9 @@ public class PlayerShip extends GameCharacter{
                 velocityY = FixedPointUtil.mul(velocityY, slowDownRatio);
             }
         }
-
-        //endregion
+    }
+    private void applyInputByPointer(long deltaTime){
+        GameLoop gameLoop = (GameLoop)getLoop();
 
         //region 마우스를 향해 회전
         long mousePosX = FixedPointUtil.fromLong(gameLoop.getMousePosX(playerID));
@@ -280,8 +292,9 @@ public class PlayerShip extends GameCharacter{
         if (gameLoop.isKeyInputJustPressed(playerID,"mouse_button_right")) {
             tryToDoActiveSkill(deltaTime);
         }
-
-        //region 화면 밖으로 나가지 못하게 제약
+    }
+    private void applyBoundary(){
+        // 화면 밖으로 나가지 못하게 제약
         if ((velocityX <= 0L) && (getPosX() < (16 << 16) + FixedPointUtil.ZERO_5)) {
             setPosX((16 << 16) + FixedPointUtil.ZERO_5);
         }
@@ -295,8 +308,8 @@ public class PlayerShip extends GameCharacter{
         if ((velocityY >= 0L) && (getPosY() > ((600L << 16)) - (16 << 16) + FixedPointUtil.ZERO_5)) {
             setPosY(((600L << 16)) - (16 << 16) + FixedPointUtil.ZERO_5);
         }
-        //endregion
-
+    }
+    private void checkActiveSkillCooldown(long deltaTime){
         if (!isActiveSkillActable){
             if (activeSkillActivateElapsed >= activeSkill.getCoolTime()){
                 isActiveSkillActable = true;
@@ -306,8 +319,8 @@ public class PlayerShip extends GameCharacter{
                 activeSkillActivateElapsed += deltaTime;
             }
         }
-
-        if (isReflexible){
+    }
+    private void checkReflexion(long deltaTime){if (isReflexible){
             if (reflexibleElapsed >= reflexibleTime){
                 isReflexible = false;
                 reflexibleElapsed = 0;
@@ -317,6 +330,7 @@ public class PlayerShip extends GameCharacter{
             }
         }
     }
+
 
     private void tryToDoActiveSkill(long deltaTime) {
         if (activeSkill != null){

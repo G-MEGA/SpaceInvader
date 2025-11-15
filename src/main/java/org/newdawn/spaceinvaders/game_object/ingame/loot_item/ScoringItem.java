@@ -19,7 +19,7 @@ public class ScoringItem extends LootItem {
     protected void onCollideWithPlayerShip(PlayerShip ship) {
         if (getLoop() instanceof GameLoop){
             GameLoop gameLoop = (GameLoop)getLoop();
-            gameLoop.increaseScore(SCORING_SCORE);
+            gameLoop.scoreSystem.increaseScore(SCORING_SCORE);
         }
     }
 }

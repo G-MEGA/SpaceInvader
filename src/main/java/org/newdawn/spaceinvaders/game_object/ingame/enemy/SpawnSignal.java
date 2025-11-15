@@ -1,7 +1,6 @@
 package org.newdawn.spaceinvaders.game_object.ingame.enemy;
 
 import org.newdawn.spaceinvaders.PositionAngleSet;
-import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.game_object.ingame.store.StoreSlot;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
@@ -75,7 +74,7 @@ public class SpawnSignal extends GameObject2D{
         if (warnElapsed >= warningTime){
             if (gameLoop != null && spawnGameObject != null){
                 if (spawnSignalType == ENEMY_SIGNAL){
-                    gameLoop.addEnemy((Enemy)spawnGameObject);
+                    gameLoop.enemySystem.addEnemy((Enemy)spawnGameObject);
                 }
                 else if (spawnSignalType == STORE_ITEM_SIGNAL){
                     gameLoop.addGameObject((StoreSlot)spawnGameObject);

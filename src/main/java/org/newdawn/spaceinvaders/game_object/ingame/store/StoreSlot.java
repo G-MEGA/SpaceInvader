@@ -5,18 +5,14 @@ import java.awt.Graphics2D;
 
 import event_bus.IEventBusSubscriber;
 import org.newdawn.spaceinvaders.enums.IndicatorTextType;
-import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
-import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 import org.newdawn.spaceinvaders.game_object.gui.TextRenderer;
 import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
-import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
-import org.newdawn.spaceinvaders.loop.Loop;
 import org.newdawn.spaceinvaders.loop.game_loop.EventStoreSectionEnded;
 
 public class StoreSlot extends GameObject2D implements ICollider2DOwner, IEventBusSubscriber {
@@ -75,7 +71,7 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner, IEventB
 
     @Override
     protected void draw(Graphics2D g) {
-        priceText.setText(getItem().getPriceString(gameLoop.getMyPlayerShip()));
+        priceText.setText(getItem().getPriceString(gameLoop.playerShipSystem.getMyPlayerShip()));
         super.draw(g);
     }
 
@@ -84,16 +80,16 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner, IEventB
         if (collider instanceof PlayerShip){
             PlayerShip playerShip = (PlayerShip) collider;
 
-            if(gameLoop.decreaseCoin(getItem().getPrice(playerShip))){
+            if(gameLoop.coinSystem.decreaseCoin(getItem().getPrice(playerShip))){
                 if(item.onAcquire(gameLoop, playerShip)){
                     destroy();
                 }
                 else{
-                    gameLoop.increaseCoin(getItem().getPrice(playerShip)); //* IStoreItem의 내부 구매 조건이 충족 되지 않았다면, 환불해줌.
+                    gameLoop.coinSystem.increaseCoin(getItem().getPrice(playerShip)); //* IStoreItem의 내부 구매 조건이 충족 되지 않았다면, 환불해줌.
                 }
             }
             else{
-                gameLoop.showIndicatorText("코인 갯수가 부족 합니다!", IndicatorTextType.WARNING);
+                gameLoop.textSystem.showIndicatorText("코인 갯수가 부족 합니다!", IndicatorTextType.WARNING);
             }
         }
     }

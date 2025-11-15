@@ -37,8 +37,8 @@ public class Raider extends SweeperEnemy{
         super.process(deltaTime);
 
         if(!_hasCharged){
-            for (int aliveShipIndex=0; aliveShipIndex < ((GameLoop)getLoop()).getAliveShipCount(); aliveShipIndex++) {
-                PlayerShip playerShip = ((GameLoop)getLoop()).getAliveShip(aliveShipIndex);
+            for (int aliveShipIndex=0; aliveShipIndex < ((GameLoop)getLoop()).playerShipSystem.getAliveShipCount(); aliveShipIndex++) {
+                PlayerShip playerShip = ((GameLoop)getLoop()).playerShipSystem.getAliveShip(aliveShipIndex);
                 if (Math.abs(playerShip.getPosX() - getPosX()) < 29 << 16){
                     _hasCharged = true;
                     velocityX = 0;

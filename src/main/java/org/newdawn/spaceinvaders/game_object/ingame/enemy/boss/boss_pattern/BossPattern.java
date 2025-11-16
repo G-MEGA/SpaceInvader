@@ -1,10 +1,8 @@
-
 package org.newdawn.spaceinvaders.game_object.ingame.enemy.boss.boss_pattern;
 
 import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.boss.Boss;
 import org.newdawn.spaceinvaders.loop.Loop;
-
 
 public abstract class BossPattern extends GameObject {
     protected Boss boss;

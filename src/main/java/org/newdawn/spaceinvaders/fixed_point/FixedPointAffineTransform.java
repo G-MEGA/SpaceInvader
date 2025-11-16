@@ -2,7 +2,6 @@ package org.newdawn.spaceinvaders.fixed_point;
 
 import java.awt.geom.AffineTransform;
 
-
 public class FixedPointAffineTransform {
     long posX = 0;
     long posY = 0;

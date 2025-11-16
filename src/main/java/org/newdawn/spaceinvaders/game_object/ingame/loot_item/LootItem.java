@@ -1,14 +1,11 @@
 package org.newdawn.spaceinvaders.game_object.ingame.loot_item;
 
-import org.newdawn.spaceinvaders.game_object.GameObject;
 import org.newdawn.spaceinvaders.game_object.Mover2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
-import org.newdawn.spaceinvaders.loop.GameLoop;
 import org.newdawn.spaceinvaders.loop.Loop;
-import org.newdawn.spaceinvaders.sprite.SpriteStore;
 
 public abstract class LootItem extends Mover2D implements ICollider2DOwner {
     private Long moveSpeed = 100L << 16;

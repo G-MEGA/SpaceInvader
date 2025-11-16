@@ -1,14 +1,10 @@
 package org.newdawn.spaceinvaders.map_load;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Collectors;

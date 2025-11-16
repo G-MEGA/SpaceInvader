@@ -25,7 +25,7 @@ public class MapLoader {
     public StoreSlotFactory getStoreSlotFactory() { return storeSlotFactory; }
 
     private Queue<SectionData> sections;
-    private boolean hasSectionEnd = true;
+    private boolean hasCurrentSectionEnd = true;
     private SectionData currentSection;
     public SectionData getCurrentSection() { return currentSection; }
     private long sectionElapsed = 0;
@@ -53,51 +53,55 @@ public class MapLoader {
     public void parseMapData(String rawMapData){ sections = MapDataParser.getInstance().parseMapData(rawMapData); }
     
     public void executeMapCommand() {
-        if (currentSection == null || !currentSection.hasMoreInstantiateCommands()){
-            if (hasSectionEnd){
-                currentSection = sections.poll();
-                hasSectionEnd = false;
-
-                //* 다음 section이 존재하지 않는다면 stage 클리어로 처리
-                if (currentSection == null) {
-                    gameLoop.notifyWin();
-                    return;
-                }
-
-                if (currentSection.getSectionType() == SectionType.NEW_WAVE){
-                    for(PlayerShip ship: gameLoop.playerShipSystem.getPlayerShips()){
-                        ship.onWaveStart();
-                    }
-                }
-            }
-            else{
-                //* 현재 Section이 New Wave 타입이라면, 적이 모두 파괴되었을 때 다음 Section으로 넘어감
-                if (currentSection.getSectionType() == SectionType.NEW_WAVE){
-                    if (!gameLoop.enemySystem.HasEnemy()){
-                        hasSectionEnd = true;
-                        sectionElapsed = 0;
-                    }
-                }
-                //* 현재 Section이 Store 타입이라면, Scection 시작 15초 후에 Section 종료
-                if (currentSection.getSectionType() == SectionType.STORE){
-                    if (sectionElapsed >= STORE_SECTION_DURATION){
-                        hasSectionEnd = true;
-                        sectionElapsed = 0;
-
-                        gameLoop.getEventBus().publish(new EventStoreSectionEnded());
-                    }
-                }
-            }
+        if (hasCurrentSectionInstantiateEnd()){
+            if (hasCurrentSectionEnd){ startNextSection(); }
+            else{ checkCurrentSectionEnd(); }
         }
         else{
-            while (currentSection.hasMoreInstantiateCommands() && currentSection.getNextInstantiateCommandInstantiateTime() >= sectionElapsed){
+            while (hasAvailableInstantiateCommand()){
                 InstantiateCommand instantiateCommand = currentSection.pollNextInstantiateCommand();
-                ExecuteInstantiateCommand(instantiateCommand);
+                executeInstantiateCommand(instantiateCommand);
             }
         }
     }
+    private void startNextSection(){
+        currentSection = sections.poll();
+        hasCurrentSectionEnd = false;
 
-    private void ExecuteInstantiateCommand(InstantiateCommand command) {
+        //* 다음 section이 존재하지 않는다면 stage 클리어로 처리
+        if (currentSection == null) {
+            gameLoop.notifyWin();
+            return;
+        }
+        
+        if (currentSection.getSectionType() == SectionType.NEW_WAVE){
+            for(PlayerShip ship: gameLoop.playerShipSystem.getPlayerShips()){
+                ship.onWaveStart();
+            }
+        }
+    }
+    private void checkCurrentSectionEnd() {
+        //* 현재 Section이 New Wave 타입이라면, 적이 모두 파괴되었을 때 다음 Section으로 넘어감
+        if (currentSection.getSectionType() == SectionType.NEW_WAVE){
+            if (!gameLoop.enemySystem.HasEnemy()){
+                hasCurrentSectionEnd = true;
+                sectionElapsed = 0;
+            }
+        }
+        //* 현재 Section이 Store 타입이라면, Scection 시작 15초 후에 Section 종료
+        if (currentSection.getSectionType() == SectionType.STORE){
+            if (sectionElapsed >= STORE_SECTION_DURATION){
+                hasCurrentSectionEnd = true;
+                sectionElapsed = 0;
+
+                gameLoop.getEventBus().publish(new EventStoreSectionEnded());
+            }
+        }
+    }
+    private boolean hasCurrentSectionInstantiateEnd() { return currentSection == null || !currentSection.hasMoreInstantiateCommands(); }
+    private boolean hasAvailableInstantiateCommand() { return currentSection.hasMoreInstantiateCommands() && currentSection.getNextInstantiateCommandInstantiateTime() >= sectionElapsed; }
+
+    private void executeInstantiateCommand(InstantiateCommand command) {
         PositionAngleSet positionAngleSet = new PositionAngleSet(command.getInstantiateX(), command.getInstantiateY());
         switch (command.getGameObjectType()) {
             case ENEMY:

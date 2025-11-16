@@ -4,8 +4,6 @@ import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
 import org.newdawn.spaceinvaders.game_object.ingame.store.IStoreItem;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
-
-
 public abstract class PlayerSkill implements IStoreItem {
     protected String skillNameField;
     protected String skillSpriteRefField;

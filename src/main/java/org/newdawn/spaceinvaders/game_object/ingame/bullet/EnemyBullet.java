@@ -4,7 +4,6 @@ import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 import org.newdawn.spaceinvaders.loop.game_loop.EventBombUsed;
 
-import event_bus.EventBus;
 import event_bus.IEventBusSubscriber;
 
 public class EnemyBullet extends Bullet implements IEventBusSubscriber{

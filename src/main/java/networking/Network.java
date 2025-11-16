@@ -1,10 +1,5 @@
 package networking;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryonet.EndPoint;
-
-import java.util.ArrayList;
-
 public class Network {
     public static final String SERVER_TAG = "server";
 

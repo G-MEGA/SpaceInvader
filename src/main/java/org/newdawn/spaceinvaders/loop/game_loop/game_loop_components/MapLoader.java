@@ -75,7 +75,7 @@ public class MapLoader {
         }
         
         if (currentSection.getSectionType() == SectionType.NEW_WAVE){
-            for(PlayerShip ship: gameLoop.playerShipSystem.getPlayerShips()){
+            for(PlayerShip ship: gameLoop.getPlayerShips()){
                 ship.onWaveStart();
             }
         }
@@ -83,7 +83,7 @@ public class MapLoader {
     private void checkCurrentSectionEnd() {
         //* 현재 Section이 New Wave 타입이라면, 적이 모두 파괴되었을 때 다음 Section으로 넘어감
         if (currentSection.getSectionType() == SectionType.NEW_WAVE){
-            if (!gameLoop.enemySystem.HasEnemy()){
+            if (!gameLoop.HasEnemy()){
                 hasCurrentSectionEnd = true;
                 sectionElapsed = 0;
             }
@@ -94,7 +94,7 @@ public class MapLoader {
                 hasCurrentSectionEnd = true;
                 sectionElapsed = 0;
 
-                gameLoop.getEventBus().publish(new EventStoreSectionEnded());
+                gameLoop.publish(new EventStoreSectionEnded());
             }
         }
     }
@@ -108,7 +108,7 @@ public class MapLoader {
                 enemyFactory.spawnEnemy(enemyHiveMind, command.getGameObjectId(), positionAngleSet);
                 break;
             case PASSIVE_SKILL:
-                storeSlotFactory.createPassiveSkillItemSlot(command.getGameObjectId(), positionAngleSet, gameLoop.playerShipSystem.getPlayerShip(gameLoop.playerShipSystem.getMyPlayerID()));
+                storeSlotFactory.createPassiveSkillItemSlot(command.getGameObjectId(), positionAngleSet, gameLoop.getPlayerShip(gameLoop.getMyPlayerID()));
                 break;
             case ACTIVE_SKILL:
                 storeSlotFactory.createActiveSkillItemSlot(command.getGameObjectId(), positionAngleSet);

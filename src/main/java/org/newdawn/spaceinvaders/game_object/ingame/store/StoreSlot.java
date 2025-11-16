@@ -66,12 +66,12 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner, IEventB
         priceText.setSortingLayer(-100);
         collider2D.setSortingLayer(-100);
 
-        gameLoop.getEventBus().register(EventStoreSectionEnded.class, this);
+        gameLoop.register(EventStoreSectionEnded.class, this);
     }
 
     @Override
     protected void draw(Graphics2D g) {
-        priceText.setText(getItem().getPriceString(gameLoop.playerShipSystem.getMyPlayerShip()));
+        priceText.setText(getItem().getPriceString(gameLoop.getMyPlayerShip()));
         super.draw(g);
     }
 
@@ -80,16 +80,16 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner, IEventB
         if (collider instanceof PlayerShip){
             PlayerShip playerShip = (PlayerShip) collider;
 
-            if(gameLoop.coinSystem.decreaseCoin(getItem().getPrice(playerShip))){
+            if(gameLoop.decreaseCoin(getItem().getPrice(playerShip))){
                 if(item.onAcquire(gameLoop, playerShip)){
                     destroy();
                 }
                 else{
-                    gameLoop.coinSystem.increaseCoin(getItem().getPrice(playerShip)); //* IStoreItem의 내부 구매 조건이 충족 되지 않았다면, 환불해줌.
+                    gameLoop.increaseCoin(getItem().getPrice(playerShip)); //* IStoreItem의 내부 구매 조건이 충족 되지 않았다면, 환불해줌.
                 }
             }
             else{
-                gameLoop.textSystem.showIndicatorText("코인 갯수가 부족 합니다!", IndicatorTextType.WARNING);
+                gameLoop.showIndicatorText("코인 갯수가 부족 합니다!", IndicatorTextType.WARNING);
             }
         }
     }
@@ -98,7 +98,7 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner, IEventB
     protected void onDestroy() {
         super.onDestroy();
 
-        gameLoop.getEventBus().unregister(EventStoreSectionEnded.class, this);
+        gameLoop.unregister(EventStoreSectionEnded.class, this);
     }
 
     @Override

@@ -17,7 +17,7 @@ public class EnemyBullet extends Bullet implements IEventBusSubscriber{
     public EnemyBullet(GameLoop gameLoop, long spawnAngle, long spawnCentralX, long spawnCentralY, long spawnOffset, long spawnSpeed) {
         super(gameLoop, spawnAngle, spawnCentralX, spawnCentralY, spawnOffset, spawnSpeed, SPRITE_REF);
 
-        gameLoop.getEventBus().register(EventBombUsed.class, this);
+        gameLoop.register(EventBombUsed.class, this);
     }
     
     @Override
@@ -49,6 +49,6 @@ public class EnemyBullet extends Bullet implements IEventBusSubscriber{
     protected void onDestroy(){
         super.onDestroy();
 
-        ((GameLoop)getLoop()).getEventBus().unregister(EventBombUsed.class, this);
+        ((GameLoop)getLoop()).unregister(EventBombUsed.class, this);
     }
 }

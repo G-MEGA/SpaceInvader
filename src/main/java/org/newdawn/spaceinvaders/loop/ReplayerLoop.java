@@ -1,6 +1,5 @@
 package org.newdawn.spaceinvaders.loop;
 
-import networking.Network;
 import networking.rudp.Connection;
 import networking.rudp.IRUDPPeerListener;
 import networking.rudp.PacketData.PacketData;
@@ -9,7 +8,6 @@ import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.loop_input.LoopInputLog;
 import org.newdawn.spaceinvaders.network.LoopRUDPPeerListener;
-import serializer.GameLoopSerializer;
 
 import java.awt.*;
 import java.util.ArrayList;

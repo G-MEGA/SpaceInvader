@@ -1,5 +1,10 @@
 package org.newdawn.spaceinvaders.sprite;
 
 public class SpriteRef {
-    static final public String TEST_PASSIVE_SKILL_REF = "sprites/testPassiveSkill.png";
+    static public final String TEST_PASSIVE_SKILL_REF = "sprites/testPassiveSkill.png";
+
+    // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    public SpriteRef(){
+
+    }
 }

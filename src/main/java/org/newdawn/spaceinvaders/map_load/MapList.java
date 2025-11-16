@@ -1,14 +1,10 @@
 package org.newdawn.spaceinvaders.map_load;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -35,7 +31,6 @@ public class MapList {
             System.err.println("리소스를 읽는 중 오류가 발생했습니다: " + e.getMessage());
             e.printStackTrace();
         }
-        //TODO 유저 커스텀 맵 목록 읽어와서 pathList에 추가하기
 
         // 맵 목록 처리
         for(Path path : pathList){

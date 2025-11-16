@@ -1,7 +1,6 @@
 package org.newdawn.spaceinvaders.loop;
 
 import event_bus.EventBus;
-import networking.Network;
 import networking.rudp.Connection;
 import networking.rudp.IRUDPPeerListener;
 import networking.rudp.PacketData.PacketData;
@@ -18,15 +17,7 @@ import org.newdawn.spaceinvaders.loop.game_loop.game_loop_components.MapLoader;
 import org.newdawn.spaceinvaders.loop.game_loop.game_loop_components.ScoreSystem;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.loop_input.LoopInputLog;
-import org.newdawn.spaceinvaders.map_load.MapList;
-import org.newdawn.spaceinvaders.map_load.SectionData;
-import org.newdawn.spaceinvaders.map_load.map_load_commands.InstantiateCommand;
-import org.newdawn.spaceinvaders.map_load.map_load_commands.MapLoadCommand;
-import org.newdawn.spaceinvaders.map_load.map_load_commands.SectionCommand;
 import org.newdawn.spaceinvaders.network.LoopRUDPPeerListener;
-import org.newdawn.spaceinvaders.singleton.MapDataParser;
-
-import com.esotericsoftware.minlog.Log;
 
 import org.newdawn.spaceinvaders.game_object.GameObject;
 
@@ -166,7 +157,6 @@ public class GameLoop extends Loop {
         enemySystem.cleanUpEnemies();
         scoreSystem.increaseScore();
 
-        //TODO Enemies 배열로 바꾸기
         for(GameObject gameObject : getGameObjects()){
             if(gameObject instanceof Enemy){
                 ((Enemy) gameObject).velocityX = FixedPointUtil.mul(

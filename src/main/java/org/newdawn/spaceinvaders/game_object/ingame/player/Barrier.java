@@ -2,7 +2,6 @@ package org.newdawn.spaceinvaders.game_object.ingame.player;
 
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.GameCharacter;
-import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.game_object.collision.Collider2D;
 import org.newdawn.spaceinvaders.game_object.collision.ICollider2DOwner;
 import org.newdawn.spaceinvaders.game_object.ingame.bullet.EnemyBullet;
@@ -40,7 +39,7 @@ public class Barrier extends GameCharacter {
     public void collidedWith(ICollider2DOwner collider) {
         if (collider instanceof EnemyBullet){
             EnemyBullet enemyBullet = (EnemyBullet)collider;
-            enemyBullet.onHitByPlayerShip(); //TODO 함수명 바꾸기
+            enemyBullet.onHitByPlayerShip();
             
             decreaseHealth();
 

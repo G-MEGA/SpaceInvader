@@ -1,8 +1,5 @@
 package org.newdawn.spaceinvaders;
 
-import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import firebase.FirebaseClientAuth;
@@ -17,10 +14,8 @@ import serializer.GameLoopSerializer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Map;
-import java.util.Random;
 
 public class Main {
     static final String ID_TOKEN = "idToken";

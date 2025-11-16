@@ -1,11 +1,8 @@
 package org.newdawn.spaceinvaders.game_object;
 
-import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointAffineTransform;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.loop.Loop;
-
-import java.awt.geom.AffineTransform;
 
 public class GameObject2D extends GameObject{
     FixedPointAffineTransform localTransform = new FixedPointAffineTransform();

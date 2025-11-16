@@ -1,6 +1,5 @@
 package org.newdawn.spaceinvaders.loop_input;
 
-
 import java.util.ArrayList;
 
 public class LoopInputLog {

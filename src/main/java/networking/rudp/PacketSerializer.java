@@ -31,7 +31,7 @@ public class PacketSerializer {
     private byte[] serializeObject(Object object){
         output.setPosition(0);
         kryo.writeClassAndObject(output, object);
-        byte[] bytes = output.toBytes();// TODO 이거 GC에 부담 줄 수 있으니 나중에 수정하자 System.arraycopy()랑 output.getBuffer()로
+        byte[] bytes = output.toBytes();
         output.close();
         return bytes;
     }

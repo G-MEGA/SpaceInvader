@@ -1,6 +1,5 @@
 package org.newdawn.spaceinvaders.loop;
 
-import networking.Network;
 import networking.rudp.Connection;
 import networking.rudp.IRUDPPeerListener;
 import networking.rudp.PacketData.PacketData;

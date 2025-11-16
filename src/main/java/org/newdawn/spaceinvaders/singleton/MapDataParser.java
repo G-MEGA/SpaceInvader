@@ -26,6 +26,11 @@ public class MapDataParser {
     }
 
     public Queue<SectionData> parseMapData(String plainData){
+        Queue<MapLoadCommand> commands = parseCommands(plainData);
+
+        return organizeCommandToSection(commands);
+    }
+    private Queue<MapLoadCommand> parseCommands(String plainData) {
         Queue<MapLoadCommand> commands = new LinkedList<>();
         String[] plainFile = Arrays.stream(plainData.trim().split("\n"))
                             .map(String::toLowerCase) // 모든 영문자를 소문자로 바꿈
@@ -33,27 +38,29 @@ public class MapDataParser {
                             .filter(s -> !s.isBlank()) // 빈 줄 제거
                             .toArray(String[]::new);
                             
+
         for (String plainCommand : plainFile){
-            MapLoadCommand command = null;
+                    MapLoadCommand command = null;
 
-            if (plainCommand.startsWith(">")){ // section command로 판단
-                command = parseSectionCommand(plainCommand);
-            }
-            else if (plainCommand.startsWith(":")){ // special command로 판단
-                command = parseSpecialCommand(plainCommand);
-            }
-            else if (plainCommand.startsWith("/")){
-                continue; // 맵의 메타데이터를 의미함. 구현 보류
-            }
-            else{ // command 맨 앞에 특정한 표시자가 없으면 instantiate command로 판단
-                command = parseInstantiateCommand(plainCommand);
-            }
-            
-            commands.add(command);
-        }
-
+                    if (plainCommand.startsWith(">")){ // section command로 판단
+                        command = parseSectionCommand(plainCommand);
+                    }
+                    else if (plainCommand.startsWith(":")){ // special command로 판단
+                        command = parseSpecialCommand(plainCommand);
+                    }
+                    else if (plainCommand.startsWith("/")){
+                        continue; // 맵의 메타데이터를 의미함. 구현 보류
+                    }
+                    else{ // command 맨 앞에 특정한 표시자가 없으면 instantiate command로 판단
+                        command = parseInstantiateCommand(plainCommand);
+                    }
+                    
+                    commands.add(command);
+                }
+        return commands;
+    }
+    private Queue<SectionData> organizeCommandToSection(Queue<MapLoadCommand> commands) {
         SectionCommand currentSectionCommand = null;
-        //TODO 흠 이런 구조에서는 현재 SpeicalCommand가 의미가 없어짐
         Queue<InstantiateCommand> currentInstantiateCommands = null;
         Queue<SectionData> sections = new LinkedList<>();
 
@@ -77,9 +84,9 @@ public class MapDataParser {
                 }
             }
         }
-        
         return sections;
     }
+        
 
     private MapLoadCommand parseInstantiateCommand(String plainData){
         String[] attributes = plainData.split("\\s+");

@@ -1,13 +1,11 @@
 package org.newdawn.spaceinvaders.game_object.visual;
 
-import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.GameObject2D;
 import org.newdawn.spaceinvaders.loop.Loop;
 import org.newdawn.spaceinvaders.sprite.Sprite;
 import org.newdawn.spaceinvaders.sprite.SpriteStore;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 
 public class SpriteRenderer extends GameObject2D {
     public String spriteRef;

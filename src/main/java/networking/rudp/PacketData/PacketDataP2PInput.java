@@ -1,7 +1,5 @@
 package networking.rudp.PacketData;
 
-import java.util.ArrayList;
-
 public class PacketDataP2PInput extends PacketData{
     public String inputLog;
     public PacketDataP2PInput(){

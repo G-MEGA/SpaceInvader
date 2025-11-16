@@ -10,7 +10,6 @@ import org.newdawn.spaceinvaders.game_object.ingame.enemy.common.Raider;
 import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
-//TODO 싱글톤으로 바꾸기
 public class EnemyFactory extends GameObject{
     GameLoop gameLoop;
 

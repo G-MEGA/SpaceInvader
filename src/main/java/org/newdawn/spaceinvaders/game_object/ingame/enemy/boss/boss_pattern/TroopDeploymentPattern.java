@@ -23,7 +23,6 @@ public class TroopDeploymentPattern extends BossPattern {
         System.out.println("TroopDeploymentPattern executed");
         GameLoop gameLoop = (GameLoop)getLoop();
         
-        //TODO FUCK
         EnemyFactory enemyFactory = gameLoop.mapLoader.getEnemyFactory();
         HiveMind enemyHiveMind = gameLoop.mapLoader.getEnemyHiveMind();
 

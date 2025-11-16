@@ -22,7 +22,7 @@ public class BombSkill extends ActiveSkill {
 
     @Override
     public void activate() {
-        gameLoop.publish(new EventBombUsed());
+        gameLoop.publishEvent(new EventBombUsed());
 
         new BlankScreenEffect(gameLoop, BOMB_EFFECT_DURATION);
     }

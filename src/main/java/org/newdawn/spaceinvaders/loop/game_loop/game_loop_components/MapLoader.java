@@ -94,7 +94,7 @@ public class MapLoader {
                 hasCurrentSectionEnd = true;
                 sectionElapsed = 0;
 
-                gameLoop.publish(new EventStoreSectionEnded());
+                gameLoop.publishEvent(new EventStoreSectionEnded());
             }
         }
     }

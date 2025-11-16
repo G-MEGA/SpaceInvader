@@ -343,15 +343,15 @@ public class GameLoop extends Loop {
         return mapLoader.getCurrentSection();
     }
 
-    public void register(Class eventClass, IEventBusSubscriber subscriber){
+    public void registerEvent(Class eventClass, IEventBusSubscriber subscriber){
         eventBus.register(eventClass, subscriber);
     }
 
-    public void unregister(Class eventClass, IEventBusSubscriber subscriber){
+    public void unregisterEvent(Class eventClass, IEventBusSubscriber subscriber){
         eventBus.unregister(eventClass, subscriber);
     }
 
-    public void publish(Object event){
+    public void publishEvent(Object event){
         eventBus.publish(event);
     }
 

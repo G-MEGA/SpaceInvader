@@ -66,7 +66,7 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner, IEventB
         priceText.setSortingLayer(-100);
         collider2D.setSortingLayer(-100);
 
-        gameLoop.register(EventStoreSectionEnded.class, this);
+        gameLoop.registerEvent(EventStoreSectionEnded.class, this);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class StoreSlot extends GameObject2D implements ICollider2DOwner, IEventB
     protected void onDestroy() {
         super.onDestroy();
 
-        gameLoop.unregister(EventStoreSectionEnded.class, this);
+        gameLoop.unregisterEvent(EventStoreSectionEnded.class, this);
     }
 
     @Override

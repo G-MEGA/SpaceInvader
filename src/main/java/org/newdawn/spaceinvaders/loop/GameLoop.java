@@ -18,7 +18,7 @@ import org.newdawn.spaceinvaders.loop.game_loop.game_loop_components.ScoreSystem
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.loop_input.LoopInputLog;
 import org.newdawn.spaceinvaders.network.LoopRUDPPeerListener;
-
+import org.newdawn.spaceinvaders.singleton.ScreenEffectManager;
 import org.newdawn.spaceinvaders.game_object.GameObject;
 
 import java.awt.Graphics2D;
@@ -35,7 +35,8 @@ import random.SerializableRandom;
 public class GameLoop extends Loop {
     long currentFrame;
     ArrayList<LoopInputLog> inputLogs = new ArrayList<>();
-
+    
+    public ScreenEffectManager screenEffectManager;
     public MapLoader mapLoader;
     public ScoreSystem scoreSystem;
     public CoinSystem coinSystem;
@@ -84,6 +85,8 @@ public class GameLoop extends Loop {
         this.randomSeed = randomSeed;
         this.mapID = mapID;
         
+        screenEffectManager = new ScreenEffectManager(this, eventBus);
+
         random = new SerializableRandom(17L * randomSeed); // 소수 17을 곱해서 더 랜덤하게
         
         //mapID에 따른 맵 불러오기

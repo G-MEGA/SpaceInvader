@@ -31,7 +31,6 @@ public class MapList {
             System.err.println("리소스를 읽는 중 오류가 발생했습니다: " + e.getMessage());
             e.printStackTrace();
         }
-        //TODO 유저 커스텀 맵 목록 읽어와서 pathList에 추가하기
 
         // 맵 목록 처리
         for(Path path : pathList){

@@ -36,7 +36,6 @@ public abstract class Bullet extends Mover2D implements ICollider2DOwner {
         //* 현재 Bullet Sprite가 -90도 회전 되어있어서 이를 맞추기위한 연산
         spawnAngle += 90 << 16;
 
-        //TODO spawnOffset을 고정 소수점으로 받게 만들기
         long spawnX = spawnCentralX + FixedPointUtil.mul(FixedPointUtil.cos(spawnAngle), FixedPointUtil.fromLong(spawnOffset));
         long spawnY = spawnCentralY + FixedPointUtil.mul(FixedPointUtil.sin(spawnAngle), FixedPointUtil.fromLong(spawnOffset));
         setPosX(spawnX);

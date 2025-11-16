@@ -32,7 +32,7 @@ public class GameLoopSerializer {
     public byte[] serialize(GameLoop gameLoop){
         output.setPosition(0);
         kryo.writeObject(output, gameLoop);
-        byte[] bytes = output.toBytes();// TODO 이거 GC에 부담 줄 수 있으니 나중에 수정하자 System.arraycopy()랑 output.getBuffer()로
+        byte[] bytes = output.toBytes();
         output.close();
         return bytes;
     }

@@ -61,7 +61,6 @@ public class MapDataParser {
     }
     private Queue<SectionData> organizeCommandToSection(Queue<MapLoadCommand> commands) {
         SectionCommand currentSectionCommand = null;
-        //TODO 흠 이런 구조에서는 현재 SpeicalCommand가 의미가 없어짐
         Queue<InstantiateCommand> currentInstantiateCommands = null;
         Queue<SectionData> sections = new LinkedList<>();
 

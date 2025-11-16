@@ -16,8 +16,6 @@ public class LootItemFactory {
         return INSTANCE;
     }
 
-    //TODO pseudo random으로 선택하게 만들기
-    //TODO Object Pulling을 만들기 -> Loop의 GameObject에 넣어놓기
     private final HashMap<String, Long> _itemWeights = new HashMap<>(); //* <아이템 이름, 가중치
     public LootItemFactory() {
         _itemWeights.put("none", 60L);
@@ -46,7 +44,6 @@ public class LootItemFactory {
         for (String key : _itemWeights.keySet()){
             random -= _itemWeights.get(key);
             
-            //TODO 생성된 아이템을 Loop의 GameObject 배열에 넣기
             if (random <= 0){
                 switch (key) {
                     case "coin":

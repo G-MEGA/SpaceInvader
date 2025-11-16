@@ -60,7 +60,6 @@ public class Connection {
     }
     // 받은 것 중 순서가 안맞는 패킷들, 즉 expected가 아닌 것들 순서 맞는게 올 때까지 대기
     // 수신 스레드에서만 쓸 거니까 Concurrent 필요 없음
-    //TODO - receivedPacketsWaitingForSequence 중에 10초 동안 못받은거 있으면... disconnected로 들어가는게 좋지 않을까
     private final Map<Integer, Packet> receivedPacketsWaitingForSequence = new HashMap<>();
     public Map<Integer, Packet> getReceivedPacketsWaitingForSequence() {
         return receivedPacketsWaitingForSequence;

@@ -157,7 +157,6 @@ public class GameLoop extends Loop {
         enemySystem.cleanUpEnemies();
         scoreSystem.increaseScore();
 
-        //TODO Enemies 배열로 바꾸기
         for(GameObject gameObject : getGameObjects()){
             if(gameObject instanceof Enemy){
                 ((Enemy) gameObject).velocityX = FixedPointUtil.mul(

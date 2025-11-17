@@ -56,7 +56,7 @@ public class EnemyDetectionZone extends GameObject2D implements ICollider2DOwner
         if (!hasDetected){
             if (collider instanceof Enemy || collider instanceof EnemyBullet){
                 GameLoop gameLoop = (GameLoop)getLoop();
-                gameLoop.scoreSystem.increaseScore(DETECT_SCORE);
+                gameLoop.increaseScore(DETECT_SCORE);
                 hasDetected = true;
             }
         }

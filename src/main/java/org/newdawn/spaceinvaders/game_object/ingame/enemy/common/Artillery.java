@@ -36,7 +36,7 @@ public class Artillery extends SweeperEnemy{
     protected void process(long deltaTime) {
         super.process(deltaTime);
         if(target==null){
-            target = ((GameLoop)getLoop()).playerShipSystem.getRandomAlivePlayerShip();
+            target = ((GameLoop)getLoop()).getRandomAlivePlayerShip();
         }
 
         if (fireElapsed >= fireInterval && target!=null){
@@ -50,7 +50,7 @@ public class Artillery extends SweeperEnemy{
             getLoop().addGameObject(enemyBullet);
 
             //쏘고 나서 타겟 변경
-            target = ((GameLoop)getLoop()).playerShipSystem.getRandomAlivePlayerShip();
+            target = ((GameLoop)getLoop()).getRandomAlivePlayerShip();
         }
         else{
             fireElapsed += deltaTime;

@@ -18,6 +18,6 @@ public class BombSkill extends ActiveSkill {
 
     @Override
     public void activate() {
-        gameLoop.getEventBus().publish(new EventBombUsed());
+        gameLoop.publishEvent(new EventBombUsed());
     }
 }

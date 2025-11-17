@@ -39,7 +39,7 @@ public class GameLoopTextSystem {
                 gameLoop.addGameObject(text);
             }
 
-            text.setText(type.getName() + " : " + gameLoop.playerShipSystem.getPlayerShips().get(gameLoop.playerShipSystem.getMyPlayerID()).getPassiveSkillLevel(type));
+            text.setText(type.getName() + " : " + gameLoop.getPlayerShips().get(gameLoop.getMyPlayerID()).getPassiveSkillLevel(type));
         }
     }
 
@@ -63,9 +63,9 @@ public class GameLoopTextSystem {
         
         scoreText = new TextRenderer(gameLoop, "Score : 0", 15);
         scoreText.setFontStyle(1);
-        coinCountText = new TextRenderer(gameLoop, "Coin : " + Long.toString(gameLoop.coinSystem.getCoinCount()), 15);
-        playerHealthText = new TextRenderer(gameLoop, "Health : " + Long.toString(gameLoop.playerShipSystem.getPlayerShips().get(gameLoop.playerShipSystem.getMyPlayerID()).getHealth()), 15);
-        activeSkillText = new TextRenderer(gameLoop, "Active Skill : " + gameLoop.playerShipSystem.getPlayerShips().get(gameLoop.playerShipSystem.getMyPlayerID()).getActiveSkillName(), 15);
+        coinCountText = new TextRenderer(gameLoop, "Coin : " + Long.toString(gameLoop.getCoinCount()), 15);
+        playerHealthText = new TextRenderer(gameLoop, "Health : " + Long.toString(gameLoop.getPlayerShips().get(gameLoop.getMyPlayerID()).getHealth()), 15);
+        activeSkillText = new TextRenderer(gameLoop, "Active Skill : " + gameLoop.getPlayerShips().get(gameLoop.getMyPlayerID()).getActiveSkillName(), 15);
         passiveSkillHeaderText = new TextRenderer(gameLoop, "(Passive Skills)", 15);
         indicatorText = new TextRenderer(gameLoop, "", 20);
         indicatorText.alignment = 1;
@@ -105,17 +105,17 @@ public class GameLoopTextSystem {
     }
 
     public void updateText() {
-        scoreText.setText("Score : " + gameLoop.scoreSystem.getScore());
-        coinCountText.setText("Coin : " + Long.toString(gameLoop.coinSystem.getCoinCount()));
-        playerHealthText.setText("Health : " + Long.toString(gameLoop.playerShipSystem.getPlayerShips().get(gameLoop.playerShipSystem.getMyPlayerID()).getHealth()) +
-        (gameLoop.playerShipSystem.getPlayerShips().get(gameLoop.playerShipSystem.getMyPlayerID()).getCurrentShield() == 0 ? "" : " ( " + Integer.toString(gameLoop.playerShipSystem.getPlayerShips().get(gameLoop.playerShipSystem.getMyPlayerID()).getCurrentShield())  + " ) "));
+        scoreText.setText("Score : " + gameLoop.getScore());
+        coinCountText.setText("Coin : " + Long.toString(gameLoop.getCoinCount()));
+        playerHealthText.setText("Health : " + Long.toString(gameLoop.getPlayerShips().get(gameLoop.getMyPlayerID()).getHealth()) +
+        (gameLoop.getPlayerShips().get(gameLoop.getMyPlayerID()).getCurrentShield() == 0 ? "" : " ( " + Integer.toString(gameLoop.getPlayerShips().get(gameLoop.getMyPlayerID()).getCurrentShield())  + " ) "));
 
-        String activeSkillTextContent = "Active Skill : " + gameLoop.playerShipSystem.getPlayerShips().get(gameLoop.playerShipSystem.getMyPlayerID()).getActiveSkillName();
-        activeSkillTextContent += gameLoop.playerShipSystem.getPlayerShips().get(gameLoop.playerShipSystem.getMyPlayerID()).isActiveSkillActable() ? "" : "( " + Long.toString(gameLoop.playerShipSystem.getPlayerShips().get(gameLoop.playerShipSystem.getMyPlayerID()).getRemainCoolTime() >> 16) + " )";
+        String activeSkillTextContent = "Active Skill : " + gameLoop.getPlayerShips().get(gameLoop.getMyPlayerID()).getActiveSkillName();
+        activeSkillTextContent += gameLoop.getPlayerShips().get(gameLoop.getMyPlayerID()).isActiveSkillActable() ? "" : "( " + Long.toString(gameLoop.getPlayerShips().get(gameLoop.getMyPlayerID()).getRemainCoolTime() >> 16) + " )";
         activeSkillText.setText(activeSkillTextContent);
 
-        if (gameLoop.mapLoader.getCurrentSection() != null && gameLoop.mapLoader.getCurrentSection().getSectionType() == SectionType.STORE){
-            storeRemainTimeShower.setText("Remain Store Time : " + Integer.toString(FixedPointUtil.toInt(FixedPointUtil.sub(MapLoader.STORE_SECTION_DURATION, gameLoop.mapLoader.getSectionElapsed()))));
+        if (gameLoop.getCurrentSection() != null && gameLoop.getCurrentSection().getSectionType() == SectionType.STORE){
+            storeRemainTimeShower.setText("Remain Store Time : " + Integer.toString(FixedPointUtil.toInt(FixedPointUtil.sub(MapLoader.STORE_SECTION_DURATION, gameLoop.getSectionElapsed()))));
         }
         else{
             storeRemainTimeShower.setText("");

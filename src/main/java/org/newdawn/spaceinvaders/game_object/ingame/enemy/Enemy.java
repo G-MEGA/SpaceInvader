@@ -60,7 +60,7 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener, 
         
         setCollider(gameLoop);
 
-        gameLoop.getEventBus().register(EventBombUsed.class, this);
+        gameLoop.registerEvent(EventBombUsed.class, this);
     }
 
     public Enemy(GameLoop gameLoop, HiveMind hiveMind, long initialHealth){
@@ -181,7 +181,7 @@ public abstract class Enemy extends GameCharacter implements IHiveMindListener, 
     protected void onDestroy(){
         super.onDestroy();
 
-        ((GameLoop)getLoop()).getEventBus().unregister(EventBombUsed.class, this);
+        ((GameLoop)getLoop()).unregisterEvent(EventBombUsed.class, this);
     }
 
     protected void collideWithPlayerShip(){

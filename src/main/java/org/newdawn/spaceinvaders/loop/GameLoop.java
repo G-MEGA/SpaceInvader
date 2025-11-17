@@ -1,12 +1,14 @@
 package org.newdawn.spaceinvaders.loop;
 
 import event_bus.EventBus;
+import event_bus.IEventBusSubscriber;
 import networking.rudp.Connection;
 import networking.rudp.IRUDPPeerListener;
 import networking.rudp.PacketData.PacketData;
 import networking.rudp.RUDPPeer;
 import org.newdawn.spaceinvaders.Game;
 import org.newdawn.spaceinvaders.enums.GameLoopResultType;
+import org.newdawn.spaceinvaders.enums.IndicatorTextType;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.loop.game_loop.IGameLoopGameResultListener;
 import org.newdawn.spaceinvaders.loop.game_loop.game_loop_components.CoinSystem;
@@ -17,6 +19,7 @@ import org.newdawn.spaceinvaders.loop.game_loop.game_loop_components.MapLoader;
 import org.newdawn.spaceinvaders.loop.game_loop.game_loop_components.ScoreSystem;
 import org.newdawn.spaceinvaders.loop_input.LoopInput;
 import org.newdawn.spaceinvaders.loop_input.LoopInputLog;
+import org.newdawn.spaceinvaders.map_load.SectionData;
 import org.newdawn.spaceinvaders.network.LoopRUDPPeerListener;
 import org.newdawn.spaceinvaders.singleton.ScreenEffectManager;
 import org.newdawn.spaceinvaders.game_object.GameObject;
@@ -28,21 +31,23 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
+import org.newdawn.spaceinvaders.game_object.ingame.enemy.EnemyFactory;
 import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
+import org.newdawn.spaceinvaders.game_object.logic.HiveMind;
 
 import random.SerializableRandom;
 
 public class GameLoop extends Loop {
     long currentFrame;
     ArrayList<LoopInputLog> inputLogs = new ArrayList<>();
-    
-    public ScreenEffectManager screenEffectManager;
-    public MapLoader mapLoader;
-    public ScoreSystem scoreSystem;
-    public CoinSystem coinSystem;
-    public GameLoopTextSystem textSystem;
-    public GameLoopPlayerShipSystem playerShipSystem;
-    public GameLoopEnemySystem enemySystem;
+
+    private MapLoader mapLoader;
+    private ScoreSystem scoreSystem;
+    private CoinSystem coinSystem;
+    private GameLoopTextSystem textSystem;
+    private GameLoopPlayerShipSystem playerShipSystem;
+    private GameLoopEnemySystem enemySystem;
+    private ScreenEffectManager screenEffectManager;
 
     int mapID = -1;
 
@@ -53,7 +58,7 @@ public class GameLoop extends Loop {
     }
 
     private EventBus eventBus = new EventBus();
-    public EventBus getEventBus() { return eventBus; }
+    
 
     public GameLoopResultType gameResult = GameLoopResultType.IN_GAME;
     public GameLoopResultType getGameResult() {
@@ -259,5 +264,101 @@ public class GameLoop extends Loop {
                 return false;
             }
         };
+    }
+
+    public PlayerShip getRandomAlivePlayerShip(){
+        return playerShipSystem.getRandomAlivePlayerShip();
+    }
+
+    public int getAliveShipCount(){
+        return playerShipSystem.getAliveShipCount();
+    }
+
+    public PlayerShip getAliveShip(int index){
+        return playerShipSystem.getAliveShip(index);
+    }
+
+    public PlayerShip getMyPlayerShip(){
+        return playerShipSystem.getMyPlayerShip();
+    }
+
+    public PlayerShip getPlayerShip(int id){
+        return playerShipSystem.getPlayerShip(id);
+    }
+
+    public ArrayList<PlayerShip> getPlayerShips(){ 
+        return playerShipSystem.getPlayerShips(); 
+    }
+
+    public int getMyPlayerID(){
+        return playerShipSystem.getMyPlayerID();
+    }
+
+    public void notifyEnemyInstantiated(){
+        enemySystem.notifyEnemyInstantiated();
+    }
+
+    public void addEnemy(Enemy enemy){
+        enemySystem.addEnemy(enemy);
+    }
+
+    public boolean HasEnemy(){
+        return enemySystem.HasEnemy();
+    }
+
+    public long getCoinCount(){
+        return coinSystem.getCoinCount();
+    }
+
+    public void increaseCoin(){
+        coinSystem.increaseCoin();
+    }
+
+    public void increaseCoin(long count){
+        coinSystem.increaseCoin(count);
+    }
+
+    public boolean decreaseCoin(long count){
+        return coinSystem.decreaseCoin(count);
+    }
+
+    public int getScore(){
+        return scoreSystem.getScore();
+    }
+
+    public void increaseScore(int amount){
+        scoreSystem.increaseScore(amount);
+    }
+
+    public EnemyFactory getEnemyFactory(){
+        return mapLoader.getEnemyFactory();
+    }
+
+    public HiveMind getEnemyHiveMind(){
+        return mapLoader.getEnemyHiveMind();
+    }
+
+    public long getSectionElapsed(){
+        return mapLoader.getSectionElapsed();
+    }
+
+    public SectionData getCurrentSection(){
+        return mapLoader.getCurrentSection();
+    }
+
+    public void registerEvent(Class eventClass, IEventBusSubscriber subscriber){
+        eventBus.register(eventClass, subscriber);
+    }
+
+    public void unregisterEvent(Class eventClass, IEventBusSubscriber subscriber){
+        eventBus.unregister(eventClass, subscriber);
+    }
+
+    public void publishEvent(Object event){
+        eventBus.publish(event);
+    }
+
+    public void showIndicatorText(String text, IndicatorTextType type){
+        textSystem.showIndicatorText(text, type);
     }
 }

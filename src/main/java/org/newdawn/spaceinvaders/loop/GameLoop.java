@@ -47,7 +47,7 @@ public class GameLoop extends Loop {
     private GameLoopTextSystem textSystem;
     private GameLoopPlayerShipSystem playerShipSystem;
     private GameLoopEnemySystem enemySystem;
-    public ScreenEffectManager screenEffectManager;
+    private ScreenEffectManager screenEffectManager;
 
     int mapID = -1;
 

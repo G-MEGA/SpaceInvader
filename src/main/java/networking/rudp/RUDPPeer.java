@@ -121,32 +121,46 @@ public class RUDPPeer implements AutoCloseable{
             }
         }
     }
-    private boolean processPacket(PacketData packetData, Connection connection){
-        for(IRUDPPeerListener listener : listeners){
-            if(listener == null) {
-                System.err.println("RUDPPeer : listener is null");
-                continue;
-            }
-
-            // 처리 수락, 거부 여부
-            boolean result;
-
-            if(packetData instanceof PacketDataDisconnect){
-                result = listener.onDisconnected(this, connection);
-            }
-            else if(packetData instanceof PacketDataConnect){
-                result = listener.onConnected(this, connection);
-            }
-            else{
-                result = listener.onReceived(this, connection, packetData);
-            }
-
-            // 처리 거부시 루프 탈출
-            if(!result){
+    private boolean processPacket(PacketData packetData, Connection connection) {
+        for (IRUDPPeerListener listener : listeners) {
+            // 반복문 내부의 복잡한 로직을 단일 메서드 호출로 대체
+            // "처리에 실패했거나 거부했다면(!success) 즉시 중단(return false)"
+            if (!notifyListener(listener, connection, packetData)) {
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * 단일 리스너에게 이벤트를 전파하고, 계속 진행할지 여부를 반환합니다.
+     * 반환값: true(계속 진행/성공), false(중단/거부)
+     */
+    private boolean notifyListener(IRUDPPeerListener listener, Connection connection, PacketData packetData) {
+        // 1. Null 체크 (continue 로직 제거)
+        if (listener == null) {
+            System.err.println("RUDPPeer : listener is null");
+            return true; // null이면 무시하고 다음 리스너로 진행(continue와 동일 효과)
+        }
+
+        // 2. 타입별 분기 (메서드 추출로 복잡도 격리)
+        return dispatchEvent(listener, connection, packetData);
+    }
+
+    /**
+     * 패킷 타입에 따라 적절한 리스너 메서드를 호출합니다.
+     */
+    private boolean dispatchEvent(IRUDPPeerListener listener, Connection connection, PacketData packetData) {
+        if (packetData instanceof PacketDataDisconnect) {
+            return listener.onDisconnected(this, connection);
+        }
+
+        if (packetData instanceof PacketDataConnect) {
+            return listener.onConnected(this, connection);
+        }
+
+        // 기본값 (일반 데이터)
+        return listener.onReceived(this, connection, packetData);
     }
 
     public void connect(InetSocketAddress address) throws Exception {
@@ -182,16 +196,14 @@ public class RUDPPeer implements AutoCloseable{
     }
     public void broadcast(PacketData data, String exceptionTag) throws Exception {
         for (Connection connection : connections.values()){
-            if(connection.isDisconnecting()) continue;
-            if(exceptionTag != null && connection.tag.contains(exceptionTag)) continue;
+            if(connection.isDisconnecting() || exceptionTag != null && connection.tag.contains(exceptionTag)) continue;
 
             send(connection, data);
         }
     }
     public void broadcastAboutTag(String targetTag, PacketData data) throws Exception {
         for (Connection connection : connections.values()){
-            if(connection.isDisconnecting()) continue;
-            if(!connection.tag.contains(targetTag)) continue;
+            if(connection.isDisconnecting() || !connection.tag.contains(targetTag)) continue;
 
             send(connection, data);
         }
@@ -236,38 +248,65 @@ public class RUDPPeer implements AutoCloseable{
     }
 
     private void handlePacket(Packet packet, InetSocketAddress senderAddress) throws Exception {
-        if(printLog){
+        if (printLog) {
             System.out.printf("%s 수신 %s\n", localPort, packet.getType());
         }
 
         Connection connection = connections.get(senderAddress);
-        //커넥션이 없을 경우
+
+        // 1. 커넥션이 없는 경우 (핸드셰이크 처리)
         if (connection == null) {
-            if(packet.getType() == Packet.PacketType.CONNECT){
-                sendPacket(senderAddress, new Packet(Packet.PacketType.CONNECT_ACK), serializerForReceive);
-
-                return;
-            } else if(packet.getType() == Packet.PacketType.CONNECT_ACK){
-                sendPacket(senderAddress, new Packet(Packet.PacketType.CONNECT_ACKACK), serializerForReceive);
-
-                connection = new Connection(senderAddress);
-                connections.put(connection.getAddress(), connection);
-                connection.getReceivedData().offer(new PacketDataConnect());
-            } else if(packet.getType() == Packet.PacketType.CONNECT_ACKACK){
-                connection = new Connection(senderAddress);
-                connections.put(connection.getAddress(), connection);
-                connection.getReceivedData().offer(new PacketDataConnect());
-            }
-            else{
-                return;
-            }
+            handleNewConnection(packet, senderAddress);
+            return; // 핸드셰이크 패킷은 여기서 처리 끝
         }
-        // 커넥션이 있는데 Disconnect 중일 경우 아무것도 할 필요 없음
-        if(connection.isDisconnecting()) return;
 
-        // 패킷 처리
+        // 2. 커넥션이 있지만 연결 종료 중인 경우
+        if (connection.isDisconnecting()) {
+            return;
+        }
+
+        // 3. 정상 패킷 처리
         processPacket(packet, connection);
     }
+
+// --- 추출된 메서드들 ---
+
+    /**
+     * 연결이 없는 상태에서 들어온 패킷(핸드셰이크)을 처리합니다.
+     */
+    private void handleNewConnection(Packet packet, InetSocketAddress senderAddress) throws Exception {
+        Packet.PacketType type = packet.getType();
+
+        if (type == Packet.PacketType.CONNECT) {
+            sendPacket(senderAddress, new Packet(Packet.PacketType.CONNECT_ACK), serializerForReceive);
+            return;
+        }
+
+        if (type == Packet.PacketType.CONNECT_ACK) {
+            sendPacket(senderAddress, new Packet(Packet.PacketType.CONNECT_ACKACK), serializerForReceive);
+            createAndRegisterConnection(senderAddress);
+            return;
+        }
+
+        if (type == Packet.PacketType.CONNECT_ACKACK) {
+            createAndRegisterConnection(senderAddress);
+        }
+
+        // 그 외의 패킷은 연결이 없는 상태에서는 무시
+    }
+
+    /**
+     * 새로운 커넥션을 생성하고 맵에 등록합니다. (중복 코드 제거)
+     */
+    private void createAndRegisterConnection(InetSocketAddress senderAddress) {
+        Connection newConnection = new Connection(senderAddress);
+        connections.put(newConnection.getAddress(), newConnection);
+
+        // 연결 성립 이벤트 발생
+        newConnection.getReceivedData().offer(new PacketDataConnect());
+    }
+
+
     private void processPacket(Packet packet, Connection connection) throws Exception{
         if (packet.getType() == Packet.PacketType.DATA) {
             processDataPacket(packet, connection);
@@ -287,32 +326,48 @@ public class RUDPPeer implements AutoCloseable{
         //뭐든지 수신 받으면 커넥션 하트비트 갱신
         connection.updateLastHeartbeat();
     }
-    private void processDataPacket(Packet packet, Connection connection) throws Exception{
-        // ACK 전송
+    private void processDataPacket(Packet packet, Connection connection) throws Exception {
+        // 1. ACK 전송 (단순 추출)
+        sendAck(packet, connection);
+
+        // 2. 패킷 버퍼링 (받아야 할 순서보다 작으면 이미 처리된 것이므로 무시)
+        bufferPacketIfNew(packet, connection);
+
+        // 3. 순서가 맞는 패킷들 처리 (핵심 로직 개선)
+        processOrderedPackets(connection);
+    }
+
+// --- 추출된 헬퍼 메서드들 ---
+
+    private void sendAck(Packet packet, Connection connection) throws Exception {
+        // ACK는 중복 패킷이어도 보내야 하므로 항상 실행
         sendPacket(connection, new Packet(packet.getSeqNumber()), serializerForReceive);
+    }
 
-        // receivedPacketsWaitingForSequence에 패킷 넣기
-        // 기대했던 순번보다 작다면 이미 받아서 처리까지 완료 했다는 뜻이므로 또 넣을 필요 없음
-        if(packet.getSeqNumber() >= connection.getExpectedReceivedSequenceNumber()){
-            connection.getReceivedPacketsWaitingForSequence().put(packet.getSeqNumber(), packet);
+    private void bufferPacketIfNew(Packet packet, Connection connection) {
+        int seqNumber = packet.getSeqNumber();
+        // 기대값보다 작다면(이미 처리된 패킷) 버퍼링하지 않음
+        if (seqNumber >= connection.getExpectedReceivedSequenceNumber()) {
+            connection.getReceivedPacketsWaitingForSequence().put(seqNumber, packet);
         }
+    }
 
-        // 기대했던 순번이라면...
-        if (packet.getSeqNumber() == connection.getExpectedReceivedSequenceNumber()) {
-            //1. receivedPacketsWaitingForSequence 정렬
-            List<Packet> packetList = new ArrayList<>(connection.getReceivedPacketsWaitingForSequence().values().stream().toList());
-            packetList.sort(Comparator.comparing(Packet::getSeqNumber));
-            //2. for... expectedSeqNumber과 receivedPacketsWaitingForSequence의 요소가 맞으면
-            for(Packet p : packetList) {
-                if(p.getSeqNumber() != connection.getExpectedReceivedSequenceNumber()) break;
+    private void processOrderedPackets(Connection connection) throws Exception {
+        Map<Integer, Packet> waitingPackets = connection.getReceivedPacketsWaitingForSequence();
 
-                //3.    receivedPacketsWaitingForSequence에서 제거하고 receivedData에 넣기
-                connection.getReceivedPacketsWaitingForSequence().remove(p.getSeqNumber());
-                connection.getReceivedData().offer(serializerForReceive.deserializePacketData(p.getData()));
+        // while 루프: '기대하는 순번'의 패킷이 Map에 존재하는 동안 계속 실행
+        // 기존의 [List변환 -> 정렬 -> Loop -> break] 과정을 이 while문 하나로 대체
+        while (waitingPackets.containsKey(connection.getExpectedReceivedSequenceNumber())) {
 
-                //4. expectedSeqNumber++
-                connection.incrementExpectedReceivedSequenceNumber();
-            }
+            // 1. Map에서 바로 꺼내고 제거 (복잡도와 메모리 사용량 감소)
+            Packet nextPacket = waitingPackets.remove(connection.getExpectedReceivedSequenceNumber());
+
+            // 2. 데이터 처리
+            PacketData data = serializerForReceive.deserializePacketData(nextPacket.getData());
+            connection.getReceivedData().offer(data);
+
+            // 3. 기대 순번 증가
+            connection.incrementExpectedReceivedSequenceNumber();
         }
     }
     //endregion
@@ -320,28 +375,63 @@ public class RUDPPeer implements AutoCloseable{
     //region 재전송 스레드
     private void retransmitLoop() {
         while (running) {
-            try {
-                Thread.sleep(RETRANSMISSION_TIMEOUT);
-                long currentTime = System.currentTimeMillis();
-
-                for(Connection c : connections.values()){
-                    processRetransmission(c, currentTime);
-
-                    // isDisconnecting 이면 이 밑으로는 동작 안하고 스킵
-                    if(c.isDisconnecting()) continue;
-
-                    //하트비트
-                    processHeartbeat(c, currentTime);
-                }
-
-                processRemovalDisconnected(currentTime);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                running = false;
-            } catch (Exception e) {
-                System.err.printf("재전송 오류: %s\n", e.getMessage());
+            // 메인 루프는 오직 '주기적인 실행'과 '예외 방어'만 담당합니다.
+            if (!executeMaintenanceCycle()) {
+                break; // 인터럽트 발생 시 루프 종료
             }
         }
+    }
+
+    /**
+     * 한 번의 유지보수 주기를 실행합니다.
+     * @return 계속 실행 여부 (false면 스레드 종료)
+     */
+    private boolean executeMaintenanceCycle() {
+        try {
+            Thread.sleep(RETRANSMISSION_TIMEOUT);
+
+            // 로직 수행 (메서드 추출로 복잡도 격리)
+            performMaintenanceTasks();
+
+            return true;
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            running = false;
+            return false;
+        } catch (Exception e) {
+            System.err.printf("재전송 오류: %s\n", e.getMessage());
+            return true; // 일반 오류는 무시하고 계속 실행
+        }
+    }
+
+    /**
+     * 실제 로직을 수행하는 오케스트레이터
+     */
+    private void performMaintenanceTasks() {
+        long currentTime = System.currentTimeMillis();
+
+        // 모든 커넥션에 대해 작업 수행
+        for (Connection c : connections.values()) {
+            maintainSingleConnection(c, currentTime);
+        }
+
+        processRemovalDisconnected(currentTime);
+    }
+
+    /**
+     * 단일 커넥션에 대한 유지보수 작업
+     * (continue를 return으로 대체하여 구조 단순화)
+     */
+    private void maintainSingleConnection(Connection connection, long currentTime) {
+        processRetransmission(connection, currentTime);
+
+        // Guard Clause: 연결 종료 중이면 하트비트 생략
+        if (connection.isDisconnecting()) {
+            return; // continue 대신 return 사용 -> 흐름이 명확해짐
+        }
+
+        processHeartbeat(connection, currentTime);
     }
     private void processRetransmission(Connection c, long currentTime) {
         try {

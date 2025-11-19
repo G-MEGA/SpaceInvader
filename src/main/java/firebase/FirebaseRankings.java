@@ -79,58 +79,84 @@ public class FirebaseRankings {
      * @return 최고 점수와 순위 정보 (Map 형태)
      */
     public Map<String, Long> getMyBestRank(String idToken, String myUid, int mapId) throws IOException {
-        // --- 1단계: 나의 최고 점수 찾기 ---
-        String myScoresUrl = String.format("%sscores_by_user/%s/map_%d.json?auth=%s",
-                DATABASE_URL, myUid, mapId, idToken);
-        Request request = new Request.Builder().url(myScoresUrl).build();
+        // 1단계: 나의 최고 점수 가져오기 (메서드 추출)
+        long bestScore = fetchBestScore(idToken, myUid, mapId);
 
-        long bestScore = 0;
+        // Guard Clause: 점수가 없거나 0점이면 즉시 반환
+        if (bestScore <= 0) {
+            return Collections.singletonMap("error", -1L);
+        }
+
+        // 2단계: 나보다 높은 점수 개수 가져오기 (메서드 추출)
+        long higherRankersCount = fetchHigherRankersCount(idToken, mapId, bestScore);
+
+        // 3단계: 결과 반환
+        Map<String, Long> result = new HashMap<>();
+        result.put("bestScore", bestScore);
+        result.put("rank", higherRankersCount + 1);
+        return result;
+    }
+
+    private long fetchBestScore(String idToken, String myUid, int mapId) throws IOException {
+        // 1. 요청 생성
+        String url = String.format("%sscores_by_user/%s/map_%d.json?auth=%s",
+                DATABASE_URL, myUid, mapId, idToken);
+        Request request = new Request.Builder().url(url).build();
+
+        // 2. 네트워크 실행 및 응답 문자열 확보 (메서드 추출)
+        String responseBody = executeAndGetBody(request);
+
+        // 3. 파싱 및 계산 (메서드 추출)
+        return parseMaxScore(responseBody);
+    }
+
+    private String executeAndGetBody(Request request) throws IOException {
+        // try-with-resources와 유효성 검사만 담당
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) throw new IOException("Failed to get my scores: " + response);
             if (response.body() == null) throw new IOException("Empty response body");
 
-            String responseBody = response.body().string();
-            // 응답이 null일 경우 (기록이 없을 경우)
-            if (responseBody.equals("null")) {
-                return Collections.singletonMap("error", -1L); // 기록 없음
-            }
+            return response.body().string();
+        }
+    }
 
-            Type type = new TypeToken<Map<String, Long>>(){}.getType();
-            Map<String, Long> myScores = gson.fromJson(responseBody, type);
-
-            // 자바 스트림을 사용하여 최고 점수 찾기
-            bestScore = myScores.values().stream().max(Long::compare).orElse(0L);
+    private long parseMaxScore(String responseBody) {
+        // 순수 비즈니스 로직만 담당
+        if (responseBody.equals("null")) {
+            return -1L;
         }
 
-        if (bestScore == 0) {
-            return Collections.singletonMap("error", -1L); // 기록 없음
-        }
+        Type type = new TypeToken<Map<String, Long>>(){}.getType();
+        Map<String, Long> myScores = gson.fromJson(responseBody, type);
 
-        // --- 2단계: 순위 계산하기 (나보다 높은 점수 개수 세기) ---
-        // startAt 파라미터는 JSON 문자열 내부의 값과 비교하므로, 숫자여도 ""가 필요 없습니다.
-        String rankUrl = String.format("%sscores_by_map/map_%d.json?orderBy=\"score\"&startAt=%d&auth=%s",
+        return myScores.values().stream()
+                .max(Long::compare)
+                .orElse(0L);
+    }
+
+    private long fetchHigherRankersCount(String idToken, int mapId, long bestScore) throws IOException {
+        // 1. 요청 생성
+        String url = String.format("%sscores_by_map/map_%d.json?orderBy=\"score\"&startAt=%d&auth=%s",
                 DATABASE_URL, mapId, bestScore + 1, idToken);
-        Request rankRequest = new Request.Builder().url(rankUrl).build();
+        Request request = new Request.Builder().url(url).build();
 
-        long higherRankersCount = 0;
-        try (Response response = client.newCall(rankRequest).execute()) {
-            if (!response.isSuccessful()) throw new IOException("Failed to get rank: " + response);
-            if (response.body() == null) throw new IOException("Empty response body for rank");
+        // 2. 네트워크 실행 (공통 메서드 재사용 권장)
+        String responseBody = executeAndGetBody(request);
 
-            String responseBody = response.body().string();
-            if (!responseBody.equals("null")) {
-                Type type = new TypeToken<Map<String, Object>>(){}.getType();
-                Map<String, Object> higherScores = gson.fromJson(responseBody, type);
-                higherRankersCount = higherScores.size();
-            }
+        // 3. 파싱 및 카운트 계산 (메서드 추출)
+        return countRankersFromJson(responseBody);
+    }
+
+    // 순수 데이터 변환 로직
+    private long countRankersFromJson(String responseBody) {
+        if (responseBody.equals("null")) {
+            return 0L; // 나보다 높은 사람이 없음
         }
 
-        long myRank = higherRankersCount + 1;
+        Type type = new TypeToken<Map<String, Object>>(){}.getType();
+        Map<String, Object> higherScores = gson.fromJson(responseBody, type);
 
-        Map<String, Long> result = new HashMap<>();
-        result.put("bestScore", bestScore);
-        result.put("rank", myRank);
-        return result;
+        return (long) higherScores.size();
     }
 
     // JSON 응답을 객체로 변환하기 위한 도우미 클래스 (POJO)
@@ -153,31 +179,36 @@ public class FirebaseRankings {
      * @return 상위 10명의 GameResult 리스트
      */
     public List<GameResult> getTop10Rankings(String idToken, int mapId) throws IOException {
-        // orderBy: "score"를 기준으로 정렬
-        // limitToLast: 정렬된 결과의 마지막 10개를 가져옴 (즉, 가장 점수가 높은 10개)
+        // 1. URL 및 요청 생성
         String top10Url = String.format("%sscores_by_map/map_%d.json?orderBy=\"score\"&limitToLast=10&auth=%s",
                 DATABASE_URL, mapId, idToken);
         Request request = new Request.Builder().url(top10Url).build();
 
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) throw new IOException("Failed to get top 10: " + response);
-            if (response.body() == null) throw new IOException("Empty response body for top 10");
+        // 2. 네트워크 실행 (공통 메서드 재사용)
+        String responseBody = executeAndGetBody(request);
 
-            String responseBody = response.body().string();
-            if (responseBody.equals("null")) {
-                return new ArrayList<>(); // 랭킹 데이터가 없음
-            }
+        // 3. 파싱 및 정렬 (순수 로직 분리)
+        return parseAndSortRankings(responseBody);
+    }
 
-            Type type = new TypeToken<Map<String, GameResult>>(){}.getType();
-            Map<String, GameResult> scoresMap = gson.fromJson(responseBody, type);
-
-            // Map의 값들을 리스트로 변환
-            List<GameResult> topScores = new ArrayList<>(scoresMap.values());
-
-            // 중요: 점수가 높은 순서(내림차순)로 리스트를 정렬
-            topScores.sort(Comparator.comparingLong(o -> ((GameResult)o).score).reversed());
-
-            return topScores;
+    private List<GameResult> parseAndSortRankings(String responseBody) {
+        // 데이터가 없으면 빈 리스트 반환 (Guard Clause)
+        if (responseBody.equals("null")) {
+            return new ArrayList<>();
         }
+
+        // JSON 파싱
+        Type type = new TypeToken<Map<String, GameResult>>(){}.getType();
+        Map<String, GameResult> scoresMap = gson.fromJson(responseBody, type);
+
+        // 변환 및 정렬
+        List<GameResult> topScores = new ArrayList<>(scoresMap.values());
+
+        // 람다식 내부 캐스팅 제거 및 깔끔하게 정리
+        // (GameResult 객체의 score 필드에 접근한다고 가정)
+        topScores.sort((o1, o2) -> Long.compare(o2.score, o1.score));
+        // 또는 Java 8 스타일: topScores.sort(Comparator.comparingLong((GameResult o) -> o.score).reversed());
+
+        return topScores;
     }
 }

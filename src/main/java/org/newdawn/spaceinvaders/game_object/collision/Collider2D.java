@@ -142,112 +142,95 @@ public class Collider2D extends GameObject2D {
     }
 
     public boolean collidesWith(Collider2D other) {
-        long[] globalVertices = getGlobalVertices();
-        long myLeftTopX = globalVertices[0];
-        long myLeftTopY = globalVertices[1];
-        long myRightTopX = globalVertices[2];
-        long myRightTopY = globalVertices[3];
-        long myRightBottomX = globalVertices[4];
-        long myRightBottomY = globalVertices[5];
-        long myLeftBottomX = globalVertices[6];
-        long myLeftBottomY = globalVertices[7];
+        // 1. 나의 기하 정보 계산
+        long[] myV = getGlobalVertices();
+        long myCenterX = (myV[0] + myV[4]) / 2;
+        long myCenterY = (myV[1] + myV[5]) / 2;
+        long myHalfDiagAX = myV[0] - myCenterX;
+        long myHalfDiagAY = myV[1] - myCenterY;
+        long myHalfDiagBX = myV[2] - myCenterX;
+        long myHalfDiagBY = myV[3] - myCenterY;
 
-        // 평균으로 중앙지점 구하기. 합하고 2로 나눔
-        long myCenterX = (myLeftTopX + myRightBottomX) / 2;
-        long myCenterY = (myLeftTopY + myRightBottomY) / 2;
-        // 두 대각선 벡터 절반 구함
-        long myHalfDiagonalAX = (myLeftTopX - myCenterX);
-        long myHalfDiagonalAY = (myLeftTopY - myCenterY);
-        long myHalfDiagonalBX = (myRightTopX - myCenterX);
-        long myHalfDiagonalBY = (myRightTopY - myCenterY);
-        
+        // 2. 상대의 기하 정보 계산
+        long[] otherV = other.getGlobalVertices();
+        long otherCenterX = (otherV[0] + otherV[4]) / 2;
+        long otherCenterY = (otherV[1] + otherV[5]) / 2;
+        long otherHalfDiagAX = otherV[0] - otherCenterX;
+        long otherHalfDiagAY = otherV[1] - otherCenterY;
+        long otherHalfDiagBX = otherV[2] - otherCenterX;
+        long otherHalfDiagBY = otherV[3] - otherCenterY;
 
+        // 3. 중심 간 거리 벡터
+        long toOtherX = otherCenterX - myCenterX;
+        long toOtherY = otherCenterY - myCenterY;
 
-        globalVertices = other.getGlobalVertices();
-        long otherLeftTopX = globalVertices[0];
-        long otherLeftTopY = globalVertices[1];
-        long otherRightTopX = globalVertices[2];
-        long otherRightTopY = globalVertices[3];
-        long otherRightBottomX = globalVertices[4];
-        long otherRightBottomY = globalVertices[5];
-        long otherLeftBottomX = globalVertices[6];
-        long otherLeftBottomY = globalVertices[7];
-        
-        // 평균으로 중앙지점 구하기. 합하고 2로 나눔
-        long otherCenterX = (otherLeftTopX + otherRightBottomX) / 2;
-        long otherCenterY = (otherLeftTopY + otherRightBottomY) / 2;
-        // 두 대각선 벡터 절반 구함
-        long otherHalfDiagonalAX = (otherLeftTopX - otherCenterX);
-        long otherHalfDiagonalAY = (otherLeftTopY - otherCenterY);
-        long otherHalfDiagonalBX = (otherRightTopX - otherCenterX);
-        long otherHalfDiagonalBY = (otherRightTopY - otherCenterY);
+        // 4. 분리 여부 판단 (if문 제거)
+        // "어느 한 축에서라도 분리되어 있다면(isSeparated... 가 true라면) 충돌이 아님"
+        // || 연산자는 앞의 조건이 true면 뒤를 실행하지 않으므로(Short-circuit),
+        // 기존 if문과 성능 및 동작이 100% 동일합니다.
 
+        boolean isSeparated =
+                // Check 1: 나의 X축
+                isSeparatedOnAxis(
+                        getGlobalTransform().getXAxisX(), getGlobalTransform().getXAxisY(),
+                        getScaledHalfSize(boundsWidth),
+                        otherHalfDiagAX, otherHalfDiagAY, otherHalfDiagBX, otherHalfDiagBY,
+                        toOtherX, toOtherY)
+                        ||
+                        // Check 2: 나의 Y축
+                        isSeparatedOnAxis(
+                                getGlobalTransform().getYAxisX(), getGlobalTransform().getYAxisY(),
+                                getScaledHalfSize(boundsHeight),
+                                otherHalfDiagAX, otherHalfDiagAY, otherHalfDiagBX, otherHalfDiagBY,
+                                toOtherX, toOtherY)
+                        ||
+                        // Check 3: 상대의 X축
+                        isSeparatedOnAxis(
+                                other.getGlobalTransform().getXAxisX(), other.getGlobalTransform().getXAxisY(),
+                                other.getScaledHalfSize(other.boundsWidth),
+                                myHalfDiagAX, myHalfDiagAY, myHalfDiagBX, myHalfDiagBY,
+                                toOtherX, toOtherY)
+                        ||
+                        // Check 4: 상대의 Y축
+                        isSeparatedOnAxis(
+                                other.getGlobalTransform().getYAxisX(), other.getGlobalTransform().getYAxisY(),
+                                other.getScaledHalfSize(other.boundsHeight),
+                                myHalfDiagAX, myHalfDiagAY, myHalfDiagBX, myHalfDiagBY,
+                                toOtherX, toOtherY);
 
-        // 나와 상대의 중심 간 거리를 구하기 위하여
-        long meToOtherX = otherCenterX - myCenterX;
-        long meToOtherY = otherCenterY - myCenterY;
+        // 분리되지 않았다면(!isSeparated) 충돌한 것(true)
+        return !isSeparated;
+    }
 
-        long axisX;
-        long axisY;
-        long another;
-        long dotHalfDiagonal;
-        long dotMeToOther;
+// --- Helper Methods (private) ---
 
-        // my X축에 대하여
-        axisX = getGlobalTransform().getXAxisX();
-        axisY = getGlobalTransform().getXAxisY();
-        another = Math.abs(FixedPointUtil.mul(boundsWidth / 2, getGlobalTransform().getScale()));
-        dotHalfDiagonal = Math.max(
-                FixedPointUtil.dotAbs(otherHalfDiagonalAX, otherHalfDiagonalAY, axisX, axisY),
-                FixedPointUtil.dotAbs(otherHalfDiagonalBX, otherHalfDiagonalBY, axisX, axisY)  );
-        dotMeToOther = FixedPointUtil.dotAbs(meToOtherX, meToOtherY, axisX, axisY);
-        if(another + dotHalfDiagonal < dotMeToOther) return false;
+    /**
+     * 특정 축(axis)에 대해 분리되어 있는지(충돌하지 않는지) 검사합니다.
+     * @param axisX, axisY : 검사할 축의 단위 벡터 (또는 정규화된 축)
+     * @param halfSizeOnAxis : 검사 축의 주인인 객체의 투영된 절반 크기 (이미 축 정렬 상태이므로 단순 스칼라값)
+     * @param diagAX, diagAY, diagBX, diagBY : 상대 객체의 두 대각선 벡터
+     * @param distX, distY : 두 객체 중심 간의 거리 벡터
+     */
+    private boolean isSeparatedOnAxis(long axisX, long axisY, long halfSizeOnAxis,
+                                      long diagAX, long diagAY, long diagBX, long diagBY,
+                                      long distX, long distY) {
+        // 상대 대각선들을 해당 축에 투영했을 때 더 긴 길이를 구함
+        long projectionOther = Math.max(
+                FixedPointUtil.dotAbs(diagAX, diagAY, axisX, axisY),
+                FixedPointUtil.dotAbs(diagBX, diagBY, axisX, axisY)
+        );
 
-        // my Y축에 대하여
-        axisX = getGlobalTransform().getYAxisX();
-        axisY = getGlobalTransform().getYAxisY();
-        another = Math.abs(FixedPointUtil.mul(boundsHeight / 2, getGlobalTransform().getScale()));
-        dotHalfDiagonal = Math.max(
-                FixedPointUtil.dotAbs(otherHalfDiagonalAX, otherHalfDiagonalAY, axisX, axisY),
-                FixedPointUtil.dotAbs(otherHalfDiagonalBX, otherHalfDiagonalBY, axisX, axisY)  );
-        dotMeToOther = FixedPointUtil.dotAbs(meToOtherX, meToOtherY, axisX, axisY);
-        if(another + dotHalfDiagonal < dotMeToOther) return false;
+        // 중심 간 거리를 해당 축에 투영
+        long projectionCenter = FixedPointUtil.dotAbs(distX, distY, axisX, axisY);
 
-        // other X축에 대하여
-        axisX = other.getGlobalTransform().getXAxisX();
-        axisY = other.getGlobalTransform().getXAxisY();
-        another = Math.abs(FixedPointUtil.mul(other.boundsWidth / 2, other.getGlobalTransform().getScale()));
-        dotHalfDiagonal = Math.max(
-                FixedPointUtil.dotAbs(myHalfDiagonalAX, myHalfDiagonalAY, axisX, axisY),
-                FixedPointUtil.dotAbs(myHalfDiagonalBX, myHalfDiagonalBY, axisX, axisY)  );
-        dotMeToOther = FixedPointUtil.dotAbs(meToOtherX, meToOtherY, axisX, axisY);
-        if(another + dotHalfDiagonal < dotMeToOther) return false;
+        // (내 절반 크기 + 상대 절반 크기) < 중심 거리 이면 분리된 것
+        return (halfSizeOnAxis + projectionOther) < projectionCenter;
+    }
 
-        // other Y축에 대하여
-        axisX = other.getGlobalTransform().getYAxisX();
-        axisY = other.getGlobalTransform().getYAxisY();
-        another = Math.abs(FixedPointUtil.mul(other.boundsHeight / 2, other.getGlobalTransform().getScale()));
-        dotHalfDiagonal = Math.max(
-                FixedPointUtil.dotAbs(myHalfDiagonalAX, myHalfDiagonalAY, axisX, axisY),
-                FixedPointUtil.dotAbs(myHalfDiagonalBX, myHalfDiagonalBY, axisX, axisY)  );
-        dotMeToOther = FixedPointUtil.dotAbs(meToOtherX, meToOtherY, axisX, axisY);
-        if(another + dotHalfDiagonal < dotMeToOther) return false;
-
-        return true;
-        
-//        long[] myBounds = getGlobalBounds();
-//        long[] otherBounds = other.getGlobalBounds();
-//
-//        long myStartX = myBounds[0];
-//        long myStartY = myBounds[1];
-//        long myEndX = myBounds[0] + myBounds[2];
-//        long myEndY = myBounds[1] + myBounds[3];
-//
-//        long otherStartX = otherBounds[0];
-//        long otherStartY = otherBounds[1];
-//        long otherEndX = otherBounds[0] + otherBounds[2];
-//        long otherEndY = otherBounds[1] + otherBounds[3];
-//
-//        return myStartX <= otherEndX && myEndX >= otherStartX && myStartY <= otherEndY && myEndY >= otherStartY;
+    /**
+     * 월드 스케일이 적용된 절반 크기를 구합니다. (중복 계산 제거)
+     */
+    private long getScaledHalfSize(long size) {
+        return Math.abs(FixedPointUtil.mul(size / 2, getGlobalTransform().getScale()));
     }
 }

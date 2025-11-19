@@ -294,19 +294,20 @@ public class GameLoopPlayerLoop extends Loop implements IGameLoopGameResultListe
 
         @Override
         public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
+            boolean result = false;
             if (data instanceof PacketDataS2CPreprocessForGame) {
                 processPacketDataS2CPreprocessForGame((PacketDataS2CPreprocessForGame) data);
-                return true;
+                result = true;
             }
             else if (data instanceof PacketDataS2CStartGame) {
                 gameStarted = true;
-                return true;
+                result = true;
             }
             else if (data instanceof PacketDataP2PInput) {
                 processPacketDataP2PInput((PacketDataP2PInput) data);
-                return true;
+                result = true;
             }
-            return false;
+            return result;
         }
         private void processPacketDataS2CPreprocessForGame(PacketDataS2CPreprocessForGame data){
             // 게임 생성

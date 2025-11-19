@@ -47,90 +47,131 @@ public class LobbyListLoop extends Loop{
 
     public LobbyListLoop(Game game) {
         super(game);
-        lobbyCreationDialog = new JDialog(getGame().getContainer(),"로비 생성");
+
+        // 1. Swing 다이얼로그(로비 생성 창) 초기화
+        initLobbyCreationDialog();
+
+        // 2. 게임 오브젝트 및 버튼 생성
+        initGameObjects();
+
+        // 3. 객체 계층 구조 조립 (addChild)
+        buildSceneHierarchy();
+
+        // 4. 위치 및 스타일 설정
+        setupLayoutAndStyles();
+
+        // 5. 초기 데이터 요청
+        requestLobbyList();
+    }
+
+    private void initLobbyCreationDialog() {
+        lobbyCreationDialog = new JDialog(getGame().getContainer(), "로비 생성");
         lobbyCreationDialog.setLocationRelativeTo(getGame().getContainer());
         lobbyCreationDialog.setResizable(false);
         lobbyCreationDialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
         lobbyCreationDialog.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                lobbyCreationDialog.setVisible(false);
-                creatingLobby = false;
+                closeLobbyDialog(); // 로직 분리
             }
         });
-        JPanel lobbyCreationPanel = (JPanel) lobbyCreationDialog.getContentPane();
-        lobbyCreationPanel.setLayout(new BoxLayout(lobbyCreationPanel, BoxLayout.Y_AXIS));
 
-        JPanel lobbyinfoGridPanel = new JPanel(new GridLayout(2, 2));
-        lobbyinfoGridPanel.add(new JLabel("로비 제목"));
-        JTextField lobbynameText = new JTextField();
-        lobbynameText.setPreferredSize(new Dimension(200, 0));
-        lobbyinfoGridPanel.add(lobbynameText);
-        lobbyinfoGridPanel.add(new JLabel("최대 인원 수"));
-        JSpinner lobbyMaxPlayersSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4, 1));
-        lobbyMaxPlayersSpinner.setValue(4);
-        lobbyinfoGridPanel.add(lobbyMaxPlayersSpinner);
-
-        JPanel lobbyButtonsPanel = new JPanel(new FlowLayout());
-        JButton buttonCreate = new JButton("생성");
-        buttonCreate.addActionListener(e -> {
-            createLobby(lobbynameText.getText(), (Integer) lobbyMaxPlayersSpinner.getValue());
-        });
-        lobbyButtonsPanel.add(buttonCreate);
-
-        lobbyCreationPanel.add(lobbyinfoGridPanel);
-        lobbyCreationPanel.add(lobbyButtonsPanel);
-
+        // 다이얼로그 내부 UI 구성 메서드 호출
+        composeDialogContent();
         lobbyCreationDialog.pack();
+    }
 
+    private void composeDialogContent() {
+        JPanel mainPanel = (JPanel) lobbyCreationDialog.getContentPane();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+
+        // 입력 필드 구성
+        JPanel infoPanel = new JPanel(new GridLayout(2, 2));
+        JTextField nameText = new JTextField();
+        nameText.setPreferredSize(new Dimension(200, 0));
+        JSpinner maxPlayersSpinner = new JSpinner(new SpinnerNumberModel(1, 1, 4, 1));
+        maxPlayersSpinner.setValue(4);
+
+        infoPanel.add(new JLabel("로비 제목"));
+        infoPanel.add(nameText);
+        infoPanel.add(new JLabel("최대 인원 수"));
+        infoPanel.add(maxPlayersSpinner);
+
+        // 버튼 구성
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        JButton createBtn = new JButton("생성");
+        createBtn.addActionListener(e ->
+                createLobby(nameText.getText(), (Integer) maxPlayersSpinner.getValue())
+        );
+        buttonPanel.add(createBtn);
+
+        mainPanel.add(infoPanel);
+        mainPanel.add(buttonPanel);
+    }
+
+    private void closeLobbyDialog() {
+        lobbyCreationDialog.setVisible(false);
+        creatingLobby = false;
+    }
+
+    private void initGameObjects() {
         lobbylistGUI = new GameObject2D(this);
-
         lobbyButtonContainer = new GameObject2D(this);
         lobbyButtons = new ArrayList<>();
-
         notificationText = new TextRenderer(this, "입장할 로비를 선택하세요.", 20, Color.white);
 
-        createLobbyButton = new Button(this, () -> {
-            if(waitingForServer || creatingLobby){return;}
+        createLobbyButton = new Button(this, this::onClickCreateLobby, 200, 50);
+        refreshButton = new Button(this, this::onClickRefresh, 200, 50);
+        exitButton = new Button(this, this::onClickExit, 200, 50);
+    }
 
-            creatingLobby = true;
-            lobbyCreationDialog.setVisible(true);
-        }, 200, 50);
-        refreshButton = new Button(this, () -> {
-            if(waitingForServer || creatingLobby){return;}
+    // 버튼 콜백 메서드들 (람다 식 내부 로직 추출)
+    private void onClickCreateLobby() {
+        if (waitingForServer || creatingLobby) return;
+        creatingLobby = true;
+        lobbyCreationDialog.setVisible(true);
+    }
 
-            requestLobbyList();
-        }, 200, 50);
-        exitButton = new Button(this, () -> {
-            if(waitingForServer || creatingLobby){return;}
+    private void onClickRefresh() {
+        if (waitingForServer || creatingLobby) return;
+        requestLobbyList();
+    }
 
-            getGame().changeLoop(new MainMenuLoop(getGame()));
-        }, 200, 50);
+    private void onClickExit() {
+        if (waitingForServer || creatingLobby) return;
+        getGame().changeLoop(new MainMenuLoop(getGame()));
+    }
 
+    private void buildSceneHierarchy() {
         addGameObject(lobbylistGUI);
-
         lobbylistGUI.addChild(lobbyButtonContainer);
-
         lobbylistGUI.addChild(notificationText);
-
         lobbylistGUI.addChild(createLobbyButton);
         lobbylistGUI.addChild(refreshButton);
         lobbylistGUI.addChild(exitButton);
+    }
 
+    private void setupLayoutAndStyles() {
+        // 알림 텍스트
         notificationText.setPos(400L << 16, 500L << 16);
         notificationText.alignment = 1;
 
+        // 로비 생성 버튼
         createLobbyButton.setPos(800L << 16, 550L << 16);
         createLobbyButton.alignment = 2;
         createLobbyButton.addTextRenderer("로비 생성", 20, Color.WHITE, 0);
+
+        // 갱신 버튼
         refreshButton.setPos(400L << 16, 550L << 16);
         refreshButton.alignment = 1;
         refreshButton.addTextRenderer("로비 목록 갱신", 20, Color.WHITE, 0);
+
+        // 나가기 버튼
         exitButton.setPos(0L << 16, 550L << 16);
         exitButton.alignment = 0;
         exitButton.addTextRenderer("나가기", 20, Color.WHITE, 0);
-
-        requestLobbyList();
     }
+
     @Override
     public void onExitLoop(){
         super.onExitLoop();
@@ -201,11 +242,12 @@ public class LobbyListLoop extends Loop{
 
         @Override
         public boolean onReceived(RUDPPeer peer, Connection connection, PacketData data) {
+            boolean result = false;
             if(data instanceof PacketDataS2CLobbyList) {
                 updateLobbyList((PacketDataS2CLobbyList) data);
 
                 waitingForServer = false;
-                return true;
+                result = true;
             }
             else if (data instanceof PacketDataS2CEnterLobbyFaild) {
                 PacketDataS2CEnterLobbyFaild d = (PacketDataS2CEnterLobbyFaild) data;
@@ -215,7 +257,7 @@ public class LobbyListLoop extends Loop{
                 requestLobbyList();
 
                 waitingForServer = false;
-                return true;
+                result = true;
             }
             else if (data instanceof PacketDataS2CLobbyInfoUpdated) {
                 PacketDataS2CLobbyInfoUpdated d = (PacketDataS2CLobbyInfoUpdated) data;
@@ -227,15 +269,15 @@ public class LobbyListLoop extends Loop{
                     //LobbyLoop로 넘겨야함
                     getGame().changeLoop(new LobbyLoop(getGame()));
                 }
-                return false;
+//                result = false;
             }
             else if (data instanceof PacketDataP2PInput) {
                 // 만약 게임 결과 나온 후 로비로 돌아왔을 때 P2P 패킷이 여태까지 남아있으면 안되니
                 // 의미없이 소모
-                return true;
+                result = true;
             }
 
-            return false;
+            return result;
         }
         private void updateLobbyList(PacketDataS2CLobbyList d){
             // 로비 목록 갱신

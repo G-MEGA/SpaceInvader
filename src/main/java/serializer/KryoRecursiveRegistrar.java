@@ -10,8 +10,8 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType; // 제네릭 타입 분석을 위해 import
-import java.lang.reflect.Type;             // 제네릭 타입 분석을 위해 import
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -31,63 +31,82 @@ public class KryoRecursiveRegistrar {
         this.nextId = startingId;
     }
 
+    // [리팩토링 1] 메인 흐름을 관리자 역할로 변경 (복잡도: 1)
     public void register(Class<?> rootClass) {
         addToQueue(rootClass);
+        processQueue();
+        registerCustomSerializers();
+    }
 
+    // [추출] 큐 처리 루프 분리 (복잡도: 2 - while loop 1개)
+    private void processQueue() {
         while (!registrationQueue.isEmpty()) {
             Class<?> currentClass = registrationQueue.poll();
 
-            if (!currentClass.isInterface() && !Modifier.isAbstract(currentClass.getModifiers())) {
-                kryo.register(currentClass, nextId);
-                System.out.println("Registered: " + currentClass.getName() + " with ID: " + nextId);
-                nextId++;
-            }
+            tryRegisterCurrentClass(currentClass);
 
             scanFields(currentClass);
             scanSubclasses(currentClass);
         }
+    }
 
+    // [추출] 실제 등록 로직 분리 (복잡도: 2 - if 1개)
+    private void tryRegisterCurrentClass(Class<?> currentClass) {
+        if (isRegisterable(currentClass)) {
+            kryo.register(currentClass, nextId);
+            System.out.println("Registered: " + currentClass.getName() + " with ID: " + nextId);
+            nextId++;
+        }
+    }
+
+    // [추출] 등록 가능 여부 판단 로직 (복잡도: 3 - boolean logic)
+    private boolean isRegisterable(Class<?> currentClass) {
+        return !currentClass.isInterface() && !Modifier.isAbstract(currentClass.getModifiers());
+    }
+
+    // [추출] 커스텀 시리얼라이저 등록 분리 (복잡도: 1)
+    private void registerCustomSerializers() {
         kryo.register(java.awt.Color.class, new ColorSerializer());
         kryo.register(AffineTransform.class, new AffineTransformSerializer());
         kryo.register(Font.class, new FontSerializer());
     }
 
+    // [리팩토링 2] 필드 스캔 (복잡도: 2 - for loop)
+    // Transient 체크를 메서드로 빼면 더 줄일 수 있지만, 이 정도는 허용 범위입니다.
     private void scanFields(Class<?> clazz) {
         for (Field field : clazz.getDeclaredFields()) {
             if (Modifier.isTransient(field.getModifiers())) {
                 continue;
             }
-            // <<< [수정] getGenericType()을 사용하여 제네릭 정보까지 가져옴
             parseAndAddType(field.getGenericType());
         }
     }
 
-    /**
-     * [추가] Type 객체를 재귀적으로 분석하여 큐에 추가하는 헬퍼 메서드
-     */
+    // [리팩토링 3] 타입 분석 분기 로직 단순화 (복잡도: 3 - if/else if)
     private void parseAndAddType(Type type) {
-        // 타입이 ParameterizedType인 경우 (e.g., List<UserData>)
         if (type instanceof ParameterizedType) {
-            ParameterizedType pType = (ParameterizedType) type;
-            // Raw Type을 먼저 큐에 추가 (e.g., List 자체)
-            addToQueue((Class<?>) pType.getRawType());
-            // 제네릭 타입 인자들을 순회하며 재귀적으로 분석 (e.g., UserData)
-            for (Type argType : pType.getActualTypeArguments()) {
-                parseAndAddType(argType);
-            }
-            // 타입이 일반 Class인 경우
+            processParameterizedType((ParameterizedType) type);
         } else if (type instanceof Class) {
-            Class<?> clazz = (Class<?>) type;
-            // 배열이라면 내부 컴포넌트 타입을 큐에 추가 (e.g., UserData[] -> UserData)
-            while (clazz.isArray()) {
-                clazz = clazz.getComponentType();
-            }
-            addToQueue(clazz);
+            processClassType((Class<?>) type);
         }
-        // (WildcardType 등 다른 복잡한 제네릭 타입은 필요 시 추가 확장 가능)
     }
 
-    // (scanSubclasses, addToQueue 메서드는 이전과 동일)
+    // [추출] 제네릭 타입 처리 (복잡도: 2 - for loop)
+    private void processParameterizedType(ParameterizedType pType) {
+        addToQueue((Class<?>) pType.getRawType());
+        for (Type argType : pType.getActualTypeArguments()) {
+            parseAndAddType(argType);
+        }
+    }
+
+    // [추출] 일반 클래스/배열 처리 (복잡도: 2 - while loop)
+    private void processClassType(Class<?> clazz) {
+        while (clazz.isArray()) {
+            clazz = clazz.getComponentType();
+        }
+        addToQueue(clazz);
+    }
+
     private void scanSubclasses(Class<?> clazz) {
         Set<? extends Class<?>> subTypes = reflections.getSubTypesOf(clazz);
         if (!subTypes.isEmpty()) {
@@ -97,16 +116,32 @@ public class KryoRecursiveRegistrar {
         }
     }
 
+    // [리팩토링 4] 큐 추가 로직 단순화 (복잡도: 2 - if check)
     private void addToQueue(Class<?> clazz) {
-        if (registeredClasses.contains(clazz) || clazz.isPrimitive()) {
+        if (shouldIgnore(clazz)) {
             return;
         }
-        String packageName = clazz.getPackage() == null ? "" : clazz.getPackage().getName();
-        if (packageName.startsWith("java.") || packageName.startsWith("javax.")) {
-            return;
-        }
+
         registrationQueue.add(clazz);
         registeredClasses.add(clazz);
         System.out.println("  -> Added to queue: " + clazz.getName());
+    }
+
+    // [추출] 무시 조건 판단 로직 (복잡도: 3~4 -> 논리 연산자 || 로 묶임)
+    // 복잡해 보이지만 boolean 식 하나로 처리되면 복잡도가 낮게 측정됩니다.
+    private boolean shouldIgnore(Class<?> clazz) {
+        if (registeredClasses.contains(clazz) || clazz.isPrimitive()) {
+            return true;
+        }
+        return isSystemPackage(clazz);
+    }
+
+    // [추출] 시스템 패키지 확인 (복잡도: 2 - null check + startsWith)
+    private boolean isSystemPackage(Class<?> clazz) {
+        Package pkg = clazz.getPackage();
+        if (pkg == null) return false; // default package
+
+        String packageName = pkg.getName();
+        return packageName.startsWith("java.") || packageName.startsWith("javax.");
     }
 }

@@ -31,7 +31,9 @@ public class GameObject2D extends GameObject{
     }
 
     public FixedPointAffineTransform getGlobalTransform(){
-        if(!isInLoop()){throw new RuntimeException("not in loop");}
+        if(!isInLoop()){
+            throw new RuntimeException("not in loop");
+        }
 
         if(globalTransformDirty){
             if (getParent() instanceof GameObject2D) {

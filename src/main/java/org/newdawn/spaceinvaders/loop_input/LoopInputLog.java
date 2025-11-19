@@ -36,19 +36,26 @@ public class LoopInputLog {
         inputFrame = Long.parseLong(splited[0]);
 
         for(int i = 1; i < splited.length; i++){
-            char type = splited[i].charAt(splited[i].indexOf(" ") + 1);
-
-            if(type == 'K'){
-                inputs.add(new LoopInputKey(splited[i]));
-                continue;
-            }
-            else if(type == 'M'){
-                inputs.add(new LoopInputMouseMove(splited[i]));
+            if(addInputFrom(splited[i])){
                 continue;
             }
 
             throw new RuntimeException();
         }
+    }
+    private boolean addInputFrom(String data){
+        char type = data.charAt(data.indexOf(" ") + 1);
+
+        if(type == 'K'){
+            inputs.add(new LoopInputKey(data));
+            return true;
+        }
+        else if(type == 'M'){
+            inputs.add(new LoopInputMouseMove(data));
+            return  true;
+        }
+
+        return false;
     }
     public String toSaveData() {
         stringBuilder.setLength(0);

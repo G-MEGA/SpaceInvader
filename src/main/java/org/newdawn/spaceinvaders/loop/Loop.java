@@ -206,27 +206,33 @@ public abstract class Loop  {
         colliders.remove(collider);
     }
 
-    public final void processCollision2D(){
-//        int count = 0;
-//        long nanos = System.nanoTime();
-        for (int p=0;p<colliders.size();p++) {
-            for (int s=p+1;s<colliders.size();s++) {
-//                count++;
-                Collider2D me = colliders.get(p);
-                Collider2D him = colliders.get(s);
+    public final void processCollision2D() {
+        // 외부 루프: 기준이 될 객체를 하나씩 선택
+        for (int i = 0; i < colliders.size(); i++) {
+            checkCollisionsForIndex(i);
+        }
+    }
 
-                if(me.isDestroyed()) continue;
-                if(him.isDestroyed()) continue;
+    private void checkCollisionsForIndex(int index) {
+        Collider2D me = colliders.get(index);
 
-                if (me.collidesWith(him)) {
-                    ICollider2DOwner meOwner = me.getOwner();
-                    ICollider2DOwner himOwner = him.getOwner();
-                    meOwner.collidedWith(himOwner);
-                    himOwner.collidedWith(meOwner);
-                }
+        // 내부 루프: 선택된 객체(me)와 그 이후의 객체들(him)을 비교
+        for (int j = index + 1; j < colliders.size(); j++) {
+            Collider2D him = colliders.get(j);
+
+            // 2. 상대방이 살아있을 때만 충돌 검사
+            if (!me.isDestroyed() && !him.isDestroyed()) {
+                collide(me, him);
             }
         }
-//        System.out.println((System.nanoTime() - nanos)/1000_000.0 + "밀리초");
+    }
+    private void collide(Collider2D a, Collider2D b){
+        if (a.collidesWith(b)) {
+            ICollider2DOwner aOwner = a.getOwner();
+            ICollider2DOwner bOwner = b.getOwner();
+            aOwner.collidedWith(bOwner);
+            bOwner.collidedWith(aOwner);
+        }
     }
 
     protected final void processGameObjects(){

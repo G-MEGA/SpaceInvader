@@ -67,29 +67,7 @@ public class Main {
     };
 
     public Main() throws Exception {
-        GameLoopSerializer.getInstance();// GameLoopSerializer 초기화
-
-        rudpPeer = new RUDPPeer(Network.PEER_UDP_PORT + (int)(System.currentTimeMillis() % 1000));
-
-        rudpPeer.addListener(rudpPeerListener);
-
-        rudpPeer.start();
-
-        InetSocketAddress serverAddress = new InetSocketAddress(Network.SERVER_IP, Network.SERVER_UDP_PORT);
-        int max = 5;
-        for(int i = 0; i < max; i++){
-            if(rudpPeer.isConnected(serverAddress)) break;
-
-            System.out.println("서버와 연결 시도..." + (i+1) + "/ " + max);
-            rudpPeer.connect(serverAddress);
-
-            Thread.sleep(1000);
-        }
-
-        if(!rudpPeer.isConnected(serverAddress)){
-            System.err.println("서버와의 연결에 실패했습니다.");
-            System.exit(0);
-        }
+        initNetworkAndConnect();
 
         authFrame = new JFrame("로그인/회원가입");
         authFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -263,11 +241,44 @@ public class Main {
         authFrame.setLocationRelativeTo(null);//창을 디스플레이 가운데 배치
         authFrame.setVisible(true);
 
+        waitAuth();
+    }
+    private void waitAuth(){
         while(!authenticated){
-            Thread.sleep(100);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             rudpPeer.processReceivedData();
         }
     }
+    private void initNetworkAndConnect() throws Exception {
+        GameLoopSerializer.getInstance();
+        rudpPeer = new RUDPPeer(Network.PEER_UDP_PORT + (int)(System.currentTimeMillis() % 1000));
+        rudpPeer.addListener(rudpPeerListener);
+        rudpPeer.start();
+
+        InetSocketAddress serverAddress = new InetSocketAddress(Network.SERVER_IP, Network.SERVER_UDP_PORT);
+        int max = 5;
+        boolean connected = false;
+
+        for(int i = 0; i < max; i++){
+            if(rudpPeer.isConnected(serverAddress)) {
+                connected = true;
+                break;
+            }
+            System.out.println("서버와 연결 시도..." + (i+1) + "/ " + max);
+            rudpPeer.connect(serverAddress);
+            Thread.sleep(1000);
+        }
+
+        if(!connected){
+            System.err.println("서버와의 연결에 실패했습니다.");
+            System.exit(0);
+        }
+    }
+
     public void startGame(){
         rudpPeer.removeListener(rudpPeerListener);
         Game g = new Game(60L << 16, rudpPeer, (String) authInfo.get("localId"), (String) authInfo.get(ID_TOKEN));

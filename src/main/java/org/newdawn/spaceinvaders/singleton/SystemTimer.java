@@ -22,23 +22,22 @@ public final class SystemTimer {
 	 * 지정 ms 동안 대기
 	 * @param duration 대기 시간(ms)
 	 */
-	public static void sleep(long duration) {
-		if (duration <= 0) return;
+    public static void sleep(long duration) {
+        if (duration <= 0) return;
 
-		final long deadline = System.nanoTime() + duration * 1_000_000L;
-		while (true) {
-			long remaining = deadline - System.nanoTime();
-			if (remaining <= 0) break;
+        final long deadline = System.nanoTime() + duration * 1_000_000L;
+        long remaining;
 
-			long millis = remaining / 1_000_000L;
-			int nanos = (int) (remaining - millis * 1_000_000L);
-			try {
-				// 남은 시간이 1ms 이상이면 ms+nanos로, 아주 짧으면 0ms + nanos로 잠깐 쉼
-				Thread.sleep(millis, nanos);
-			} catch (InterruptedException ie) {
-				Thread.currentThread().interrupt();
-				break;
-			}
-		}
-	}
+        while ((remaining = deadline - System.nanoTime()) > 0) {
+            long millis = remaining / 1_000_000L;
+            int nanos = (int) (remaining % 1_000_000L);
+
+            try {
+                Thread.sleep(millis, nanos);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }
+    }
 }

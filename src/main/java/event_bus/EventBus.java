@@ -37,22 +37,39 @@ public class EventBus {
             subscriber.notify(event);
         }
     }
-    private void processRegistrations(){
-        for(Class eventClass:forRegister.keySet()){
-            Set<IEventBusSubscriber> set = forRegister.get(eventClass);
-            for(IEventBusSubscriber subscriber:set){
-                if(!subscribers.containsKey(eventClass)) subscribers.put(eventClass, new LinkedHashSet<>());
+    private void processRegistrations() {
+        // 메인 메서드는 단순히 흐름만 제어합니다 (복잡도 1)
+        applyNewRegistrations();
+        applyUnregistrations();
+    }
 
-                subscribers.get(eventClass).add(subscriber);
-            }
+// --- 추출된 메서드들 ---
+
+    private void applyNewRegistrations() {
+        // entrySet을 사용하여 불필요한 map.get() 호출 제거
+        for (Map.Entry<Class, LinkedHashSet<IEventBusSubscriber>> entry : forRegister.entrySet()) {
+            Class eventClass = entry.getKey();
+            Set<IEventBusSubscriber> newSubscribers = entry.getValue();
+
+            // 1. computeIfAbsent: 키가 없으면 LinkedHashSet 생성 후 반환 (if 제거)
+            // 2. addAll: 루프 없이 한 번에 추가 (내부 for 제거)
+            subscribers.computeIfAbsent(eventClass, k -> new LinkedHashSet<>())
+                    .addAll(newSubscribers);
         }
-        for(Class eventClass:forUnregister.keySet()){
-            Set<IEventBusSubscriber> set = forUnregister.get(eventClass);
-            for(IEventBusSubscriber subscriber:set){
-                if(!subscribers.containsKey(eventClass)) continue;
-                if(subscribers.get(eventClass).isEmpty()) continue;
+    }
 
-                subscribers.get(eventClass).remove(subscriber);
+    private void applyUnregistrations() {
+        for (Map.Entry<Class, LinkedHashSet<IEventBusSubscriber>> entry : forUnregister.entrySet()) {
+            Class eventClass = entry.getKey();
+            Set<IEventBusSubscriber> targetsToRemove = entry.getValue();
+
+            Set<IEventBusSubscriber> currentSubscribers = subscribers.get(eventClass);
+
+            // 해당 이벤트 클래스에 대한 구독자가 존재할 때만 제거 수행
+            if (currentSubscribers != null) {
+                // removeAll: 루프 없이 한 번에 제거 (내부 for 제거)
+                // isEmpty() 체크 불필요 (비어있으면 아무 일도 안 일어남)
+                currentSubscribers.removeAll(targetsToRemove);
             }
         }
     }

@@ -31,60 +31,106 @@ public class MapDataParser {
         return organizeCommandToSection(commands);
     }
     private Queue<MapLoadCommand> parseCommands(String plainData) {
+        // 1. 데이터 전처리 (Stream Pipeline)
+        String[] lines = Arrays.stream(plainData.trim().split("\n"))
+                .map(String::toLowerCase)
+                .map(String::trim)
+                .filter(s -> !s.isBlank())
+                .toArray(String[]::new);
+
         Queue<MapLoadCommand> commands = new LinkedList<>();
-        String[] plainFile = Arrays.stream(plainData.trim().split("\n"))
-                            .map(String::toLowerCase) // 모든 영문자를 소문자로 바꿈
-                            .map(String::trim)
-                            .filter(s -> !s.isBlank()) // 빈 줄 제거
-                            .toArray(String[]::new);
-                            
 
-        for (String plainCommand : plainFile){
-                    MapLoadCommand command = null;
+        // 2. 변환 및 수집 (단순 반복)
+        for (String line : lines) {
+            MapLoadCommand command = convertLineToCommand(line);
 
-                    if (plainCommand.startsWith(">")){ // section command로 판단
-                        command = parseSectionCommand(plainCommand);
-                    }
-                    else if (plainCommand.startsWith(":")){ // special command로 판단
-                        command = parseSpecialCommand(plainCommand);
-                    }
-                    else if (plainCommand.startsWith("/")){
-                        continue; // 맵의 메타데이터를 의미함. 구현 보류
-                    }
-                    else{ // command 맨 앞에 특정한 표시자가 없으면 instantiate command로 판단
-                        command = parseInstantiateCommand(plainCommand);
-                    }
-                    
-                    commands.add(command);
-                }
-        return commands;
-    }
-    private Queue<SectionData> organizeCommandToSection(Queue<MapLoadCommand> commands) {
-        SectionCommand currentSectionCommand = null;
-        Queue<InstantiateCommand> currentInstantiateCommands = null;
-        Queue<SectionData> sections = new LinkedList<>();
-
-        while (!commands.isEmpty()){    
-            MapLoadCommand currentCommand = commands.poll();
-
-            if (currentCommand instanceof SectionCommand){
-                if (currentSectionCommand != null) {
-                    sections.add(new SectionData(currentSectionCommand, currentInstantiateCommands));
-                }
-                currentSectionCommand = (SectionCommand)currentCommand;
-                currentInstantiateCommands = new LinkedList<>();
-            }
-            else if (currentCommand instanceof InstantiateCommand){
-                currentInstantiateCommands.add((InstantiateCommand)currentCommand);
-            }
-            else if (currentCommand instanceof SpecialCommand){
-                if (((SpecialCommand)currentCommand).getSpecialCommandType() == SpecialCommandType.GAME_END){
-                    sections.add(new SectionData(currentSectionCommand, currentInstantiateCommands));
-                    break;
-                }
+            // null이 아닌 경우(유효한 커맨드인 경우)에만 추가
+            if (command != null) {
+                commands.add(command);
             }
         }
-        return sections;
+
+        return commands;
+    }
+
+    private MapLoadCommand convertLineToCommand(String line) {
+        return switch (line.charAt(0)) {
+            case '/' -> null;                     // 메타데이터
+            case '>' -> parseSectionCommand(line);
+            case ':' -> parseSpecialCommand(line);
+            default  -> parseInstantiateCommand(line);
+        };
+    }
+    private Queue<SectionData> organizeCommandToSection(Queue<MapLoadCommand> commands) {
+        // 상태와 로직을 캡슐화한 객체 생성
+        SectionAccumulator accumulator = new SectionAccumulator();
+
+        // 조건: 커맨드가 남아있고 && 게임 종료 신호가 오지 않았을 때
+        while (!commands.isEmpty() && !accumulator.isFinished()) {
+            accumulator.process(commands.poll());
+        }
+
+        return accumulator.getSections();
+    }
+
+// --- 상태와 로직을 관리하는 헬퍼 클래스 (Inner Class) ---
+
+    private static class SectionAccumulator {
+        private final Queue<SectionData> sections = new LinkedList<>();
+        private SectionCommand currentSectionCommand = null;
+        private Queue<InstantiateCommand> currentInstantiateCommands = new LinkedList<>();
+        private boolean finished = false;
+
+        public void process(MapLoadCommand command) {
+            if (command instanceof SectionCommand) {
+                flush(); // 이전 섹션 저장
+                currentSectionCommand = (SectionCommand) command;
+                currentInstantiateCommands = new LinkedList<>();
+            }
+            else if (command instanceof InstantiateCommand) {
+                currentInstantiateCommands.add((InstantiateCommand) command);
+            }
+            else if (isGameEndCommand(command)) {
+                flush(); // 현재 섹션 저장
+                finished = true; // 종료 플래그 설정
+            }
+        }
+
+        public boolean isFinished() {
+            return finished;
+        }
+
+        public Queue<SectionData> getSections() {
+            return sections;
+        }
+
+        private void flush() {
+            if (currentSectionCommand != null) {
+                sections.add(new SectionData(currentSectionCommand, currentInstantiateCommands));
+            }
+        }
+
+        private boolean isGameEndCommand(MapLoadCommand command) {
+            return command instanceof SpecialCommand
+                    && ((SpecialCommand) command).getSpecialCommandType() == SpecialCommandType.GAME_END;
+        }
+    }
+
+// --- 추출된 헬퍼 메서드들 ---
+
+    // 섹션 데이터를 리스트에 추가하는 로직 (중복 제거)
+    private void flushCurrentSection(Queue<SectionData> sections,
+                                     SectionCommand sectionCmd,
+                                     Queue<InstantiateCommand> instantiateCmds) {
+        if (sectionCmd != null) {
+            sections.add(new SectionData(sectionCmd, instantiateCmds));
+        }
+    }
+
+    // 종료 커맨드인지 확인하는 로직 (복잡한 조건식 캡슐화)
+    private boolean isGameEndCommand(MapLoadCommand command) {
+        return command instanceof SpecialCommand
+                && ((SpecialCommand) command).getSpecialCommandType() == SpecialCommandType.GAME_END;
     }
         
 

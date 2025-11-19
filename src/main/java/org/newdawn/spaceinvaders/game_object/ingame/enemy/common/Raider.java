@@ -32,21 +32,50 @@ public class Raider extends SweeperEnemy{
         onHitFrames.add("sprites/enemy/enemyOnHit3.png");
     }
 
+    // 상수 추출로 매직 넘버(29 << 16) 제거 및 의미 부여
+    private static final long DETECTION_RANGE_X = 29L << 16;
+    private static final long CHARGE_SPEED_Y = FixedPointUtil.fromLong(300L);
+
     @Override
     protected void process(long deltaTime) {
         super.process(deltaTime);
 
-        if(!_hasCharged){
-            for (int aliveShipIndex=0; aliveShipIndex < ((GameLoop)getLoop()).getAliveShipCount(); aliveShipIndex++) {
-                PlayerShip playerShip = ((GameLoop)getLoop()).getAliveShip(aliveShipIndex);
-                if (Math.abs(playerShip.getPosX() - getPosX()) < 29 << 16){
-                    _hasCharged = true;
-                    velocityX = 0;
-                    velocityY = FixedPointUtil.fromLong(300L);
-                    break;
-                }
+        // 1. 이미 돌격했다면 로직 종료 (Guard Clause)
+        if (_hasCharged) return;
+
+        // 2. 탐색 후 조건 만족 시 돌격 실행
+        if (isPlayerInDetectionRange()) {
+            startCharge();
+        }
+    }
+
+    /**
+     * 범위 내에 플레이어가 있는지 탐색합니다.
+     * (탐색 로직 분리 -> 복잡도 격리)
+     */
+    private boolean isPlayerInDetectionRange() {
+        GameLoop gameLoop = (GameLoop) getLoop();
+        int aliveCount = gameLoop.getAliveShipCount();
+
+        for (int i = 0; i < aliveCount; i++) {
+            PlayerShip playerShip = gameLoop.getAliveShip(i);
+
+            // X축 거리가 감지 범위 내인지 확인
+            if (Math.abs(playerShip.getPosX() - getPosX()) < DETECTION_RANGE_X) {
+                return true; // 발견 즉시 true 반환 (break 불필요)
             }
         }
+        return false;
+    }
+
+    /**
+     * 돌격 상태로 전환하고 속도를 설정합니다.
+     * (상태 변경 로직 분리)
+     */
+    private void startCharge() {
+        _hasCharged = true;
+        velocityX = 0;
+        velocityY = CHARGE_SPEED_Y;
     }
 
     @Override

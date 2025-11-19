@@ -20,72 +20,73 @@ public class StoreSlotFactory {
     public static final int PS_DAMAGE_UP = 1;
     public static final int PS_ADDITIONAL_ENGINE = 2;
     public static final int PS_REPAIR_KIT = 3;
-    
+
     //* active skill ID
     public static final int AS_BARRIER = 0;
     public static final int AS_BOMB = 1;
     public static final int AS_LASER = 2;
     public static final int AS_REFLECT = 3;
 
-    //kryo 역직렬화를 위한 매개변수 없는 생성자
     public StoreSlotFactory(){}
     public StoreSlotFactory(GameLoop gameLoop) {
         this.gameLoop = gameLoop;
     }
 
-    public void createPassiveSkillItemSlot(int skillId, PositionAngleSet positionAngleSet, PlayerShip playerShip){
-        PassiveSkill passiveSkill = null;
+    // [Refactoring] 메인 메서드는 흐름만 제어 (복잡도 2: null 체크 하나뿐)
+    public void createPassiveSkillItemSlot(int skillId, PositionAngleSet pos, PlayerShip playerShip){
+        PassiveSkill passiveSkill = generatePassiveSkill(skillId);
 
+        if (passiveSkill != null) {
+            spawnToGameLoop(passiveSkill, pos);
+        }
+    }
+
+    // [Refactoring] 메인 메서드는 흐름만 제어 (복잡도 2)
+    public void createActiveSkillItemSlot(int skillId, PositionAngleSet pos){
+        ActiveSkill activeSkill = generateActiveSkill(skillId);
+
+        if (activeSkill != null) {
+            spawnToGameLoop(activeSkill, pos);
+        }
+    }
+
+    // [Extract] 공통된 스폰 로직 분리 (복잡도 1: 분기 없음)
+    private void spawnToGameLoop(IStoreItem skillItem, PositionAngleSet pos) {
+        StoreSlot storeSlot = new StoreSlot(gameLoop, skillItem, pos.positionX, pos.positionY);
+        SpawnSignal spawnSignal = new SpawnSignal(storeSlot, gameLoop, pos, SpawnSignal.STORE_ITEM_SIGNAL);
+        gameLoop.addGameObject(spawnSignal);
+    }
+
+    // [Extract] 스위치 문 분리 (복잡도 4~5: 스위치 문 집중)
+    // Java 14+를 쓴다면 Switch Expression을 써서 더 줄일 수 있습니다.
+    private PassiveSkill generatePassiveSkill(int skillId) {
+        PassiveSkill passiveSkill = null;
         switch (skillId) {
-            case PS_FIRE_SPEED:
-                passiveSkill = new PassiveSkill(PlayerPassiveSkillType.FIRE_SPEED, gameLoop);
-                break;
-            case PS_DAMAGE_UP:
-                passiveSkill = new PassiveSkill(PlayerPassiveSkillType.DAMAGE_UP, gameLoop);
-                break;
-            case PS_ADDITIONAL_ENGINE:
-                passiveSkill = new PassiveSkill(PlayerPassiveSkillType.ADDITIONAL_ENGINE, gameLoop);
-                break;
-            case PS_REPAIR_KIT:
-                passiveSkill = new PassiveSkill(PlayerPassiveSkillType.REPAIR_KIT, gameLoop);
-                break;
+            case PS_FIRE_SPEED:      passiveSkill = new PassiveSkill(PlayerPassiveSkillType.FIRE_SPEED, gameLoop); break;
+            case PS_DAMAGE_UP:       passiveSkill = new PassiveSkill(PlayerPassiveSkillType.DAMAGE_UP, gameLoop); break;
+            case PS_ADDITIONAL_ENGINE: passiveSkill = new PassiveSkill(PlayerPassiveSkillType.ADDITIONAL_ENGINE, gameLoop); break;
+            case PS_REPAIR_KIT:      passiveSkill = new PassiveSkill(PlayerPassiveSkillType.REPAIR_KIT, gameLoop); break;
             default:
                 System.err.println(skillId + "은 존재하지 않은 passiveSkill ID 입니다.");
-                return;
+                passiveSkill = null;
+                break;
         }
-
-        StoreSlot storeSlot = new StoreSlot(gameLoop, passiveSkill, positionAngleSet.positionX, positionAngleSet.positionY);
-
-        SpawnSignal spawnSignal = new SpawnSignal(storeSlot, gameLoop, positionAngleSet, SpawnSignal.STORE_ITEM_SIGNAL);
-
-        gameLoop.addGameObject(spawnSignal);
+        return passiveSkill;
     }
-    
-    public void createActiveSkillItemSlot(int skillId, PositionAngleSet positionAngleSet){
+
+    // [Extract] 스위치 문 분리 (복잡도 4~5)
+    private ActiveSkill generateActiveSkill(int skillId) {
         ActiveSkill activeSkill = null;
         switch (skillId) {
-            case AS_BARRIER:
-                activeSkill = new BarrierSkill(gameLoop);
-                break;
-            case AS_BOMB:
-                activeSkill = new BombSkill(gameLoop);
-                break;
-            case AS_LASER:
-                activeSkill = new LaserSkill(gameLoop);
-                break;
-            case AS_REFLECT:
-                activeSkill = new ReflectSkill(gameLoop);
-                break;
+            case AS_BARRIER: activeSkill = new BarrierSkill(gameLoop); break;
+            case AS_BOMB:    activeSkill = new BombSkill(gameLoop); break;
+            case AS_LASER:   activeSkill = new LaserSkill(gameLoop); break;
+            case AS_REFLECT: activeSkill = new ReflectSkill(gameLoop); break;
             default:
                 System.err.println(skillId + "은 존재하지 않은 activeSkill ID 입니다.");
-                return;
+                activeSkill = null;
+                break;
         }
-
-        StoreSlot storeSlot = new StoreSlot(gameLoop, activeSkill, positionAngleSet.positionX, positionAngleSet.positionY);
-
-        SpawnSignal spawnSignal = new SpawnSignal(storeSlot, gameLoop, positionAngleSet, SpawnSignal.STORE_ITEM_SIGNAL);
-
-        gameLoop.addGameObject(spawnSignal);
+        return activeSkill;
     }
-
 }

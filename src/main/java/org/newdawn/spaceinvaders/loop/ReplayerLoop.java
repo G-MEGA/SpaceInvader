@@ -65,36 +65,66 @@ public class ReplayerLoop extends Loop{
     @Override
     public void process(ArrayList<LoopInput> inputs) {
         super.process(inputs);
-
         getGame().getRudpPeer().processReceivedData();
-
         handleInputs();
 
-        int leftLoop = playSpeed;
+        // 복잡한 루프 로직을 별도 메서드로 위임하여 흐름을 단순화
+        runSimulationLoop();
+    }
 
-        while(!paused && leftLoop>0){
-            leftLoop --;
+    /**
+     * 정해진 배속(playSpeed)만큼 시뮬레이션을 반복 실행합니다.
+     */
+    private void runSimulationLoop() {
+        int stepsRemaining = playSpeed;
 
-            if(inputLogs.size() <= currentLogIndex){  // 마지막 입력까지 시뮬레이션 완료함
+        // while 조건에 후위 연산자를 사용하여 내부의 'leftLoop--' 제거 및 라인 단축
+        while (!paused && stepsRemaining-- > 0) {
+            // 1. 로그가 끝났으면 루프 종료 (Guard Clause)
+            if (inputLogs.size() <= currentLogIndex) {
                 return;
             }
 
-            LoopInputLog currentLog = inputLogs.get(currentLogIndex);
+            // 2. 단일 프레임 처리 (메서드 추출)
+            processSingleFrame();
+        }
+    }
 
-            if(currentLog.inputFrame < gameLoop.currentFrame){
-                throw new IllegalStateException("currentLog.inputFrame < gameLoop.currentFrame");
-            }
+    /**
+     * 한 프레임의 로직을 처리합니다.
+     */
+    private void processSingleFrame() {
+        LoopInputLog currentLog = inputLogs.get(currentLogIndex);
 
-            if(currentLog.inputFrame == gameLoop.currentFrame){
-                gameLoop.process(currentLog.inputs);
-                currentLogIndex++;
-            }
-            else{
-                gameLoop.process();
-            }
+        // 1. 유효성 검사 (Guard Clause)
+        validateFrameOrder(currentLog);
 
+        // 2. 게임 로직 수행 (분기 로직)
+        applyGameProcess(currentLog);
 
-            currentFrame++;
+        // 3. 프레임 증가
+        currentFrame++;
+    }
+
+    /**
+     * 현재 로그가 유효한 순서인지 검사합니다.
+     */
+    private void validateFrameOrder(LoopInputLog currentLog) {
+        if (currentLog.inputFrame < gameLoop.currentFrame) {
+            throw new IllegalStateException("currentLog.inputFrame < gameLoop.currentFrame");
+        }
+    }
+
+    /**
+     * 조건에 따라 게임 루프를 진행합니다.
+     * (순수 비즈니스 로직)
+     */
+    private void applyGameProcess(LoopInputLog currentLog) {
+        if (currentLog.inputFrame == gameLoop.currentFrame) {
+            gameLoop.process(currentLog.inputs);
+            currentLogIndex++;
+        } else {
+            gameLoop.process();
         }
     }
     private void handleInputs(){

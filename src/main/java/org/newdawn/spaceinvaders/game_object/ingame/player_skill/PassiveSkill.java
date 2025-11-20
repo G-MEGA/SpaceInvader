@@ -2,47 +2,47 @@ package org.newdawn.spaceinvaders.game_object.ingame.player_skill;
 
 import org.newdawn.spaceinvaders.enums.IndicatorTextType;
 import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
+import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
-public class PassiveSkill extends PlayerSkill{
+public abstract class PassiveSkill{
     private PlayerPassiveSkillType type;
     public PlayerPassiveSkillType getType() { return type; }
+    private int level = 0;
+    private int maxLevel;
+    protected PlayerShip playerShip;
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setPassiveSkillLevel(int i){
+      if((i>0)&&(i<=maxLevel)){
+        level = i;
+        activate(level);
+      }
+    }
+
+    public void upgradePassiveSkill(){
+        setPassiveSkillLevel(level+1);
+    }
+
+    public boolean isPasiveSkillMaxLevel(){
+        return level == maxLevel;
+    }
 
     // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public PassiveSkill(){
         super();
     }
-    public PassiveSkill(PlayerPassiveSkillType type, GameLoop gameLoop) {
-        super(type.getName(), type.getSpriteRef(), gameLoop);
-
-        this.type = type;
-    }
-
-    @Override
-    public boolean onAcquire(GameLoop gameLoop, PlayerShip playerShip) {
-        if (playerShip.isPasiveSkillMaxLevel(type)) {
-            gameLoop.showIndicatorText("'" + type.name() + "'" + " 패시브 스킬은 현재 최대 레벨 입니다.", IndicatorTextType.WARNING);
-            return false;
-        }
-        playerShip.upgradePassiveSkill(type);
+    public PassiveSkill(PlayerShip playerShip,int maxLevel) {
         this.playerShip = playerShip;
-        gameLoop.notifySkillStoreItemAcquired();
-        return true;
+        this.maxLevel = maxLevel;
     }
 
-    @Override
-    public int getPrice(PlayerShip playerShip) {
-        return playerShip.getPassiveSkillLevel(getType())*2 + 1;
-    }
 
-    @Override
-    public String getPriceString(PlayerShip playerShip) {
-        if (playerShip.isPasiveSkillMaxLevel(type)){
-            return "?";
-        }
-        else{
-            return Integer.toString(getPrice(playerShip));
-        }
-    }
+    public abstract void activate(int level); 
+    
+
 }

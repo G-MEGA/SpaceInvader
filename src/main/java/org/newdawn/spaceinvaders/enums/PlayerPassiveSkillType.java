@@ -10,15 +10,15 @@ public enum PlayerPassiveSkillType {
 
     private final String name;
     private final String spriteRef;
-    private final int maxLevel;
+    private final int price;
     
-    PlayerPassiveSkillType(String name, String spriteRef, int maxLevel) {
+    PlayerPassiveSkillType(String name, String spriteRef, int price) {
         this.name = name;
         this.spriteRef = spriteRef;
-        this.maxLevel = maxLevel;
+        this.price = price;
     }
     
     public String getName() { return name; }
     public String getSpriteRef() { return spriteRef; }
-    public int getMaxLevel() { return maxLevel; }
+    public int getPrice() { return price; }
 }

@@ -3,8 +3,7 @@ package org.newdawn.spaceinvaders.game_object.ingame.store;
 import org.newdawn.spaceinvaders.PositionAngleSet;
 import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.SpawnSignal;
-import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
-import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.StorePassiveItem;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.ActiveSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BarrierSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.BombSkill;
@@ -33,21 +32,21 @@ public class StoreSlotFactory {
         this.gameLoop = gameLoop;
     }
 
-    public void createPassiveSkillItemSlot(int skillId, PositionAngleSet positionAngleSet, PlayerShip playerShip){
-        PassiveSkill passiveSkill = null;
+    public void createPassiveSkillItemSlot(int skillId, PositionAngleSet positionAngleSet){
+        StorePassiveItem passiveSkill = null;
 
         switch (skillId) {
             case PS_FIRE_SPEED:
-                passiveSkill = new PassiveSkill(PlayerPassiveSkillType.FIRE_SPEED, gameLoop);
+                passiveSkill = new StorePassiveItem(PlayerPassiveSkillType.FIRE_SPEED);
                 break;
             case PS_DAMAGE_UP:
-                passiveSkill = new PassiveSkill(PlayerPassiveSkillType.DAMAGE_UP, gameLoop);
+                passiveSkill = new StorePassiveItem(PlayerPassiveSkillType.DAMAGE_UP);
                 break;
             case PS_ADDITIONAL_ENGINE:
-                passiveSkill = new PassiveSkill(PlayerPassiveSkillType.ADDITIONAL_ENGINE, gameLoop);
+                passiveSkill = new StorePassiveItem(PlayerPassiveSkillType.ADDITIONAL_ENGINE);
                 break;
             case PS_REPAIR_KIT:
-                passiveSkill = new PassiveSkill(PlayerPassiveSkillType.REPAIR_KIT, gameLoop);
+                passiveSkill = new StorePassiveItem(PlayerPassiveSkillType.REPAIR_KIT);
                 break;
             default:
                 System.err.println(skillId + "은 존재하지 않은 passiveSkill ID 입니다.");

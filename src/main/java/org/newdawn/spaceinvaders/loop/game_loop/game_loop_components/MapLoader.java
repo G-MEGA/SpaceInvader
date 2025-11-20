@@ -108,7 +108,7 @@ public class MapLoader {
                 enemyFactory.spawnEnemy(enemyHiveMind, command.getGameObjectId(), positionAngleSet);
                 break;
             case PASSIVE_SKILL:
-                storeSlotFactory.createPassiveSkillItemSlot(command.getGameObjectId(), positionAngleSet, gameLoop.getPlayerShip(gameLoop.getMyPlayerID()));
+                storeSlotFactory.createPassiveSkillItemSlot(command.getGameObjectId(), positionAngleSet);
                 break;
             case ACTIVE_SKILL:
                 storeSlotFactory.createActiveSkillItemSlot(command.getGameObjectId(), positionAngleSet);

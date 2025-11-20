@@ -1,9 +1,6 @@
 package org.newdawn.spaceinvaders.game_object.ingame.player_skill;
-
-import org.newdawn.spaceinvaders.enums.PlayerPassiveSkillType;
 import org.newdawn.spaceinvaders.fixed_point.FixedPointUtil;
 import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
-import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class MoveSpeedUpPassiveSkill extends PassiveSkill {
 

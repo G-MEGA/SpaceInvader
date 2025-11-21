@@ -16,7 +16,28 @@ public class MapInfo {
 
     public MapInfo(Path path) {
         this.path = path;
+        refresh();
+    }
 
+    @Override
+    public String toString() {
+        return "MapInfo " + title + " " + path + " " + hash;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+    public Path getPath() {
+        return path;
+    }
+    public String getTitle() {
+        return title;
+    }
+    public String getDescription() {
+        return description;
+    }
+
+    public void refresh(){
         try {
             // 2. Files.readString() 메서드를 호출하여 파일 내용을 String으로 읽어옵니다.
             String content = Files.readString(path);
@@ -44,24 +65,6 @@ public class MapInfo {
             System.err.println("파일을 읽는 중 오류가 발생했습니다: " + e.getMessage());
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public String toString() {
-        return "MapInfo " + title + " " + path + " " + hash;
-    }
-
-    public String getHash() {
-        return hash;
-    }
-    public Path getPath() {
-        return path;
-    }
-    public String getTitle() {
-        return title;
-    }
-    public String getDescription() {
-        return description;
     }
 
     public static String md5(String input) {

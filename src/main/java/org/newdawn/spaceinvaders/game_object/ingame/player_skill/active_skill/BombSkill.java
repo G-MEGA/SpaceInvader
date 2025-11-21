@@ -1,5 +1,6 @@
 package org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill;
 
+import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 import org.newdawn.spaceinvaders.loop.game_loop.EventBombUsed;
 
@@ -17,7 +18,7 @@ public class BombSkill extends ActiveSkill {
     }
 
     @Override
-    public void activate() {
+    public void activate(PlayerShip playerShip) {
         gameLoop.publishEvent(new EventBombUsed());
     }
 }

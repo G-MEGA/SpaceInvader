@@ -1,6 +1,7 @@
 package org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill;
 
 import org.newdawn.spaceinvaders.game_object.ingame.laser.PlayerLaser;
+import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class LaserSkill extends ActiveSkill{
@@ -17,7 +18,7 @@ public class LaserSkill extends ActiveSkill{
     }
 
     @Override
-    public void activate() {
+    public void activate(PlayerShip playerShip) {
         long spawnPosX = playerShip.getPosX();
         long spawnPosY = playerShip.getPosY();
         long spawnAngle = playerShip.getRotation();

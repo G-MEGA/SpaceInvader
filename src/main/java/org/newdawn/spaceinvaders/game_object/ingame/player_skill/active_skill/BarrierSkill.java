@@ -1,6 +1,7 @@
 package org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill;
 
 import org.newdawn.spaceinvaders.game_object.ingame.player.Barrier;
+import org.newdawn.spaceinvaders.game_object.ingame.player.PlayerShip;
 import org.newdawn.spaceinvaders.loop.GameLoop;
 
 public class BarrierSkill extends ActiveSkill{
@@ -17,7 +18,7 @@ public class BarrierSkill extends ActiveSkill{
     }
 
     @Override
-    public void activate() {
+    public void activate(PlayerShip playerShip) {
         long spawnAngle = playerShip.getRotation();
         long spawnX = playerShip.getPosX();
         long spawnY = playerShip.getPosY();

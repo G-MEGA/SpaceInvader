@@ -11,6 +11,11 @@ import org.newdawn.spaceinvaders.game_object.ingame.bullet.EnemyBullet;
 import org.newdawn.spaceinvaders.game_object.ingame.bullet.PlayerBullet;
 import org.newdawn.spaceinvaders.game_object.ingame.enemy.Enemy;
 import org.newdawn.spaceinvaders.game_object.ingame.laser.EnemyLaser;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.DamageUpPassiveSkill;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.FireSpeedPassiveSkill;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.MoveSpeedUpPassiveSkill;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.PassiveSkill;
+import org.newdawn.spaceinvaders.game_object.ingame.player_skill.RepairKitPassiveSkill;
 import org.newdawn.spaceinvaders.game_object.ingame.player_skill.active_skill.ActiveSkill;
 import org.newdawn.spaceinvaders.game_object.visual.SpriteRenderer;
 import org.newdawn.spaceinvaders.loop.GameLoop;
@@ -19,16 +24,31 @@ public class PlayerShip extends GameCharacter{
     private int playerID;
 
     private int bulletDamage = 1;
+    public void setBulletDamage(int newBulletDamage){
+        bulletDamage = newBulletDamage;
+    }
 
     /** The speed at which the player's ship should move (pixels/sec) */
     private final long defaultMoveSpeed = 300L << 16;
     private long moveSpeed = defaultMoveSpeed;
+    public long getDefaultMoveSpeed(){
+        return defaultMoveSpeed;
+    }
+    public void setMoveSpeed(long newMoveSpeed){
+        moveSpeed = newMoveSpeed;
+    }
 
     /** The time at which last fired a shot */
     private long lastFire = 0L;
     /** The interval between our players shot (s) */
     private final long defaultFiringIntreval = FixedPointUtil.ZERO_5;
     private long firingInterval = defaultFiringIntreval;
+    public long getDefaultFiringIntreval(){
+        return defaultFiringIntreval;
+    }
+    public void setFiringInterval(long newFiringInterval){
+        firingInterval = newFiringInterval;
+    }
 
     private long activeSkillActivateElapsed = Long.MAX_VALUE;
     private boolean isActiveSkillActable = true;
@@ -51,116 +71,17 @@ public class PlayerShip extends GameCharacter{
     private int waveInitialShield = 0;
     private int currentShield = waveInitialShield; 
     public int getCurrentShield() { return currentShield; }
+    public void setWaveInitialShield(int initialShield){
+        waveInitialShield = initialShield;
+    }
 
     private EnemyDetectionZone enemyDetectionZone;
 
-    private HashMap<PlayerPassiveSkillType, Integer> passiveSkills = new HashMap<>(); // < PlayerPassiveSkillType, level >
-    public int getPassiveSkillLevel(PlayerPassiveSkillType type) { return passiveSkills.get(type); }
-    public boolean isPasiveSkillMaxLevel(PlayerPassiveSkillType type) { return passiveSkills.get(type) == type.getMaxLevel(); }
-    public void upgradePassiveSkill(PlayerPassiveSkillType type) { upgradePassiveSkill(type, 1);}
-    public void upgradePassiveSkill(PlayerPassiveSkillType type, int amount){
-        if (!isPasiveSkillMaxLevel(type)){
-            //* 증가된 레벨 값을 0와 type의 최대 레벨 사이로 clamp한다
-            int newLevel = Math.max(0, Math.min(type.getMaxLevel(), passiveSkills.get(type) + amount));
-            passiveSkills.put(type, newLevel);
-
-            applyPassiveSkill();
-        }
-    } 
-    private void applyPassiveSkill() {
-        for (PlayerPassiveSkillType type : passiveSkills.keySet()) {
-            if (type == PlayerPassiveSkillType.FIRE_SPEED){
-                applyFireSpeedPassiveSkill();
-            }
-            if (type == PlayerPassiveSkillType.DAMAGE_UP){
-                applayDamageUpPassiveSkill();
-            }
-            if (type == PlayerPassiveSkillType.ADDITIONAL_ENGINE){
-                applyAdditionalPassiveSkill();
-            }
-            if (type == PlayerPassiveSkillType.REPAIR_KIT){
-                applyRepairKitPassiveSkill();
-            }
-        }
-    }
-    private void applyFireSpeedPassiveSkill() {
-        long fireSpeedMultiplier;
-        switch (passiveSkills.get(PlayerPassiveSkillType.FIRE_SPEED)) {
-                case 1:
-                    fireSpeedMultiplier = (1 << 16) + FixedPointUtil.ZERO_3;
-                    break;
-                case 2:
-                    fireSpeedMultiplier = (1 << 16) + FixedPointUtil.ZERO_8;
-                    break;
-                case 3:
-                    fireSpeedMultiplier = (2 << 16) + FixedPointUtil.ZERO_5;
-                    break;
-                default:
-                    fireSpeedMultiplier = 1 << 16;
-                    break;
-            }
-            firingInterval = FixedPointUtil.div(defaultFiringIntreval, fireSpeedMultiplier);
-        }
-    private void applayDamageUpPassiveSkill() {
-        int newBulletDamage = 1;
-        switch (passiveSkills.get(PlayerPassiveSkillType.DAMAGE_UP)) {
-            case 1:
-                newBulletDamage = 2; 
-                break;
-            case 2:
-                newBulletDamage = 3; 
-                break;
-            case 3:
-                newBulletDamage = 4; 
-                break;
-            case 4:
-                newBulletDamage = 5; 
-                break;
-            case 5:
-                newBulletDamage = 6; 
-                break;
-            default:
-                newBulletDamage = 1;
-                break;
-        }
-        bulletDamage = newBulletDamage;
-    }
-    private void applyAdditionalPassiveSkill() {
-        long moveSpeedMultiplier = 1 << 16;
-        switch (passiveSkills.get(PlayerPassiveSkillType.ADDITIONAL_ENGINE)) {
-            case 1:
-                moveSpeedMultiplier = (1 << 16) + FixedPointUtil.ZERO_15;
-                break;
-            case 2:
-                moveSpeedMultiplier = (1 << 16) + FixedPointUtil.ZERO_3;
-                break;
-            case 3:
-                moveSpeedMultiplier = (1 << 16) + FixedPointUtil.ZERO_5;
-                break;
-            default:
-                moveSpeedMultiplier = 1 << 16;
-                break;
-        }
-        moveSpeed = FixedPointUtil.mul(defaultMoveSpeed, moveSpeedMultiplier);
-    }
-    private void applyRepairKitPassiveSkill() {
-        int initialShield = 1;
-        switch (passiveSkills.get(PlayerPassiveSkillType.REPAIR_KIT)) {
-            case 1:
-                initialShield = 1;
-                break;
-            case 2:
-                initialShield = 1;
-                break;
-            case 3:
-                initialShield = 2;
-                break;
-            default:
-                initialShield = 1;
-                break;
-        }
-        waveInitialShield = initialShield;
-    }
+    private HashMap<PlayerPassiveSkillType, PassiveSkill> passiveSkills = new HashMap<>(); // < PlayerPassiveSkillType, PassiveSkill >
+    public int getPassiveSkillLevel(PlayerPassiveSkillType type) { return passiveSkills.get(type).getLevel(); }
+    public boolean isPasiveSkillMaxLevel(PlayerPassiveSkillType type) { return passiveSkills.get(type).isPasiveSkillMaxLevel(); }
+    public void upgradePassiveSkill(PlayerPassiveSkillType type) { passiveSkills.get(type).upgradePassiveSkill();}
+   
     
     private Boolean isSpeedUp = false;
     private long speedUpRatio = 2 << 16 + FixedPointUtil.ZERO_5;
@@ -196,9 +117,11 @@ public class PlayerShip extends GameCharacter{
 
         this.playerID = playerID;
 
-        for (PlayerPassiveSkillType type : PlayerPassiveSkillType.values()) {
-            passiveSkills.put(type, 0);
-        }
+        passiveSkills.put(PlayerPassiveSkillType.DAMAGE_UP,new DamageUpPassiveSkill(this));
+        passiveSkills.put(PlayerPassiveSkillType.FIRE_SPEED,new FireSpeedPassiveSkill(this));
+        passiveSkills.put(PlayerPassiveSkillType.REPAIR_KIT,new RepairKitPassiveSkill(this));
+        passiveSkills.put(PlayerPassiveSkillType.ADDITIONAL_ENGINE,new MoveSpeedUpPassiveSkill(this));
+
 
         spriteRenderer = new SpriteRenderer(gameLoop);
         spriteRenderer.setSpriteRef("sprites/ship.gif");
@@ -340,7 +263,7 @@ public class PlayerShip extends GameCharacter{
     private void tryToDoActiveSkill(long deltaTime) {
         if (activeSkill != null){
             if (isActiveSkillActable){
-                activeSkill.activate();
+                activeSkill.activate(this);
                 activeSkillActivateElapsed = -deltaTime; //* textUI 띄울 때 activeSkill.getCoolTime() 부터 보이도록 하는 용도로 -deltaTime을 할당
                 isActiveSkillActable = false;
             }

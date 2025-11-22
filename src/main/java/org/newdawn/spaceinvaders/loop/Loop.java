@@ -100,7 +100,8 @@ public abstract class Loop  {
 
 
         if(inputs != null && !inputs.isEmpty()) {
-            for (LoopInput input : inputs) {
+            ArrayList<LoopInput> currentInputs =  new ArrayList<>(inputs);
+            for (LoopInput input : currentInputs) {
                 input(input);
             }
         }

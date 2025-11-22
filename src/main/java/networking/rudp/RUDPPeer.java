@@ -122,7 +122,8 @@ public class RUDPPeer implements AutoCloseable{
         }
     }
     private boolean processPacket(PacketData packetData, Connection connection) {
-        for (IRUDPPeerListener listener : listeners) {
+        Set<IRUDPPeerListener> currentListeners = new HashSet<>(listeners);
+        for (IRUDPPeerListener listener : currentListeners) {
             // 반복문 내부의 복잡한 로직을 단일 메서드 호출로 대체
             // "처리에 실패했거나 거부했다면(!success) 즉시 중단(return false)"
             if (!notifyListener(listener, connection, packetData)) {

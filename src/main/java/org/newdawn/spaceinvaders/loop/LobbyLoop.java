@@ -104,7 +104,7 @@ public class LobbyLoop extends Loop{
         Button button = new Button(this, () -> onClickMapSelect(index), 100, 50);
 
         button.setPos(0L << 16, index * 50L << 16);
-        button.addTextRenderer(mapInfo.getTitle(), 20, Color.WHITE, 0);
+        button.addTextRenderer(" " + mapInfo.getTitle(), 20, Color.WHITE, 0);
 
         mapSelectionButtonContainer.addChild(button);
         // (필요하다면 mapSelectionButtons.add(button); 도 여기에 추가)
@@ -146,10 +146,10 @@ public class LobbyLoop extends Loop{
         // 하단 버튼 배치
         readyButton.setPos(800L << 16, 550L << 16);
         readyButton.alignment = 2;
-        readyButton.addTextRenderer("Ready", 20, Color.RED, 1);
+        readyButton.addTextRenderer("Ready ", 20, Color.RED, 1);
 
         exitButton.setPos(0L << 16, 550L << 16);
-        exitButton.addTextRenderer("나가기", 20, Color.white, 0);
+        exitButton.addTextRenderer(" 나가기", 20, Color.white, 0);
     }
 
     private void buildSceneHierarchy() {

@@ -159,7 +159,7 @@ public class LobbyListLoop extends Loop{
         // 로비 생성 버튼
         createLobbyButton.setPos(800L << 16, 550L << 16);
         createLobbyButton.alignment = 2;
-        createLobbyButton.addTextRenderer("로비 생성", 20, Color.WHITE, 0);
+        createLobbyButton.addTextRenderer("로비 생성 ", 20, Color.WHITE, 0);
 
         // 갱신 버튼
         refreshButton.setPos(400L << 16, 550L << 16);
@@ -169,7 +169,7 @@ public class LobbyListLoop extends Loop{
         // 나가기 버튼
         exitButton.setPos(0L << 16, 550L << 16);
         exitButton.alignment = 0;
-        exitButton.addTextRenderer("나가기", 20, Color.WHITE, 0);
+        exitButton.addTextRenderer(" 나가기", 20, Color.WHITE, 0);
     }
 
     @Override

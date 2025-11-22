@@ -25,27 +25,27 @@ import java.util.ArrayList;
 
 public class MainMenuLoop extends Loop {
     long t = 0L;
-    SpriteRenderer spriteRenderer;
+//    SpriteRenderer spriteRenderer;
 
     public MainMenuLoop(Game game) {
         super(game);
 
-        spriteRenderer = new SpriteRenderer(this);
-        spriteRenderer.setSpriteRef("sprites/ship.gif");
-        spriteRenderer.setPos(250L << 16, 400 << 16);
-        spriteRenderer.setRotation(37 << 16);
-        spriteRenderer.setScale(20 << 16);
-        addGameObject(spriteRenderer);
+//        spriteRenderer = new SpriteRenderer(this);
+//        spriteRenderer.setSpriteRef("sprites/ship.gif");
+//        spriteRenderer.setPos(250L << 16, 400 << 16);
+//        spriteRenderer.setRotation(37 << 16);
+//        spriteRenderer.setScale(20 << 16);
+//        addGameObject(spriteRenderer);
 
         TextRenderer titleText = new TextRenderer(this, "Space Invader", 100, Color.WHITE, 1);
         titleText.setPos(400L << 16, 0L << 16);
         titleText.alignment = 1;
         addGameObject(titleText);
 
-        TextRenderer subTitleText = new TextRenderer(this, "~총과 폭탄으로 성립하는 우주 외교~", 25, Color.WHITE, 2);
-        subTitleText.setPos(400L << 16, titleText.getPosY() + (200L << 16));
-        subTitleText.alignment = 1;
-        addGameObject(subTitleText);
+//        TextRenderer subTitleText = new TextRenderer(this, "~총과 폭탄으로 성립하는 우주 외교~", 25, Color.WHITE, 2);
+//        subTitleText.setPos(400L << 16, titleText.getPosY() + (200L << 16));
+//        subTitleText.alignment = 1;
+//        addGameObject(subTitleText);
 
         // 게임 시작 버튼
         Button startButton = new Button(this, new IButtonListener() {
@@ -54,7 +54,7 @@ public class MainMenuLoop extends Loop {
                 game.changeLoop(new LobbyListLoop(game));
             }
         }, 250, 50);
-        startButton.setPos(400L << 16, subTitleText.getPosY() + (100L << 16));
+        startButton.setPos(400L << 16, titleText.getPosY() + (300L << 16));
         startButton.alignment = 1;
         addGameObject(startButton);
         startButton.addTextRenderer("게임 시작", 25, Color.WHITE, 0);
@@ -122,11 +122,11 @@ public class MainMenuLoop extends Loop {
 
         t += getGame().fixedDeltaTime;
 
-        spriteRenderer.setRotation(
-                FixedPointUtil.fromDouble(
-                        Math.toDegrees(
-                                Math.sin(FixedPointUtil.toDouble(t) * Math.PI * 2) * Math.PI * 0.125 +
-                                        Math.PI*0.25)));
+//        spriteRenderer.setRotation(
+//                FixedPointUtil.fromDouble(
+//                        Math.toDegrees(
+//                                Math.sin(FixedPointUtil.toDouble(t) * Math.PI * 2) * Math.PI * 0.125 +
+//                                        Math.PI*0.25)));
 
         processGameObjects();
     }

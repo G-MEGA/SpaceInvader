@@ -42,8 +42,8 @@ public class MapLoader {
         storeSlotFactory = new StoreSlotFactory(gameLoop);
     }
 
-    // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public MapLoader(){
+        // Kryo 역직렬화를 위한 매개변수 없는 생성자
     }
 
     public void initEntities(){

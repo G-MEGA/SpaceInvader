@@ -10,6 +10,9 @@ public class StorePassiveItem implements IStoreItem{
 
     private PlayerPassiveSkillType type;
 
+    public StorePassiveItem(){
+        // Kryo 역직렬화를 위한 매개변수 없는 생성자
+    }
     public StorePassiveItem(PlayerPassiveSkillType type){
         this.type = type;
     }

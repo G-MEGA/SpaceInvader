@@ -8,8 +8,8 @@ import org.newdawn.spaceinvaders.loop.GameLoop;
 public class GameLoopEnemySystem {
     private GameLoop gameLoop;
 
-    // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public GameLoopEnemySystem() {
+        // Kryo 역직렬화를 위한 매개변수 없는 생성자
     }
 
     public GameLoopEnemySystem(GameLoop gameLoop) {

@@ -25,8 +25,8 @@ public class ScoreSystem {
         this.gameLoop = gameLoop;
     }
 
-    // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public ScoreSystem(){
+        // Kryo 역직렬화를 위한 매개변수 없는 생성자
     }
     
     public void requestTimeScoring(GameLoopResultType gameResult, long deltaTime){

@@ -8,8 +8,8 @@ import org.newdawn.spaceinvaders.loop.GameLoop;
 public class GameLoopPlayerShipSystem {
     private GameLoop gameLoop;
 
-    // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public GameLoopPlayerShipSystem() {
+        // Kryo 역직렬화를 위한 매개변수 없는 생성자
     }
 
     public GameLoopPlayerShipSystem(GameLoop gameLoop, int myPlayerID) {

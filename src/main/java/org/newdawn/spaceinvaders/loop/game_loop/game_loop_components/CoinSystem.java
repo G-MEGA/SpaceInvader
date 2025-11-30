@@ -5,8 +5,8 @@ import org.newdawn.spaceinvaders.loop.GameLoop;
 public class CoinSystem {
     GameLoop gameLoop;
 
-    // Kryo 역직렬화를 위한 매개변수 없는 생성자
     public CoinSystem(){
+        // Kryo 역직렬화를 위한 매개변수 없는 생성자
     }
 
     public CoinSystem(GameLoop gameLoop) {
